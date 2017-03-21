@@ -5,12 +5,18 @@
  */
 package com.kirinpatel;
 
+import com.kirinpatel.gui.Window;
+
 /**
- *
+ * Main class that will run the application.
+ * 
  * @author Kirin Patel
- * @version 0.1
+ * @version 1.0
+ * @see com.kirinpatel.gui.Window
  */
 public class Main {
+    
+    public static Window window;
     
     /**
      * Main method.
@@ -18,6 +24,6 @@ public class Main {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        
+        window = new Window("sync", 0);
     }
 }
