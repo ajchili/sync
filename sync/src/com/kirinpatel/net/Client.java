@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  *
  * @author Kirin Patel
- * @version 0.2
+ * @version 0.3
  */
 public class Client {
     
@@ -44,11 +44,11 @@ public class Client {
         } catch (IOException ex) {
             // Error handling
             System.out.println("Error stopping client. " + ex.getMessage());
-            System.exit(5);
+            System.exit(4);
         } catch (InterruptedException ex) {
             // Error handling
             System.out.println("Error stopping client. " + ex.getMessage());
-            System.exit(6);
+            System.exit(5);
         }
     }
     

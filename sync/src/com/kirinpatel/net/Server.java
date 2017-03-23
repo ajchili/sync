@@ -9,29 +9,34 @@ import com.kirinpatel.util.Message;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
  * @author Kirin Patel
- * @version 0.2
+ * @version 0.3
  */
 public class Server {
     
     private boolean isRunning = true;
     private Thread serverThread;
+    private ExecutorService executor;
     private ServerSocket service;
     private ArrayList<Socket> sockets = new ArrayList<>();
     
     public Server(int port) {
+        executor = Executors.newCachedThreadPool();
+        
         try {
             service = new ServerSocket(port);
             
             serverThread = new Thread(new ServerThread());
-            new Thread(new ServerSocketThread()).start();
             
-            serverThread.start();
+            executor.execute(serverThread);
+            executor.execute(new ServerSocketThread());
         } catch (IOException ex) {
             // Error handling
             System.out.println("Error creating server. " + ex.getMessage());
@@ -50,15 +55,15 @@ public class Server {
                 
                 service.close();
                 
-                serverThread.join();
+                executor.shutdown();
+                
+                while (!executor.isTerminated()) {
+                    
+                }
             } catch (IOException ex) {
                 // Error handling
                 System.out.println("Error closing server. " + ex.getMessage());
                 System.exit(3);
-            } catch (InterruptedException ex) {
-                // Error handling
-                System.out.println("Error closing server. " + ex.getMessage());
-                System.exit(4);
             }
         }
     }
@@ -67,21 +72,37 @@ public class Server {
 
         @Override
         public void run() {
+            Socket socket;
             ObjectInputStream input;
             ObjectOutputStream output;
+            boolean isConnected;
+            Iterator<Socket> iterator;
+            
             while(isRunning) {
-                for (Socket socket : sockets) {
+                iterator = sockets.iterator();
+                
+                while(iterator.hasNext()) {
+                    socket = iterator.next();
+                    isConnected = true;
+                    
                     try {
                         input = new ObjectInputStream(socket.getInputStream());
                         output = new ObjectOutputStream(socket.getOutputStream());
                         
-                        while(input.available() > -1) {
+                        while(input.available() > -1 && isConnected) {
                             Message message = (Message) input.readObject();
                             switch(message.getType()) {
                                 case 0:
-                                    System.out.println("(" + sockets.indexOf(socket) + ") " + socket.getInetAddress() + ": Connected!");
-                                    socket.close();
-                                    sockets.remove(socket);
+                                    switch((int) message.getMessage()) {
+                                        case 0:
+                                            System.out.println("(" + sockets.indexOf(socket) + ") " + socket.getInetAddress() + ": Disconnected!");
+                                            input.close();
+                                            output.close();
+                                            socket.close();
+                                            iterator.remove();
+                                            isConnected = false;
+                                            break;
+                                    }
                                     break;
                             }
                         }
@@ -93,7 +114,7 @@ public class Server {
                 }
                 
                 try {
-                    wait(1000);
+                    Thread.sleep(1000/30, 0);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -110,10 +131,10 @@ public class Server {
                 socket.setKeepAlive(true);
                 sockets.add(socket);
                 
-                new Thread(new Server.SocketThread(socket)).start();
+                executor.execute(new Server.SocketThread(socket));
             } catch (IOException ex) {
                 // Error handling
-                System.out.println(ex.hashCode() + " Error with server socket. " + ex.getMessage());
+                System.out.println("Error with server socket. " + ex.getMessage());
             }
         }
     }
@@ -135,7 +156,7 @@ public class Server {
                         System.out.println("(" + sockets.size() + ") " + socket.getInetAddress() + ": Connected!");
                         ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
                         output.writeObject(new Message(0, 1));
-                        new Thread(new ServerSocketThread()).start();
+                        executor.execute(new ServerSocketThread());
                         isRunning = false;
                     } catch (IOException ex) {
                         // Error handling

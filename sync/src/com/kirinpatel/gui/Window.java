@@ -14,7 +14,7 @@ import javax.swing.*;
 /**
  *
  * @author Kirin Patel
- * @version 0.2
+ * @version 0.3
  * @see com.kirinpatel.Main
  * @see com.kirinpatel.net.Server
  * @see com.kirinpatel.net.Client
@@ -117,6 +117,7 @@ public class Window extends JFrame {
             @Override
             public void componentHidden(ComponentEvent e) {
                 server.stop();
+                dispose();
                 Main.window.setVisible(true);
             }
         });
@@ -127,7 +128,14 @@ public class Window extends JFrame {
      * This method will create the client Window.
      */
     private void createClient() {
-        Client client = new Client("localhost", 12345);
+        String ipAddress = JOptionPane.showInputDialog("Please enter the server IP address.");
+        if (ipAddress == null) {
+            dispose();
+            Main.window.setVisible(true);
+            return;
+        }
+        
+        Client client = new Client(ipAddress, 12345);
         
         setSize(1280, 720);
         setMinimumSize(new Dimension(640, 480));
@@ -153,8 +161,9 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
-                Main.window.setVisible(true);
                 client.stop();
+                dispose();
+                Main.window.setVisible(true);
             }
         });
         setLocationRelativeTo(null);
