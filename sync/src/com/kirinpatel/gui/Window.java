@@ -9,12 +9,15 @@ import com.kirinpatel.Main;
 import com.kirinpatel.net.*;
 import java.awt.*;
 import java.awt.event.*;
+import javafx.application.*;
+import javafx.embed.swing.*;
+import javafx.scene.*;
 import javax.swing.*;
 
 /**
  *
  * @author Kirin Patel
- * @version 0.3
+ * @version 0.4
  * @see com.kirinpatel.Main
  * @see com.kirinpatel.net.Server
  * @see com.kirinpatel.net.Client
@@ -25,6 +28,10 @@ import javax.swing.*;
  * @see javax.awt.AbastractButton
  */
 public class Window extends JFrame {
+    
+    private boolean isRunning = false;
+    public static JTextArea textArea;
+    public static JTextField textInput;
     
     /**
      * Main constructor that will create a Window with specified title and
@@ -90,14 +97,16 @@ public class Window extends JFrame {
      * This method will create the server Window.
      */
     private void createServer() {
-        Server server = new Server(12345);
-        
         setSize(1280, 720);
         setMinimumSize(new Dimension(640, 480));
+        
+        createGUI(0);
         
         setResizable(true);
                 
         setDefaultCloseOperation(HIDE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
         addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -116,12 +125,14 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
-                server.stop();
+                isRunning = false;
                 dispose();
                 Main.window.setVisible(true);
             }
         });
-        setLocationRelativeTo(null);
+        
+        isRunning = true;
+        new Thread(new WindowThread(0)).start();
     }
     
     /**
@@ -135,14 +146,14 @@ public class Window extends JFrame {
             return;
         }
         
-        Client client = new Client(ipAddress, 12345);
-        
         setSize(1280, 720);
         setMinimumSize(new Dimension(640, 480));
         
         setResizable(true);
                 
         setDefaultCloseOperation(HIDE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
         addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -161,11 +172,134 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
-                client.stop();
+                isRunning = false;
                 dispose();
                 Main.window.setVisible(true);
             }
         });
-        setLocationRelativeTo(null);
+        
+        isRunning = true;
+        new Thread(new WindowThread(1, ipAddress)).start();
+    }
+    
+    private void createGUI(int type) {
+        setLayout(new BorderLayout());
+        
+        JFXPanel fxPanel = new JFXPanel();
+        add(fxPanel, BorderLayout.CENTER);
+        
+        JPanel interactionPanel = new JPanel(new GridLayout(3, 1));
+        JPanel statusPanel = new JPanel();
+        interactionPanel.add(statusPanel);
+        JPanel controlPanel = new JPanel();
+        interactionPanel.add(controlPanel);
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        inputPanel.setPreferredSize(new Dimension(256, 288));
+        inputPanel.setMinimumSize(new Dimension(128, 192));
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        JScrollPane scroll = new JScrollPane(textArea);
+        inputPanel.add(scroll, BorderLayout.CENTER);
+        JPanel textPanel = new JPanel(new GridLayout(1, 2));
+        textInput = new JTextField();
+        textPanel.add(textInput);
+        JButton sendMessage = new JButton("Send");
+        textPanel.add(sendMessage);
+        inputPanel.add(textPanel, BorderLayout.SOUTH);
+        interactionPanel.add(inputPanel);
+        
+        add(interactionPanel, BorderLayout.EAST);
+  
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                initFX(fxPanel);
+            }
+       });
+    }
+
+    private static void initFX(JFXPanel fxPanel) {
+        Scene scene = createScene();
+        fxPanel.setScene(scene);
+    }
+    
+    private static Scene createScene() {
+        Group root = new Group();
+        Scene scene = new Scene(root);
+
+        return (scene);
+    }
+    
+    class WindowThread implements Runnable {
+
+        private int type;
+        private String ip;
+        
+        public WindowThread(int type) {
+            this.type = type;
+        }
+        
+        public WindowThread(int type, String ip) {
+            this.type = type;
+            this.ip = ip;
+        }
+        
+        @Override
+        public void run() {
+            switch(type) {
+                case 0:
+                    Server server = null;
+                    
+                    new Thread(new ServerThread(server)).start();
+                    
+                    server = new Server();
+                    break;
+                case 1:
+                    Client client = null;
+                    
+                    new Thread(new ClientThread(client)).start();
+                    
+                    client = new Client(ip);
+                    break;
+            }
+        }
+        
+        public class ServerThread implements Runnable {
+
+            private Server server;
+
+            public ServerThread(Server server) {
+                this.server = server;
+            }
+
+            @Override
+            public void run() {
+                while(isRunning) {
+
+                }
+
+                server.stop();
+            }
+        }
+        
+        public class ClientThread implements Runnable {
+            
+            private Client client;
+            
+            public ClientThread(Client client) {
+                this.client = client;
+            }
+            
+            @Override
+            public void run() {
+                while(isRunning) {
+                    
+                }
+                
+                client.stop();
+            }
+        }
     }
 }
