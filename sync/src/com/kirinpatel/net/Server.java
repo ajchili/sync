@@ -15,11 +15,12 @@ import java.util.logging.Logger;
 /**
  *
  * @author Kirin Patel
- * @version 0.4
+ * @version 0.5
  */
 public class Server {
     
     public static int numberOfConnectedClients = 0;
+    public static String mediaURL = "";
     
     private boolean isRunning = true;
     private ExecutorService connectionExecutor;
@@ -60,6 +61,10 @@ public class Server {
                 }
             }
         }
+    }
+    
+    public void setMediaURL(String mediaURL) {
+        this.mediaURL = mediaURL;
     }
     
     public void stop() {
@@ -131,8 +136,10 @@ public class Server {
             } finally {
                 try {
                     numberOfConnectedClients--;
-                    input.close();
-                    output.close();
+                    if (input != null)
+                        input.close();
+                    if (output != null)
+                        output.close();
                     socket.close();
                 } catch (IOException ex) {
                     // Error handling
