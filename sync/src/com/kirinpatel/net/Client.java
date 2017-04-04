@@ -10,13 +10,16 @@ import java.io.*;
 import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.*;
 
 /**
  *
  * @author Kirin Patel
- * @version 0.4
+ * @version 0.5
  */
 public class Client {
+    
+    public static String mediaURL = "";
     
     private Socket socket;
     boolean isConnected = false;
@@ -42,46 +45,44 @@ public class Client {
         
         @Override
         public void run() {
-            ObjectInputStream input = null;
-            ObjectOutputStream output = null;
-            
             try {
-                output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(0, 1));
-                output.flush();
+                JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
+                messageBuilder.add("type", 0);
+                messageBuilder.add("message", 1);
+                Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
+                flush();
                 
-                while(socket.getInputStream().available() < 0) {
-                    
-                }
-                input = new ObjectInputStream(socket.getInputStream());
-                
-                Message status = (Message) input.readObject();
-                isConnected = (int) status.getMessage() == 1;
-                System.out.println(isConnected);
-                
-                while(isConnected) {
+                while (socket.getInputStream().available() < 0) {
                     
                 }
                 
-                output.writeObject(new Message(0, 0));
+                JsonObject object = Json.createReader(socket.getInputStream()).readObject();
+                if (object.getInt("type") == 0)
+                    isConnected = (object.getInt("message") == 2);
+                
+                while (isConnected) {
+                    if (socket.getInputStream().available() > 0) {
+                        object = Json.createReader(socket.getInputStream()).readObject();
+                        switch(object.getInt("type")) {
+                            case 10202:
+                                System.out.println(object);
+                                break;
+                        }
+                    }
+                }
             } catch (IOException ex) {
-                // Error handling
-                System.out.println("Error joining server. " + ex.getMessage());
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-                System.exit(0);
-            } catch (ClassNotFoundException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    input.close();
-                    output.close();
                     socket.close();
                 } catch (IOException ex) {
-                    // Error handling
-                    System.out.println("Error stopping client. " + ex.getMessage());
-                    System.exit(1);
+                    Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        }
+        
+        private void flush() throws IOException {
+            socket.getOutputStream().flush();
         }
     }
 }

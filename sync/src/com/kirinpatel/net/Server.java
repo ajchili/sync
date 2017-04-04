@@ -5,17 +5,17 @@
  */
 package com.kirinpatel.net;
 
-import com.kirinpatel.util.Message;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.json.*;
 
 /**
  *
  * @author Kirin Patel
- * @version 0.5
+ * @version 0.6
  */
 public class Server {
     
@@ -25,6 +25,7 @@ public class Server {
     private boolean isRunning = true;
     private ExecutorService connectionExecutor;
     private ServerSocket service;
+    private static boolean sendURL = false;
     
     public Server() {
         connectionExecutor = Executors.newFixedThreadPool(10);
@@ -65,6 +66,11 @@ public class Server {
     
     public void setMediaURL(String mediaURL) {
         this.mediaURL = mediaURL;
+        sendURL = true;
+    }
+    
+    public static void sendURL(boolean b) {
+        sendURL = b;
     }
     
     public void stop() {
@@ -73,7 +79,7 @@ public class Server {
     
     class ServerSocketTask implements Runnable {
         
-        private Socket socket;
+        private final Socket socket;
         
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
@@ -83,69 +89,62 @@ public class Server {
         public void run() {
             boolean hasConnected = false;
             
-            ObjectInputStream input = null;
-            ObjectOutputStream output = null;
-            
-           try {
-                while(socket.getInputStream().available() < 0) {
+            try {
+                while (socket.getInputStream().available() < 0) {
                     
                 }
-                numberOfConnectedClients++;
-                input = new ObjectInputStream(socket.getInputStream());
                 
-                Message connectionMessage = (Message) input.readObject();
+                JsonObject object = Json.createReader(socket.getInputStream()).readObject();
                 
-                if (connectionMessage.getType() == 0 && (int) connectionMessage.getMessage() == 1) {
-                    output = new ObjectOutputStream(socket.getOutputStream());
-                    output.writeObject(new Message(0, 1));
-                    output.flush();
-                    hasConnected = true;
-                    System.out.println("Client connected. (" + socket.getInetAddress() + ":" + socket.getPort() + ")");
-                }
+                if (object.getInt("type") ==  0) {
+                    hasConnected = object.getInt("message") == 1;
                     
-                while(isRunning && hasConnected) {
-                    Message message = (Message) input.readObject();
-                    switch(message.getType()) {
-                        case 0:
-                            int messageBody = (int) message.getMessage();
-                            switch(messageBody) {
-                                case 0:
-                                    hasConnected = false;
-                                    break;
-                                case 1:
-                                    System.out.println("Client connected. (" + socket.getInetAddress() + ":" + socket.getPort() + ")");
-                            }
-                            break;
-                        case 1:
-                            break;
-                        case 2:
-                            break;
-                        case 3:
-                            break;
-                        case 4:
-                            break;
+                    // Send connection message
+                    
+                    JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
+                    messageBuilder.add("type", 0);
+                    messageBuilder.add("message", 2);
+                    Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
+                    flush();
+                    
+                    // Send current media
+                    sendURL();
+                }
+                
+                while (isRunning && hasConnected) {
+                    if (socket.getInputStream().available() > 0) {
+                        
+                    }
+                    
+                    if (sendURL) {
+                        sendURL();
                     }
                 }
             } catch (IOException ex) {
-                // Error handling
-                System.out.println("Error with socket. " + ex.getMessage());
-                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                // Error handling
-                System.out.println("Error with message. " + ex.getMessage());
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    numberOfConnectedClients--;
-                    if (input != null)
-                        input.close();
-                    if (output != null)
-                        output.close();
                     socket.close();
                 } catch (IOException ex) {
-                    // Error handling
-                    System.out.println("Error closing socket. " + ex.getMessage());
+                    Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        }
+        
+        private void flush() throws IOException {
+            socket.getOutputStream().flush();
+        }
+        
+        private synchronized void sendURL() throws IOException {
+            if (!mediaURL.equals("")) {
+                JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
+                messageBuilder.add("type", 10202);
+                messageBuilder.add("message", mediaURL);
+                Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
+                flush();
+            }
+            
+            sendURL = false;
         }
     }
 }
