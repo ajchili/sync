@@ -8,10 +8,10 @@ package com.kirinpatel.util;
 import java.io.Serializable;
 
 /**
- * Message object used to send data between clients and a server.
+ * Message object used to send/comprehend data between clients and a server.
  *
  * @author Kirin Patel
- * @version 1.1
+ * @version 1.2
  */
 public class Message implements Serializable {
     
@@ -31,7 +31,7 @@ public class Message implements Serializable {
      *       10201 - String is message
      *       10202 - String is URL
      * 103 - Next object is object
-     *       10300 - Object is message
+     *       10300 - Object is Message
      * 
      * Message:
      *   TYPE 0:

@@ -20,7 +20,7 @@ import javax.swing.*;
 /**
  *
  * @author Kirin Patel
- * @version 0.6
+ * @version 0.7
  * @see com.kirinpatel.Main
  * @see com.kirinpatel.net.Server
  * @see com.kirinpatel.net.Client
@@ -28,10 +28,12 @@ import javax.swing.*;
 public class Window extends JFrame {
     
     private boolean isRunning = false;
-    private static JTextArea textArea;
-    private static JTextField textInput;
-    private JFXPanel fxPanel;
+    private static String mediaURL = "";
+    private static String message = "";
     
+    public static JTextArea textArea;
+    public static JTextField textInput;
+    private JFXPanel fxPanel;
     
     /**
      * Main constructor that will create a Window with specified title and
@@ -183,7 +185,7 @@ public class Window extends JFrame {
         });
         
         isRunning = true;
-        new Thread(new WindowThread(1, ipAddress)).start();
+        new Thread(new WindowThread(1, ipAddress, this)).start();
     }
     
     private void createGUI(int type) {
@@ -192,185 +194,146 @@ public class Window extends JFrame {
         fxPanel = new JFXPanel();
         add(fxPanel, BorderLayout.CENTER);
         
+        JPanel interactionPanel = new JPanel(new GridLayout(3, 1));
+        JPanel statusPanel = new JPanel();
+        interactionPanel.add(statusPanel);
+        JPanel controlPanel = new JPanel(new GridLayout(3, 1));
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        
         switch(type) {
             case 0:
-               /**
-                * Interaction Panel
-                */
-               JPanel interactionPanel = new JPanel(new GridLayout(3, 1));
-
-               // Sub panels
-                   /**
-                    * Status Panel
-                    */
-                   JPanel statusPanel = new JPanel();
-                   interactionPanel.add(statusPanel);
-
-                   /**
-                    * Control Panel
-                    */
-                   JPanel controlPanel = new JPanel(new GridLayout(3, 1));
-                   JTextField url = new JTextField();
-                   url.setColumns(25);
-                   JScrollPane urlScroll = new JScrollPane(url);
-                   controlPanel.add(urlScroll);
-                   JButton setVideoURL = new JButton("Set URL");
-                   setVideoURL.addActionListener(new ActionListener() {
-                       @Override
-                       public void actionPerformed(ActionEvent e) {
-                           Server.mediaURL = url.getText();
-                           Server.sendURL(true);
-                           Platform.runLater(new Runnable() {
-                               @Override
-                               public void run() {
-                                   initFX(fxPanel, 0);
-                               }
-                           });
-                       }
-                   });
-                   controlPanel.add(setVideoURL);
-                   JPanel videoControls = new JPanel(new GridLayout(1, 3));
-                   controlPanel.add(videoControls);
-                   interactionPanel.add(controlPanel);
-
-                   /**
-                    * Input Panel
-                    */
-                   JPanel inputPanel = new JPanel(new BorderLayout());
-                   inputPanel.setPreferredSize(new Dimension(256, 288));
-                   inputPanel.setMinimumSize(new Dimension(128, 192));
-                   textArea = new JTextArea();
-                   textArea.setEditable(false);
-                   textArea.setLineWrap(true);
-                   textArea.setWrapStyleWord(true);
-                   JScrollPane scroll = new JScrollPane(textArea);
-                   inputPanel.add(scroll, BorderLayout.CENTER);
-                   JPanel textPanel = new JPanel(new GridLayout(1, 2));
-                   textInput = new JTextField();
-                   textPanel.add(textInput);
-                   JButton sendMessage = new JButton("Send");
-                   textPanel.add(sendMessage);
-                   inputPanel.add(textPanel, BorderLayout.SOUTH);
-                   interactionPanel.add(inputPanel);
-
-                add(interactionPanel, BorderLayout.EAST);
+                JTextField url = new JTextField();
+                url.setColumns(25);
+                JScrollPane urlScroll = new JScrollPane(url);
+                controlPanel.add(urlScroll);
+                JButton setVideoURL = new JButton("Set URL");
+                setVideoURL.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        mediaURL = url.getText();
+                        Server.setMediaURL(mediaURL);
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                initFX(fxPanel);
+                            }
+                        });
+                    }
+                });
+                controlPanel.add(setVideoURL);
+                JPanel videoControls = new JPanel(new GridLayout(1, 3));
+                controlPanel.add(videoControls);
+                interactionPanel.add(controlPanel);
                 break;
             case 1:
                 break;
         }
+        
+        inputPanel.setPreferredSize(new Dimension(256, 288));
+        inputPanel.setMinimumSize(new Dimension(128, 192));
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        JScrollPane textScroll = new JScrollPane(textArea);
+        inputPanel.add(textScroll, BorderLayout.CENTER);
+        JPanel textPanel = new JPanel(new GridLayout(1, 2));
+        textInput = new JTextField();
+        textPanel.add(textInput);
+        JButton sendMessage = new JButton("Send");
+        sendMessage.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                switch(type) {
+                    case 0:
+                        break;
+                    case 1:
+                        break;
+                }
+            }   
+        });
+        textPanel.add(sendMessage);
+        inputPanel.add(textPanel, BorderLayout.SOUTH);
+        interactionPanel.add(inputPanel);
+
+        add(interactionPanel, BorderLayout.EAST);
   
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                initFX(fxPanel, type);
+                initFX(fxPanel);
             }
         });
     }
 
-    private static void initFX(JFXPanel fxPanel, int type) {
-        Scene scene = createScene(type);
+    private static void initFX(JFXPanel fxPanel) {
+        Scene scene = createScene();
         fxPanel.setScene(scene);
     }
     
-    private static Scene createScene(int type) {
+    // TODO: Add media controls for server side
+    private static Scene createScene() {
         Group root = new Group();
         Scene scene = new Scene(root);
         
-        switch (type) {
-            case 0:
-                if (!Server.mediaURL.equals("")) {
-                    Media media = new Media(Server.mediaURL);
-                    MediaPlayer mediaPlayer = new MediaPlayer(media);
-                    mediaPlayer.setAutoPlay(true);
-                    mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        if (!mediaURL.equals("")) {
+            Media media = new Media(mediaURL);
+            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setAutoPlay(true);
+            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
 
-                    MediaView mediaView = new MediaView(mediaPlayer);
-                    
-                    StackPane p = new StackPane();
-                    p.getChildren().add(mediaView);
-                    p.setStyle("-fx-background-color: #000000;");
-                    
-                    StackPane.setAlignment(mediaView, Pos.CENTER);
-                    scene = new Scene(p);
-                    mediaView.fitWidthProperty().bind(scene.widthProperty());
-                    mediaView.fitHeightProperty().bind(scene.heightProperty());
-                }
-                break;
-            case 1:
-                if (!Client.mediaURL.equals("")) {
-                    Media media = new Media(Server.mediaURL);
-                    MediaPlayer mediaPlayer = new MediaPlayer(media);
-                    mediaPlayer.setAutoPlay(true);
-                    mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            MediaView mediaView = new MediaView(mediaPlayer);
 
-                    MediaView mediaView = new MediaView(mediaPlayer);
-                    
-                    StackPane p = new StackPane();
-                    p.getChildren().add(mediaView);
-                    p.setStyle("-fx-background-color: #000000;");
-                    
-                    StackPane.setAlignment(mediaView, Pos.CENTER);
-                    scene = new Scene(p);
-                    mediaView.fitWidthProperty().bind(scene.widthProperty());
-                    mediaView.fitHeightProperty().bind(scene.heightProperty());
-                }
-                break;
+            StackPane p = new StackPane();
+            p.getChildren().add(mediaView);
+            p.setStyle("-fx-background-color: #000000;");
+
+            StackPane.setAlignment(mediaView, Pos.CENTER);
+            scene = new Scene(p);
+            mediaView.fitWidthProperty().bind(scene.widthProperty());
+            mediaView.fitHeightProperty().bind(scene.heightProperty());
         }
         
         return (scene);
     }
     
-    public void setMediaURL(String mediaURL, int type) {
-        switch (type) {
-            case 0:
-                Server.mediaURL = mediaURL;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        initFX(fxPanel, 0);
-                    }
-                });
-                break;
-            case 1:
-                Client.mediaURL = mediaURL;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        initFX(fxPanel, 0);
-                    }
-                });
-                break;
-        }
+    public void setMediaURL(String mediaURL) {
+        this.mediaURL = mediaURL;
+        
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                initFX(fxPanel);
+            }
+        });
     }
     
     class WindowThread implements Runnable {
 
         private int type;
+        private Window window;
         private String ip;
-        private Server server = null;
-        private Client client = null;
         
         public WindowThread(int type) {
             this.type = type;
         }
         
-        public WindowThread(int type, String ip) {
+        public WindowThread(int type, String ip, Window window) {
             this.type = type;
             this.ip = ip;
+            this.window = window;
         }
         
         @Override
         public void run() {
             switch(type) {
                 case 0:
-                    new Thread(new ServerThread(server)).start();
+                    new Thread(new ServerThread()).start();
                     
-                    server = new Server();
                     break;
                 case 1:
-                    new Thread(new ClientThread(client)).start();
-                    
-                    client = new Client(ip);
+                    new Thread(new ClientThread(ip, window)).start();
                     break;
             }
         }
@@ -379,39 +342,42 @@ public class Window extends JFrame {
 
             private Server server;
 
-            public ServerThread(Server server) {
-                this.server = server;
-            }
-
             @Override
             public void run() {
-                while(isRunning) {
-
-                }
-
+                server = new Server();
+            
                 server.stop();
             }
             
             public void setVideoUrl(String mediaURL) {
                 server.setMediaURL(mediaURL);
             }
+            
+            public void sendMessage(String message) {
+                server.sendMessage(message);
+            }
         }
         
         public class ClientThread implements Runnable {
             
             private Client client;
+            private String ip;
+            private Window window;
             
-            public ClientThread(Client client) {
-                this.client = client;
+            public ClientThread(String ip, Window window) {
+                this.ip = ip;
+                this.window = window;
             }
             
             @Override
             public void run() {
-                while(isRunning) {
-                    
-                }
+                client = new Client(ip, window);
                 
                 client.stop();
+            }
+            
+            public void sendMessage(String message) {
+                client.sendMessage(message);
             }
         }
     }

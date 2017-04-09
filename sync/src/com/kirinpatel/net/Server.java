@@ -7,25 +7,29 @@ package com.kirinpatel.net;
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 import javax.json.*;
 
 /**
  *
  * @author Kirin Patel
- * @version 0.6
+ * @version 0.7
  */
 public class Server {
     
     public static int numberOfConnectedClients = 0;
-    public static String mediaURL = "";
+    private static String mediaURL = "";
+    private String message;
     
     private boolean isRunning = true;
     private ExecutorService connectionExecutor;
     private ServerSocket service;
     private static boolean sendURL = false;
+    private static boolean sendMessage = false;
+    private static boolean sendUserMessage = false;
+    private static ArrayList<String> connectedUsers = new ArrayList<>();
     
     public Server() {
         connectionExecutor = Executors.newFixedThreadPool(10);
@@ -34,7 +38,7 @@ public class Server {
             
             Socket socket;
             
-            while(true) {
+            while(isRunning) {
                 socket = service.accept();
                 
                 connectionExecutor.execute(new ServerSocketTask(socket));
@@ -42,7 +46,7 @@ public class Server {
         } catch (IOException ex) {
             // Error handling
             System.out.println("Error creating server. " + ex.getMessage());
-            System.exit(0);
+            isRunning = false;
         } finally {
             isRunning = false;
             
@@ -64,21 +68,27 @@ public class Server {
         }
     }
     
-    public void setMediaURL(String mediaURL) {
-        this.mediaURL = mediaURL;
+    public static void setMediaURL(String mediaURL) {
+        Server.mediaURL = mediaURL;
         sendURL = true;
     }
     
-    public static void sendURL(boolean b) {
-        sendURL = b;
+    public void sendMessage(String message) {
+        if (this.message.equals(""))
+            this.message = message;
+        else 
+            this.message += "\n" + message;
+        
+        sendMessage = true;
     }
     
-    public void stop() {
+    public synchronized void stop() {
         isRunning = false;
     }
     
     class ServerSocketTask implements Runnable {
         
+        private String username;
         private final Socket socket;
         
         public ServerSocketTask(Socket socket) {
@@ -90,14 +100,13 @@ public class Server {
             boolean hasConnected = false;
             
             try {
-                while (socket.getInputStream().available() < 0) {
-                    
-                }
+                waitForMessage();
                 
                 JsonObject object = Json.createReader(socket.getInputStream()).readObject();
                 
                 if (object.getInt("type") ==  0) {
                     hasConnected = object.getInt("message") == 1;
+                    numberOfConnectedClients++;
                     
                     // Send connection message
                     
@@ -113,17 +122,41 @@ public class Server {
                 
                 while (isRunning && hasConnected) {
                     if (socket.getInputStream().available() > 0) {
-                        
+                        object = Json.createReader(socket.getInputStream()).readObject();
+                        switch(object.getInt("type")) {
+                            case 0:
+                                switch(object.getInt("message")) {
+                                    case 0:
+                                        numberOfConnectedClients--;
+                                        break;
+                                }
+                                break;
+                            case 10200:
+                                username = object.getString("message");
+                                connectedUsers.add(username);
+                                break;
+                            case 10201:
+                                sendMessage(object.getString("message"));
+                                break;
+                            default:
+                                System.out.println(object);
+                                break;
+                        }
                     }
                     
-                    if (sendURL) {
+                    if (sendURL)
                         sendURL();
+                    
+                    if (sendMessage) {
+                        
                     }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
+                    numberOfConnectedClients--;
+                    connectedUsers.remove(username);
                     socket.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
@@ -131,7 +164,13 @@ public class Server {
             }
         }
         
-        private void flush() throws IOException {
+        private void waitForMessage() throws IOException {
+            while (socket.getInputStream().available() < 0) {
+                    
+            }
+        }
+        
+        private synchronized void flush() throws IOException {
             socket.getOutputStream().flush();
         }
         
