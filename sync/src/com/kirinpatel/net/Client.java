@@ -15,19 +15,19 @@ import javax.json.*;
 /**
  *
  * @author Kirin Patel
- * @version 0.6
+ * @version 0.7
  */
 public class Client {
     
-    private String message;
+    private String username;
     
     private Socket socket;
     private Window window;
     private boolean isConnected = false;
-    private boolean sendMessage;
     
     public Client(String ip, Window window) {
         this.window = window;
+        username = System.getProperty("user.name");
         
         try {
             socket = new Socket(ip, 8000);
@@ -39,11 +39,6 @@ public class Client {
             System.out.println("Error joining server. " + ex.getMessage());
             stop();
         }
-    }
-    
-    public void sendMessage(String message) {
-        this.message = message;
-        sendMessage = true;
     }
     
     public synchronized void stop() {
@@ -72,7 +67,7 @@ public class Client {
                         object = Json.createReader(socket.getInputStream()).readObject();
                         switch(object.getInt("type")) {
                             case 10201:
-                                displayMessage(object.getString("message"));
+                                // Recieved message
                                 break;
                             case 10202:
                                 setMediaURL(object.getString("message"));
@@ -82,9 +77,6 @@ public class Client {
                                 break;
                         }
                     }
-                    
-                    if (sendMessage)
-                        sendMessage(message);
                 }
                 
                 disconnectFromServer();
@@ -129,18 +121,6 @@ public class Client {
             messageBuilder.add("message", System.getProperty("user.name"));
             Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
             flush();
-        }
-        
-        private synchronized void sendMessage(String message) throws IOException {
-            JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
-            messageBuilder.add("type", 10201);
-            messageBuilder.add("message", System.getProperty("user.name") + ": " + message);
-            Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
-            flush();
-        }
-        
-        private synchronized void displayMessage(String message) {
-            window.textArea.append(message);
         }
     }
 }

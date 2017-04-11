@@ -5,9 +5,9 @@
  */
 package com.kirinpatel.net;
 
+import com.kirinpatel.gui.Window;
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
 import javax.json.*;
@@ -15,24 +15,23 @@ import javax.json.*;
 /**
  *
  * @author Kirin Patel
- * @version 0.7
+ * @version 0.8
  */
 public class Server {
     
-    public static int numberOfConnectedClients = 0;
     private static String mediaURL = "";
     private String message;
     
     private boolean isRunning = true;
+    private Window window;
     private ExecutorService connectionExecutor;
     private ServerSocket service;
     private static boolean sendURL = false;
-    private static boolean sendMessage = false;
-    private static boolean sendUserMessage = false;
-    private static ArrayList<String> connectedUsers = new ArrayList<>();
     
-    public Server() {
+    public Server(Window window) {
+        this.window = window;
         connectionExecutor = Executors.newFixedThreadPool(10);
+        
         try {
             service = new ServerSocket(8000);
             
@@ -73,22 +72,12 @@ public class Server {
         sendURL = true;
     }
     
-    public void sendMessage(String message) {
-        if (this.message.equals(""))
-            this.message = message;
-        else 
-            this.message += "\n" + message;
-        
-        sendMessage = true;
-    }
-    
     public synchronized void stop() {
         isRunning = false;
     }
     
     class ServerSocketTask implements Runnable {
         
-        private String username;
         private final Socket socket;
         
         public ServerSocketTask(Socket socket) {
@@ -106,10 +95,8 @@ public class Server {
                 
                 if (object.getInt("type") ==  0) {
                     hasConnected = object.getInt("message") == 1;
-                    numberOfConnectedClients++;
                     
                     // Send connection message
-                    
                     JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
                     messageBuilder.add("type", 0);
                     messageBuilder.add("message", 2);
@@ -127,16 +114,12 @@ public class Server {
                             case 0:
                                 switch(object.getInt("message")) {
                                     case 0:
-                                        numberOfConnectedClients--;
+                                        // User disconnected
                                         break;
                                 }
                                 break;
-                            case 10200:
-                                username = object.getString("message");
-                                connectedUsers.add(username);
-                                break;
                             case 10201:
-                                sendMessage(object.getString("message"));
+                                // Recieved message
                                 break;
                             default:
                                 System.out.println(object);
@@ -146,17 +129,11 @@ public class Server {
                     
                     if (sendURL)
                         sendURL();
-                    
-                    if (sendMessage) {
-                        
-                    }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    numberOfConnectedClients--;
-                    connectedUsers.remove(username);
                     socket.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);

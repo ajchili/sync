@@ -20,7 +20,7 @@ import javax.swing.*;
 /**
  *
  * @author Kirin Patel
- * @version 0.7
+ * @version 0.8
  * @see com.kirinpatel.Main
  * @see com.kirinpatel.net.Server
  * @see com.kirinpatel.net.Client
@@ -245,11 +245,15 @@ public class Window extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                switch(type) {
-                    case 0:
-                        break;
-                    case 1:
-                        break;
+                if (!textInput.getText().equals("")) {
+                    switch(type) {
+                        case 0:
+                            break;
+                        case 1:
+                            break;
+                    }
+                    
+                    textInput.setText("");
                 }
             }   
         });
@@ -284,7 +288,6 @@ public class Window extends JFrame {
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
 
             MediaView mediaView = new MediaView(mediaPlayer);
-
             StackPane p = new StackPane();
             p.getChildren().add(mediaView);
             p.setStyle("-fx-background-color: #000000;");
@@ -309,6 +312,10 @@ public class Window extends JFrame {
         });
     }
     
+    public void addMessage(String message) {
+        textArea.append(message);
+    }
+    
     class WindowThread implements Runnable {
 
         private int type;
@@ -329,7 +336,7 @@ public class Window extends JFrame {
         public void run() {
             switch(type) {
                 case 0:
-                    new Thread(new ServerThread()).start();
+                    new Thread(new ServerThread(window)).start();
                     
                     break;
                 case 1:
@@ -341,20 +348,21 @@ public class Window extends JFrame {
         public class ServerThread implements Runnable {
 
             private Server server;
+            private Window window;
+            
+            public ServerThread(Window window) {
+                this.window = window;
+            }
 
             @Override
             public void run() {
-                server = new Server();
+                server = new Server(window);
             
                 server.stop();
             }
             
             public void setVideoUrl(String mediaURL) {
                 server.setMediaURL(mediaURL);
-            }
-            
-            public void sendMessage(String message) {
-                server.sendMessage(message);
             }
         }
         
@@ -374,10 +382,6 @@ public class Window extends JFrame {
                 client = new Client(ip, window);
                 
                 client.stop();
-            }
-            
-            public void sendMessage(String message) {
-                client.sendMessage(message);
             }
         }
     }
