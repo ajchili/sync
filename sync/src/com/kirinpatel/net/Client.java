@@ -20,6 +20,8 @@ import javax.json.*;
 public class Client {
     
     private String username;
+    private String message;
+    private boolean sendMessage;
     
     private Socket socket;
     private Window window;
@@ -41,20 +43,22 @@ public class Client {
         }
     }
     
-    public synchronized void stop() {
+    public void stop() {
         isConnected = false;
     }
     
-    private class ClientThread implements Runnable {
-        
+    public void sendMessage(String message) {
+        this.message = message;
+        sendMessage = true;
+    }
+    
+    class ClientThread implements Runnable {
+       
         @Override
         public void run() {
             try {
                 connectToServer();
-                
-                while (socket.getInputStream().available() < 0) {
-                    
-                }
+                waitForMessage();
                 
                 JsonObject object = Json.createReader(socket.getInputStream()).readObject();
                 if (object.getInt("type") == 0)
@@ -68,8 +72,10 @@ public class Client {
                         switch(object.getInt("type")) {
                             case 10201:
                                 // Recieved message
+                                window.addMessage(object.getString("message"));
                                 break;
                             case 10202:
+                                // Recieve url
                                 setMediaURL(object.getString("message"));
                                 break;
                             default:
@@ -77,6 +83,9 @@ public class Client {
                                 break;
                         }
                     }
+                    
+                    if (sendMessage)
+                        sendMessage();
                 }
                 
                 disconnectFromServer();
@@ -93,6 +102,12 @@ public class Client {
         
         private synchronized void flush() throws IOException {
             socket.getOutputStream().flush();
+        }
+        
+        private synchronized void waitForMessage() throws IOException {
+            while (socket.getInputStream().available() < 0 && isConnected) {
+            
+            }
         }
         
         private synchronized void connectToServer() throws IOException {
@@ -118,7 +133,16 @@ public class Client {
         private synchronized void sendUsername() throws IOException {
             JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
             messageBuilder.add("type", 10200);
-            messageBuilder.add("message", System.getProperty("user.name"));
+            messageBuilder.add("message", username);
+            Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
+            flush();
+        }
+        
+        private synchronized void sendMessage() throws IOException {
+            sendMessage = false;
+            JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
+            messageBuilder.add("type", 10201);
+            messageBuilder.add("message", message);
             Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
             flush();
         }

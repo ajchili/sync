@@ -21,6 +21,7 @@ public class Server {
     
     private static String mediaURL = "";
     private String message;
+    private boolean sendMessage;
     
     private boolean isRunning = true;
     private Window window;
@@ -34,6 +35,7 @@ public class Server {
         
         try {
             service = new ServerSocket(8000);
+            service.setReuseAddress(true);
             
             Socket socket;
             
@@ -45,26 +47,32 @@ public class Server {
         } catch (IOException ex) {
             // Error handling
             System.out.println("Error creating server. " + ex.getMessage());
-            isRunning = false;
         } finally {
             isRunning = false;
             
-            if (!service.isClosed()) {
-                try {
-                    service.close();
+            if (service != null)
+                if (!service.isClosed())
+                    try {
+                        service.close();
+                        
+                        connectionExecutor.shutdown();
 
-                    connectionExecutor.shutdown();
-
-                    while (!connectionExecutor.isTerminated()) {
-
+                        while (!connectionExecutor.isTerminated()) {
+                        
+                        }
+                    } catch (IOException ex) {
+                        // Error handling
+                        System.out.println("Error closing server. " + ex.getMessage());
+                        System.exit(1);
                     }
-                } catch (IOException ex) {
-                    // Error handling
-                    System.out.println("Error closing server. " + ex.getMessage());
-                    System.exit(1);
-                }
-            }
         }
+    }
+    
+    /**
+     * Stops server.
+     */
+    public void stop() {
+        isRunning = false;
     }
     
     public static void setMediaURL(String mediaURL) {
@@ -72,12 +80,32 @@ public class Server {
         sendURL = true;
     }
     
-    public synchronized void stop() {
-        isRunning = false;
+    public void sendMessage(String message) {
+        this.message = message;
+        sendMessage = true;
+    }
+    
+    class ServerTask implements Runnable {
+        
+        @Override
+        public void run() {
+            Socket socket;
+            
+            try {
+                while(isRunning) {
+                    socket = service.accept();
+
+                    connectionExecutor.execute(new ServerSocketTask(socket));
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     class ServerSocketTask implements Runnable {
         
+        private String username;
         private final Socket socket;
         
         public ServerSocketTask(Socket socket) {
@@ -118,8 +146,11 @@ public class Server {
                                         break;
                                 }
                                 break;
+                            case 10200:
+                                username = object.getString("message");
                             case 10201:
                                 // Recieved message
+                                sendMessage(username + ": " + object.getString("message") + "\n");
                                 break;
                             default:
                                 System.out.println(object);
@@ -129,21 +160,25 @@ public class Server {
                     
                     if (sendURL)
                         sendURL();
+                    
+                    if (sendMessage)
+                        sendMessage(System.getProperty("user.name") + ": " + message + "\n");
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
             } finally {
                 try {
-                    socket.close();
+                    if (socket != null)
+                        socket.close();
                 } catch (IOException ex) {
                     Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
         
-        private void waitForMessage() throws IOException {
-            while (socket.getInputStream().available() < 0) {
-                    
+        private synchronized void waitForMessage() throws IOException {
+            while (socket.getInputStream().available() < 0 && isRunning) {
+            
             }
         }
         
@@ -161,6 +196,19 @@ public class Server {
             }
             
             sendURL = false;
+        }
+        
+        private synchronized void sendMessage(String message) throws IOException {
+            if (sendMessage)
+                sendMessage = false;
+            
+            JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
+            messageBuilder.add("type", 10201);
+            messageBuilder.add("message", message);
+            Json.createWriter(socket.getOutputStream()).writeObject(messageBuilder.build());
+            flush();
+            
+            window.addMessage(message);
         }
     }
 }

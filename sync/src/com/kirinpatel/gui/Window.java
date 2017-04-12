@@ -20,16 +20,17 @@ import javax.swing.*;
 /**
  *
  * @author Kirin Patel
- * @version 0.8
+ * @version 0.9
  * @see com.kirinpatel.Main
  * @see com.kirinpatel.net.Server
  * @see com.kirinpatel.net.Client
  */
 public class Window extends JFrame {
     
-    private boolean isRunning = false;
+    private static Server server;
+    private static Client client;
+    
     private static String mediaURL = "";
-    private static String message = "";
     
     public static JTextArea textArea;
     public static JTextField textInput;
@@ -128,14 +129,12 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
-                isRunning = false;
                 dispose();
                 Main.window.setVisible(true);
             }
         });
         
-        isRunning = true;
-        new Thread(new WindowThread(0)).start();
+        new Thread(new WindowThread(0, this)).start();
     }
     
     /**
@@ -178,13 +177,11 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
-                isRunning = false;
                 dispose();
                 Main.window.setVisible(true);
             }
         });
         
-        isRunning = true;
         new Thread(new WindowThread(1, ipAddress, this)).start();
     }
     
@@ -226,6 +223,7 @@ public class Window extends JFrame {
                 interactionPanel.add(controlPanel);
                 break;
             case 1:
+                interactionPanel.add(new JPanel());
                 break;
         }
         
@@ -248,8 +246,12 @@ public class Window extends JFrame {
                 if (!textInput.getText().equals("")) {
                     switch(type) {
                         case 0:
+                            server.sendMessage(textInput.getText());
+                            textInput.setText("");
                             break;
                         case 1:
+                            client.sendMessage(textInput.getText());
+                            textInput.setText("");
                             break;
                     }
                     
@@ -322,8 +324,9 @@ public class Window extends JFrame {
         private Window window;
         private String ip;
         
-        public WindowThread(int type) {
+        public WindowThread(int type, Window window) {
             this.type = type;
+            this.window = window;
         }
         
         public WindowThread(int type, String ip, Window window) {
@@ -337,7 +340,6 @@ public class Window extends JFrame {
             switch(type) {
                 case 0:
                     new Thread(new ServerThread(window)).start();
-                    
                     break;
                 case 1:
                     new Thread(new ClientThread(ip, window)).start();
@@ -347,7 +349,6 @@ public class Window extends JFrame {
         
         public class ServerThread implements Runnable {
 
-            private Server server;
             private Window window;
             
             public ServerThread(Window window) {
@@ -357,7 +358,7 @@ public class Window extends JFrame {
             @Override
             public void run() {
                 server = new Server(window);
-            
+                
                 server.stop();
             }
             
@@ -368,7 +369,6 @@ public class Window extends JFrame {
         
         public class ClientThread implements Runnable {
             
-            private Client client;
             private String ip;
             private Window window;
             
