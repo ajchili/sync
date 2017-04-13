@@ -129,6 +129,7 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
+                server.stop();
                 dispose();
                 Main.window.setVisible(true);
             }
@@ -177,6 +178,7 @@ public class Window extends JFrame {
 
             @Override
             public void componentHidden(ComponentEvent e) {
+                client.stop();
                 dispose();
                 Main.window.setVisible(true);
             }
@@ -358,8 +360,6 @@ public class Window extends JFrame {
             @Override
             public void run() {
                 server = new Server(window);
-                
-                server.stop();
             }
             
             public void setVideoUrl(String mediaURL) {
@@ -380,8 +380,6 @@ public class Window extends JFrame {
             @Override
             public void run() {
                 client = new Client(ip, window);
-                
-                client.stop();
             }
         }
     }

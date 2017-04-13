@@ -29,43 +29,15 @@ public class Server {
     private ServerSocket service;
     private static boolean sendURL = false;
     
+    /**
+     * Main constructor that will setup the server with the provided GUI Window.
+     * 
+     * @param window GUI Window
+     */
     public Server(Window window) {
         this.window = window;
-        connectionExecutor = Executors.newFixedThreadPool(10);
         
-        try {
-            service = new ServerSocket(8000);
-            service.setReuseAddress(true);
-            
-            Socket socket;
-            
-            while(isRunning) {
-                socket = service.accept();
-                
-                connectionExecutor.execute(new ServerSocketTask(socket));
-            }
-        } catch (IOException ex) {
-            // Error handling
-            System.out.println("Error creating server. " + ex.getMessage());
-        } finally {
-            isRunning = false;
-            
-            if (service != null)
-                if (!service.isClosed())
-                    try {
-                        service.close();
-                        
-                        connectionExecutor.shutdown();
-
-                        while (!connectionExecutor.isTerminated()) {
-                        
-                        }
-                    } catch (IOException ex) {
-                        // Error handling
-                        System.out.println("Error closing server. " + ex.getMessage());
-                        System.exit(1);
-                    }
-        }
+        new Thread(new ServerTask()).start();
     }
     
     /**
@@ -75,43 +47,95 @@ public class Server {
         isRunning = false;
     }
     
+    /**
+     * Send mediaURL to clients.
+     * 
+     * @param mediaURL Media URL
+     */
     public static void setMediaURL(String mediaURL) {
         Server.mediaURL = mediaURL;
         sendURL = true;
     }
     
+    /**
+     * Send message to clients.
+     * 
+     * @param message 
+     */
     public void sendMessage(String message) {
         this.message = message;
         sendMessage = true;
     }
     
+    /**
+     * 
+     */
     class ServerTask implements Runnable {
         
+        /**
+         * 
+         */
         @Override
         public void run() {
-            Socket socket;
-            
+            connectionExecutor = Executors.newFixedThreadPool(10);
+        
             try {
+                service = new ServerSocket(8000);
+                service.setReuseAddress(true);
+                
+                Socket socket;
+                
+                System.out.println("test" + isRunning);
                 while(isRunning) {
+                    System.out.println("test");
                     socket = service.accept();
 
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
             } catch (IOException ex) {
-                Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+                // Error handling
+                System.out.println("Error creating server. " + ex.getMessage());
+            } finally {
+                if (service != null)
+                    if (!service.isClosed())
+                        try {
+                            service.close();
+
+                            connectionExecutor.shutdown();
+
+                            while (!connectionExecutor.isTerminated()) {
+
+                            }
+                        } catch (IOException ex) {
+                            // Error handling
+                            System.out.println("Error closing server. " + ex.getMessage());
+                            System.exit(1);
+                        }
             }
         }
     }
     
+    /**
+     * Thread that will handle all communication between clients and server.
+     */
     class ServerSocketTask implements Runnable {
         
         private String username;
         private final Socket socket;
         
+        /**
+         * Main constructor that will establish a connection between a client
+         * and the server for communication.
+         * 
+         * @param socket Socket that a client has connected with
+         */
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
         }
         
+        /**
+         * 
+         */
         @Override
         public void run() {
             boolean hasConnected = false;
@@ -176,16 +200,31 @@ public class Server {
             }
         }
         
+        /**
+         * Waits for message from client.
+         * 
+         * @throws IOException
+         */
         private synchronized void waitForMessage() throws IOException {
             while (socket.getInputStream().available() < 0 && isRunning) {
             
             }
         }
         
+        /**
+         * Flushes output stream to client.
+         * 
+         * @throws IOException 
+         */
         private synchronized void flush() throws IOException {
             socket.getOutputStream().flush();
         }
         
+        /**
+         * Sends mediaURL to client.
+         * 
+         * @throws IOException 
+         */
         private synchronized void sendURL() throws IOException {
             if (!mediaURL.equals("")) {
                 JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
@@ -198,6 +237,12 @@ public class Server {
             sendURL = false;
         }
         
+        /**
+         * Sends message to client.
+         * 
+         * @param message Message
+         * @throws IOException 
+         */
         private synchronized void sendMessage(String message) throws IOException {
             if (sendMessage)
                 sendMessage = false;
