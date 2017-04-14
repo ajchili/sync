@@ -16,9 +16,11 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
+ * This class will run the server. All communications, UI elements, and server
+ * actions are carried out through this class.
  *
  * @author Kirin Patel
- * @version 0.1.0
+ * @version 0.1.1
  */
 public class Server extends JFrame {
     
@@ -116,7 +118,7 @@ public class Server extends JFrame {
     /**
      * Stops server.
      */
-    public void stop() {
+    private void stop() {
         dispose();
         isRunning = false;
     }
@@ -124,7 +126,7 @@ public class Server extends JFrame {
     /**
      * Sets mediaURL for server and client.
      */
-    public static void setMediaURL() {
+    private static void setMediaURL() {
         sendURL = true;
     }
     
@@ -191,7 +193,8 @@ public class Server extends JFrame {
     class ServerTask implements Runnable {
         
         /**
-         * 
+         * This method will run the startup and maintenance code of the server on
+         * a separate thread.
          */
         @Override
         public void run() {
@@ -250,7 +253,7 @@ public class Server extends JFrame {
         }
         
         /**
-         * 
+         * This method will run the client and server communication code.
          */
         @Override
         public void run() {

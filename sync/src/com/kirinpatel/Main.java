@@ -16,7 +16,7 @@ import javax.swing.*;
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.0.0
+ * @version 2.0.1
  */
 public class Main extends JFrame {
     
@@ -94,7 +94,7 @@ public class Main extends JFrame {
                     String ipAddress = UIMessage.getInput("sync", "Please enter the ip address of the server.");
                     if (ipAddress == null) {
                         setVisible(true);
-                        return;
+                        break;
                     }
                     
                     new Client("sync - Client", ipAddress);

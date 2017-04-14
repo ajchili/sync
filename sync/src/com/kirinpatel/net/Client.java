@@ -16,9 +16,11 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
- *
+ * This class will run the client. All communications, UI elements, and client
+ * actions are carried out through this class.
+ * 
  * @author Kirin Patel
- * @version 0.1.0
+ * @version 0.1.1
  */
 public class Client extends JFrame {
     
@@ -34,6 +36,12 @@ public class Client extends JFrame {
     
     private boolean isConnected = false;
     
+    /**
+     * Main constructor that will setup the client.
+     * 
+     * @param title Title
+     * @param ip IP Address
+     */
     public Client(String title, String ip) {
         super(title);
         this.ip = ip;
@@ -91,11 +99,19 @@ public class Client extends JFrame {
         setVisible(true);
     }
     
-    public void stop() {
+    /**
+     * Stops client.
+     */
+    private void stop() {
         isConnected = false;
     }
     
-    public void sendMessage(String message) {
+    /**
+     * Sends message to server.
+     * 
+     * @param message Message
+     */
+    private void sendMessage(String message) {
         this.message = message;
         sendMessage = true;
     }
@@ -146,8 +162,16 @@ public class Client extends JFrame {
         }
     }
     
+    /**
+     * This class handles the establishment of connections between a client and
+     * a server.
+     */
     class ClientTask implements Runnable {
         
+        /**
+         * This method will run the startup code of the client on a separate
+         * thread.
+         */
         @Override
         public void run() {
             username = System.getProperty("user.name");
@@ -165,8 +189,14 @@ public class Client extends JFrame {
         }
     }
     
+    /**
+     * This class will handle all communication between clients and server.
+     */
     class ClientThread implements Runnable {
        
+        /**
+         * This method will run the client and server communication code.
+         */
         @Override
         public void run() {
             try {
@@ -213,16 +243,31 @@ public class Client extends JFrame {
             }
         }
         
-        private synchronized void flush() throws IOException {
-            socket.getOutputStream().flush();
-        }
-        
+        /**
+         * Waits for message from client.
+         * 
+         * @throws IOException
+         */
         private synchronized void waitForMessage() throws IOException {
             while (socket.getInputStream().available() < 0 && isConnected) {
             
             }
         }
         
+        /**
+         * Flushes output stream to client.
+         * 
+         * @throws IOException 
+         */
+        private synchronized void flush() throws IOException {
+            socket.getOutputStream().flush();
+        }
+        
+        /**
+         * Connects client to server.
+         * 
+         * @throws IOException 
+         */
         private synchronized void connectToServer() throws IOException {
             JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
             messageBuilder.add("type", 0);
@@ -231,6 +276,11 @@ public class Client extends JFrame {
             flush();
         }
         
+        /**
+         * Disconnects client from server.
+         * 
+         * @throws IOException 
+         */
         private synchronized void disconnectFromServer() throws IOException {
             JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
             messageBuilder.add("type", 0);
@@ -239,10 +289,20 @@ public class Client extends JFrame {
             flush();
         }
         
+        /**
+         * Sets the client media URL.
+         * 
+         * @param mediaURL Media URL
+         */
         private synchronized void setMediaURL(String mediaURL) {
             mediaPanel.setMedia(mediaURL);
         }
         
+        /**
+         * Sends the system username of connected client to the server.
+         * 
+         * @throws IOException 
+         */
         private synchronized void sendUsername() throws IOException {
             JsonObjectBuilder messageBuilder = Json.createObjectBuilder();
             messageBuilder.add("type", 10200);
@@ -251,6 +311,11 @@ public class Client extends JFrame {
             flush();
         }
         
+        /**
+         * Sends a message from the client to the server.
+         * 
+         * @throws IOException 
+         */
         private synchronized void sendMessage() throws IOException {
             sendMessage = false;
             JsonObjectBuilder messageBuilder = Json.createObjectBuilder();

@@ -16,14 +16,19 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 
 /**
+ * This class will create a media view. This view will allow for playback of
+ * .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.1
+ * @version 0.0.2
  */
 public class MediaPanel extends JFXPanel {
     
     private String mediaURL = "";
     
+    /**
+     * Main constructor that will initialize the MediaPanel.
+     */
     public MediaPanel() {
         Platform.runLater(new Runnable() {
             @Override
@@ -32,12 +37,36 @@ public class MediaPanel extends JFXPanel {
             }
         });
     }
+    
+    /**
+     * Secondary constructor that will initialize the MediaPanel with a
+     * specified URL.
+     * 
+     * @param url Media URL
+     */
+    public MediaPanel(String url) {
+        this.mediaURL = url;
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                initFX();
+            }
+        });
+    }
 
+    /**
+     * Initializes the FX panel.
+     */
     private void initFX() {
         Scene scene = createScene();
         setScene(scene);
     }
     
+    /**
+     * Creates the FX scene.
+     * 
+     * @return Returns the scene.
+     */
     private Scene createScene() {
         Group root = new Group();
         Scene scene = new Scene(root);
@@ -62,16 +91,6 @@ public class MediaPanel extends JFXPanel {
         return (scene);
     }
     
-    public MediaPanel(String url) {
-        this.mediaURL = url;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX();
-            }
-        });
-    }
-    
     /**
      * Sets the media URL of the MediaPanel.
      * 
@@ -87,22 +106,39 @@ public class MediaPanel extends JFXPanel {
         });
     }
     
+    /**
+     * Plays media.
+     */
     public void play() {
         
     }
     
+    /**
+     * Stops media.
+     */
     public void stop() {
         
     }
     
+    /**
+     * Pauses media.
+     */
     public void pause() {
         
     }
     
+    /**
+     * Resumes media.
+     */
     public void resume() {
         
     }
     
+    /**
+     * Seeks to specified time in media for playback.
+     * 
+     * @param millisecond Time in milliseconds
+     */
     public void seek(int millisecond) {
         
     }
