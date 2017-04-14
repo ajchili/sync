@@ -5,42 +5,90 @@
  */
 package com.kirinpatel.net;
 
-import com.kirinpatel.gui.Window;
+import com.kirinpatel.gui.MediaPanel;
 import java.io.*;
 import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.json.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
 /**
  *
  * @author Kirin Patel
- * @version 0.7
+ * @version 0.1.0
  */
-public class Client {
+public class Client extends JFrame {
+    
+    private Socket socket;
+    private MediaPanel mediaPanel;
+    public static JTextArea textArea;
+    public static JTextField textInput;
     
     private String username;
     private String message;
+    private String ip;
     private boolean sendMessage;
     
-    private Socket socket;
-    private Window window;
     private boolean isConnected = false;
     
-    public Client(String ip, Window window) {
-        this.window = window;
-        username = System.getProperty("user.name");
+    public Client(String title, String ip) {
+        super(title);
+        this.ip = ip;
         
-        try {
-            socket = new Socket(ip, 8000);
-            socket.setKeepAlive(true);
-            
-            new Thread(new ClientThread()).start();
-        } catch (IOException ex) {
-            // Error handling
-            System.out.println("Error joining server. " + ex.getMessage());
-            stop();
-        }
+        setSize(1280, 720);
+        setMinimumSize(new Dimension(640, 480));
+        setMaximumSize(new Dimension(1280, 720));
+        setResizable(true);
+        setDefaultCloseOperation(HIDE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        addComponentListener(new ClientComponentListener());
+        
+        mediaPanel = new MediaPanel();
+        add(mediaPanel, BorderLayout.CENTER);
+        
+        JPanel interactionPanel = new JPanel(new GridLayout(3, 1));
+        JPanel statusPanel = new JPanel();
+        interactionPanel.add(statusPanel);
+        JPanel controlPanel = new JPanel(new GridLayout(3, 1));
+        JPanel inputPanel = new JPanel(new BorderLayout());
+        
+        interactionPanel.add(controlPanel);
+        
+        inputPanel.setPreferredSize(new Dimension(256, 288));
+        inputPanel.setMinimumSize(new Dimension(128, 192));
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        JScrollPane textScroll = new JScrollPane(textArea);
+        inputPanel.add(textScroll, BorderLayout.CENTER);
+        JPanel textPanel = new JPanel(new GridLayout(1, 2));
+        textInput = new JTextField();
+        textPanel.add(textInput);
+        JButton send = new JButton("Send");
+        send.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!textInput.getText().equals("")) {
+                    message = textInput.getText();
+                    sendMessage = true;
+                    textInput.setText("");
+                }
+            }   
+        });
+        textPanel.add(send);
+        inputPanel.add(textPanel, BorderLayout.SOUTH);
+        interactionPanel.add(inputPanel);
+
+        add(interactionPanel, BorderLayout.EAST);
+        
+        new Thread(new ClientTask()).start();
+        
+        setVisible(true);
     }
     
     public void stop() {
@@ -50,6 +98,71 @@ public class Client {
     public void sendMessage(String message) {
         this.message = message;
         sendMessage = true;
+    }
+    
+    /**
+     * Custom ComponentListener that will be used to handle client GUI events.
+     */
+    class ClientComponentListener implements ComponentListener {
+
+        /**
+         * Unsupported.
+         * 
+         * @param e ComponentEvent
+         */
+        @Override
+        public void componentResized(ComponentEvent e) {
+            // Not supported
+        }
+
+        /**
+         * Unsupported.
+         * 
+         * @param e ComponentEvent
+         */
+        @Override
+        public void componentMoved(ComponentEvent e) {
+            // Not supported
+        }
+
+        /**
+         * Unsupported.
+         * 
+         * @param e ComponentEvent
+         */
+        @Override
+        public void componentShown(ComponentEvent e) {
+            // Not supported
+        }
+
+        /**
+         * Stop server on hide.
+         * 
+         * @param e ComponentEvent
+         */
+        @Override
+        public void componentHidden(ComponentEvent e) {
+            stop();
+        }
+    }
+    
+    class ClientTask implements Runnable {
+        
+        @Override
+        public void run() {
+            username = System.getProperty("user.name");
+
+            try {
+                socket = new Socket(ip, 8000);
+                socket.setKeepAlive(true);
+
+                new Thread(new ClientThread()).start();
+            } catch (IOException ex) {
+                // Error handling
+                System.out.println("Error joining server. " + ex.getMessage());
+                stop();
+            }
+        }
     }
     
     class ClientThread implements Runnable {
@@ -72,7 +185,7 @@ public class Client {
                         switch(object.getInt("type")) {
                             case 10201:
                                 // Recieved message
-                                window.addMessage(object.getString("message"));
+                                textArea.append(object.getString("message"));
                                 break;
                             case 10202:
                                 // Recieve url
@@ -127,7 +240,7 @@ public class Client {
         }
         
         private synchronized void setMediaURL(String mediaURL) {
-            window.setMediaURL(mediaURL);
+            mediaPanel.setMedia(mediaURL);
         }
         
         private synchronized void sendUsername() throws IOException {
