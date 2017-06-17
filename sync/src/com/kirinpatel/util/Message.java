@@ -11,7 +11,7 @@ import java.io.Serializable;
  * Message object used to send/comprehend data between clients and a server.
  *
  * @author Kirin Patel
- * @version 1.0.3
+ * @version 1.0.4
  */
 public class Message implements Serializable {
     
@@ -21,23 +21,6 @@ public class Message implements Serializable {
     /**
      * Main constructor that will create the message with a given type and the
      * provided message.
-     * 
-     * Type:
-     *   0 - Connection message
-     * 100 - Object is double
-     * 101 - Object is boolean
-     * 102 - Object is String
-     *       10200 - String is username
-     *       10201 - String is message
-     *       10202 - String is URL
-     * 103 - Next object is object
-     *       10300 - Object is Message
-     * 
-     * Connection message:
-     *   TYPE 0:
-     *       0 - Connection ending/failure
-     *       1 - Attempting connection
-     *       2 - Connection established
      * 
      * @param type Type of message being sent
      * @param message Message to be sent

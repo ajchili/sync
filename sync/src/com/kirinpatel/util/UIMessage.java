@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
  * events.
  * 
  * @author Kirin Patel
- * @version 0.1.1
+ * @version 1.0.0
  */
 public class UIMessage {
     
@@ -26,7 +26,7 @@ public class UIMessage {
      * @param type Message type
      */
     public UIMessage(String title, String message, int type) {
-        JOptionPane.showMessageDialog(null, title, message, this.TYPE[type]);
+        JOptionPane.showMessageDialog(null, message, title, this.TYPE[type]);
     }
     
     /**

@@ -1,47 +1,48 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kirinpatel.gui;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.embed.swing.JFXPanel;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.util.Duration;
 
 /**
- * This class will create a media view. This view will allow for playback of
- * .mp4 files from a URL.
+ * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
+ * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
-    
+
     private String mediaURL = "";
-    
+    private MediaPlayer mediaPlayer;
+    private MediaControl mediaControl;
+
     /**
      * Main constructor that will initialize the MediaPanel.
      */
     public MediaPanel() {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX();
-            }
-        });
+        Platform.runLater(this::initFX);
     }
-    
+
     /**
      * Secondary constructor that will initialize the MediaPanel with a
      * specified URL.
-     * 
+     *
      * @param url Media URL
      */
     public MediaPanel(String url) {
@@ -61,42 +62,42 @@ public class MediaPanel extends JFXPanel {
         Scene scene = createScene();
         setScene(scene);
     }
-    
+
     /**
      * Creates the FX scene.
-     * 
+     *
      * @return Returns the scene.
      */
     private Scene createScene() {
         Group root = new Group();
         Scene scene = new Scene(root);
-        
+
         if (!mediaURL.equals("")) {
             Media media = new Media(mediaURL);
-            MediaPlayer mediaPlayer = new MediaPlayer(media);
+            mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setAutoPlay(true);
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+            mediaControl = new MediaControl(mediaPlayer);
+            mediaControl.setStyle("-fx-background-color: #000000;");
+            scene.setRoot(mediaControl);
 
-            MediaView mediaView = new MediaView(mediaPlayer);
-            StackPane p = new StackPane();
-            p.getChildren().add(mediaView);
-            p.setStyle("-fx-background-color: #000000;");
-
-            StackPane.setAlignment(mediaView, Pos.CENTER);
-            scene = new Scene(p);
-            mediaView.fitWidthProperty().bind(scene.widthProperty());
-            mediaView.fitHeightProperty().bind(scene.heightProperty());
+            mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
+            mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
+        } else {
+            if (mediaPlayer != null && mediaPlayer.getMedia() != null) {
+                mediaPlayer.pause();
+            }
         }
-        
+
         return (scene);
     }
-    
+
     /**
      * Sets the media URL of the MediaPanel.
-     * 
+     *
      * @param url Media URL
      */
-    public void setMedia(String url) {
+    public void setMediaURL(String url) {
         this.mediaURL = url;
         Platform.runLater(new Runnable() {
             @Override
@@ -105,41 +106,218 @@ public class MediaPanel extends JFXPanel {
             }
         });
     }
-    
-    /**
-     * Plays media.
-     */
-    public void play() {
-        
+
+    public String getMediaURL() {
+        return mediaURL;
     }
-    
+
     /**
-     * Stops media.
+     * @author Kirin Patel
+     * @version 0.0.1
+     * @date 6/17/17
+     *
+     * Source: http://docs.oracle.com/javafx/2/media/playercontrol.htm
      */
-    public void stop() {
-        
+    public class MediaControl extends BorderPane {
+        private MediaPlayer mp;
+        private MediaView mediaView;
+        private final boolean repeat = false;
+        private boolean stopRequested = false;
+        private boolean atEndOfMedia = false;
+        private Duration duration;
+        private Slider timeSlider;
+        private Label playTime;
+        private Slider volumeSlider;
+        private HBox mediaBar;
+
+        public MediaControl(final MediaPlayer mp) {
+            this.mp = mp;
+            mediaView = new MediaView(mp);
+
+            StackPane p = new StackPane();
+            p.getChildren().add(mediaView);
+            p.setStyle("-fx-background-color: black;");
+            StackPane.setAlignment(mediaView, Pos.CENTER);
+
+            setCenter(p);
+
+            mediaBar = new HBox();
+            mediaBar.setAlignment(Pos.BOTTOM_CENTER);
+            mediaBar.setPadding(new Insets(5, 10, 5, 10));
+            BorderPane.setAlignment(mediaBar, Pos.CENTER);
+
+            final Button playButton  = new Button(">");
+            mediaBar.getChildren().add(playButton);
+            p.getChildren().add(mediaBar);
+
+            Label spacer = new Label("   ");
+            mediaBar.getChildren().add(spacer);
+
+            Label timeLabel = new Label("Time: ");
+            mediaBar.getChildren().add(timeLabel);
+
+            timeSlider = new Slider();
+            HBox.setHgrow(timeSlider, Priority.ALWAYS);
+            timeSlider.setMinWidth(50);
+            timeSlider.setMaxWidth(Double.MAX_VALUE);
+            mediaBar.getChildren().add(timeSlider);
+
+            playTime = new Label();
+            playTime.setPrefWidth(130);
+            playTime.setMinWidth(50);
+            mediaBar.getChildren().add(playTime);
+
+            Label volumeLabel = new Label("Vol: ");
+            mediaBar.getChildren().add(volumeLabel);
+
+            volumeSlider = new Slider();
+            volumeSlider.setPrefWidth(70);
+            volumeSlider.setMaxWidth(Region.USE_PREF_SIZE);
+            volumeSlider.setMinWidth(30);
+
+            mediaBar.getChildren().add(volumeSlider);
+
+            playButton.setOnAction(new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    MediaPlayer.Status status = mp.getStatus();
+
+                    if (status == MediaPlayer.Status.UNKNOWN  || status == MediaPlayer.Status.HALTED)
+                    {
+                        return;
+                    }
+
+                    if ( status == MediaPlayer.Status.PAUSED
+                            || status == MediaPlayer.Status.READY
+                            || status == MediaPlayer.Status.STOPPED)
+                    {
+                        if (atEndOfMedia) {
+                            mp.seek(mp.getStartTime());
+                            atEndOfMedia = false;
+                        }
+                        mp.play();
+                    } else {
+                        mp.pause();
+                    }
+                }
+            });
+
+            mp.currentTimeProperty().addListener(new InvalidationListener()
+            {
+                public void invalidated(Observable ov) {
+                    updateValues();
+                }
+            });
+
+            mp.setOnPlaying(new Runnable() {
+                public void run() {
+                    if (stopRequested) {
+                        mp.pause();
+                        stopRequested = false;
+                    } else {
+                        playButton.setText("||");
+                    }
+                }
+            });
+
+            mp.setOnPaused(new Runnable() {
+                public void run() {
+                    playButton.setText(">");
+                }
+            });
+
+            mp.setOnReady(new Runnable() {
+                public void run() {
+                    duration = mp.getMedia().getDuration();
+                    updateValues();
+                }
+            });
+
+            mp.setCycleCount(repeat ? MediaPlayer.INDEFINITE : 1);
+            mp.setOnEndOfMedia(new Runnable() {
+                public void run() {
+                    if (!repeat) {
+                        playButton.setText(">");
+                        stopRequested = true;
+                        atEndOfMedia = true;
+                    }
+                }
+            });
+
+            timeSlider.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    if (timeSlider.isValueChanging()) {
+                        mp.seek(duration.multiply(timeSlider.getValue() / 100.0));
+                    }
+                }
+            });
+
+            volumeSlider.valueProperty().addListener(new InvalidationListener() {
+                public void invalidated(Observable ov) {
+                    mp.setVolume(volumeSlider.getValue() / 100.0);
+                }
+            });
+        }
+
+        protected void updateValues() {
+            if (playTime != null && timeSlider != null && volumeSlider != null) {
+                Platform.runLater(new Runnable() {
+                    public void run() {
+                        Duration currentTime = mp.getCurrentTime();
+                        playTime.setText(formatTime(currentTime, duration));
+                        timeSlider.setDisable(duration.isUnknown());
+                        if (!timeSlider.isDisabled()
+                                && duration.greaterThan(Duration.ZERO)
+                                && !timeSlider.isValueChanging()) {
+                            timeSlider.setValue(currentTime.divide(duration).toMillis()
+                                    * 100.0);
+                        }
+                        if (!volumeSlider.isValueChanging()) {
+                            volumeSlider.setValue((int)Math.round(mp.getVolume()
+                                    * 100));
+                        }
+                    }
+                });
+            }
+        }
+
+        private String formatTime(Duration elapsed, Duration duration) {
+            int intElapsed = (int)Math.floor(elapsed.toSeconds());
+            int elapsedHours = intElapsed / (60 * 60);
+            if (elapsedHours > 0) {
+                intElapsed -= elapsedHours * 60 * 60;
+            }
+            int elapsedMinutes = intElapsed / 60;
+            int elapsedSeconds = intElapsed - elapsedHours * 60 * 60
+                    - elapsedMinutes * 60;
+
+            if (duration.greaterThan(Duration.ZERO)) {
+                int intDuration = (int)Math.floor(duration.toSeconds());
+                int durationHours = intDuration / (60 * 60);
+                if (durationHours > 0) {
+                    intDuration -= durationHours * 60 * 60;
+                }
+                int durationMinutes = intDuration / 60;
+                int durationSeconds = intDuration - durationHours * 60 * 60 -
+                        durationMinutes * 60;
+                if (durationHours > 0) {
+                    return String.format("%d:%02d:%02d/%d:%02d:%02d",
+                            elapsedHours, elapsedMinutes, elapsedSeconds,
+                            durationHours, durationMinutes, durationSeconds);
+                } else {
+                    return String.format("%02d:%02d/%02d:%02d",
+                            elapsedMinutes, elapsedSeconds,durationMinutes,
+                            durationSeconds);
+                }
+            } else {
+                if (elapsedHours > 0) {
+                    return String.format("%d:%02d:%02d", elapsedHours,
+                            elapsedMinutes, elapsedSeconds);
+                } else {
+                    return String.format("%02d:%02d",elapsedMinutes,
+                            elapsedSeconds);
+                }
+            }
+        }
     }
-    
-    /**
-     * Pauses media.
-     */
-    public void pause() {
-        
-    }
-    
-    /**
-     * Resumes media.
-     */
-    public void resume() {
-        
-    }
-    
-    /**
-     * Seeks to specified time in media for playback.
-     * 
-     * @param millisecond Time in milliseconds
-     */
-    public void seek(int millisecond) {
-        
-    }
+
 }

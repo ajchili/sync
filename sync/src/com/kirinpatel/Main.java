@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kirinpatel;
 
 import com.kirinpatel.net.*;
@@ -16,7 +11,7 @@ import javax.swing.*;
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.0.1
+ * @version 2.0.2
  */
 public class Main extends JFrame {
     
@@ -87,7 +82,7 @@ public class Main extends JFrame {
             
             switch(type) {
                 case 0:
-                    new Server("sync - Server");
+                    new Server();
                     dispose();
                     break;
                 case 1:
@@ -96,8 +91,7 @@ public class Main extends JFrame {
                         setVisible(true);
                         break;
                     }
-                    
-                    new Client("sync - Client", ipAddress);
+
                     dispose();
                     break;
             }
