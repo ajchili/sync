@@ -6,6 +6,7 @@ import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,10 +14,11 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/16/17
  */
 public class Client {
@@ -66,6 +68,8 @@ public class Client {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private boolean isConnected = false;
+        private boolean isPaused = false;
+        private Duration lastSentTime = new Duration(0);
 
         public void run() {
             connectToServer();
@@ -83,8 +87,38 @@ public class Client {
                                     Client.stop();
                                 }
                                 break;
+                            case 11:
+                                Debug.Log("Receiving list of connected clients...", 4);
+                                Debug.Log("Connected clients list received.", 4);
+                                gui.clientControlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
+                                break;
+                            case 20:
+                                Debug.Log("Receiving media URL...", 4);
+                                Debug.Log("Media URL received.", 4);
+                                gui.mediaPanel.setMediaURL(message.getMessage().toString());
+                                break;
+                            case 21:
+                                Debug.Log("Receiving play...", 4);
+                                isPaused = false;
+                                break;
+                            case 22:
+                                Debug.Log("Receiving pause...", 4);
+                                isPaused = true;
+                                break;
+                            case 23:
+                                Debug.Log("Receiving media time...", 4);
+                                lastSentTime = (Duration) message.getMessage();
+                                gui.mediaPanel.seek(lastSentTime);
                             default:
-                                Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
+                                if (message.getType() == 23) {
+                                    break;
+                                }
+
+                                if (message.getMessage() != null) {
+                                    Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
+                                } else {
+                                    Debug.Log("Unregistered message - (" + message.getType() + ").", 2);
+                                }
                                 break;
                         }
                     }
@@ -92,6 +126,18 @@ public class Client {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
+                }
+
+                if (isPaused && !gui.mediaPanel.isMediaPaused()) {
+                    gui.mediaPanel.pauseMedia();
+                }
+
+                if (!isPaused && gui.mediaPanel.isMediaPaused()) {
+                    gui.mediaPanel.playMedia();
+                }
+
+                if (lastSentTime.toMillis() < (gui.mediaPanel.getMediaTime().toMillis() - 250) || lastSentTime.toMillis() > (gui.mediaPanel.getMediaTime().toMillis() + 50)) {
+                    sendVideoTime();
                 }
             }
 
@@ -137,6 +183,7 @@ public class Client {
             Debug.Log("Client started.", 1);
 
             sendUsernameToServer();
+            sendVideoTime();
         }
 
         private synchronized void disconnectFromServer() {
@@ -179,6 +226,19 @@ public class Client {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        private synchronized void sendVideoTime() {
+            try {
+                Debug.Log("Sending current media time...", 4);
+                output.writeObject(new Message(24, gui.mediaPanel.getMediaTime()));
+                output.flush();
+                Debug.Log("Current media time sent.", 4);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            lastSentTime = gui.mediaPanel.getMediaTime();
         }
     }
 }

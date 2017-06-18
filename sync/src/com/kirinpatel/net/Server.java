@@ -4,11 +4,14 @@ import com.kirinpatel.Main;
 import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
+import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -18,16 +21,17 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/16/17
  */
 public class Server {
 
     private ServerGUI gui;
-    private ArrayList<User> connectedClients = new ArrayList<>();
+    private static ArrayList<User> connectedClients = new ArrayList<>();
     private static ServerThread server;
     private static boolean isRunning = false;
     private static boolean closeServer = false;
+    private static boolean isBound = false;
 
     public Server() {
         Debug.Log("Starting server...", 1);
@@ -42,7 +46,11 @@ public class Server {
 
     public static void stop() {
         Debug.Log("Stopping server...", 1);
-        closeServer = true;
+        if (connectedClients.size() == 1) {
+            server.stop();
+        } else {
+            closeServer = true;
+        }
     }
 
     class ServerThread implements Runnable {
@@ -66,6 +74,10 @@ public class Server {
 
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
+            } catch(BindException e) {
+                Debug.Log("Unable to start server, address already in use!", 5);
+                gui.dispose();
+                isBound = true;
             } catch(SocketException e) {
                 Debug.Log("Closing unused socket...", 4);
                 Debug.Log("Socket closed.", 4);
@@ -79,7 +91,11 @@ public class Server {
                 }
 
                 Debug.Log("Server stopped.", 1);
+
                 new Main();
+                if (isBound) {
+                    new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
+                }
             }
         }
 
@@ -110,10 +126,15 @@ public class Server {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private User user;
+        private ArrayList<User> users = new ArrayList<>();
         private boolean isClientConnected = false;
+        private String mediaURL = "";
+        private boolean isPaused = false;
+        private Duration time = new Duration(0);
 
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
+            users.addAll(connectedClients);
         }
 
         public void run() {
@@ -147,8 +168,19 @@ public class Server {
                                 connectedClients.add(user);
                                 gui.serverControlPanel.updateConnectedClients(connectedClients);
                                 break;
+                            case 24:
+                                Debug.Log("Receiving client time...",4);
+                                time = (Duration) message.getMessage();
                             default:
-                                Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
+                                if (message.getType() == 24) {
+                                    break;
+                                }
+
+                                if (message.getMessage() != null) {
+                                    Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
+                                } else {
+                                    Debug.Log("Unregistered message - (" + message.getType() + ").", 2);
+                                }
                                 break;
                         }
                     }
@@ -156,6 +188,22 @@ public class Server {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
+                }
+
+                if (users.size() != connectedClients.size()) {
+                    sendConnectedUsersToClient();
+                }
+
+                if (mediaURL != gui.mediaPanel.getMediaURL()) {
+                    sendMediaURL();
+                }
+
+                if (isPaused != gui.mediaPanel.isMediaPaused()) {
+                    sendVideoState(gui.mediaPanel.isMediaPaused());
+                }
+
+                if (time.toMillis() < (gui.mediaPanel.getMediaTime().toMillis() - 2000) || time.toMillis() > (gui.mediaPanel.getMediaTime().toMillis() + 1000)) {
+                    sendVideoTime();
                 }
             }
 
@@ -197,6 +245,60 @@ public class Server {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+
+        private synchronized void sendConnectedUsersToClient() {
+            try {
+                Debug.Log("Sending list connected clients...", 4);
+                output.writeObject(new Message(11, connectedClients));
+                output.flush();
+                Debug.Log("Connected clients list sent.", 4);
+                users.clear();
+                users.addAll(connectedClients);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private synchronized void sendMediaURL() {
+            try {
+                output.writeObject(new Message(20, gui.mediaPanel.getMediaURL()));
+                output.flush();
+                mediaURL = gui.mediaPanel.getMediaURL();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private synchronized void sendVideoState(boolean isPaused) {
+            if (isPaused) {
+                try {
+                    output.writeObject(new Message(22, null));
+                    output.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    output.writeObject(new Message(21, null));
+                    output.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            this.isPaused = gui.mediaPanel.isMediaPaused();
+            sendVideoTime();
+        }
+
+        private synchronized void sendVideoTime() {
+            try {
+                output.writeObject(new Message(23, time.add(new Duration(gui.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
+                output.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            time = gui.mediaPanel.getMediaTime();
         }
     }
 }

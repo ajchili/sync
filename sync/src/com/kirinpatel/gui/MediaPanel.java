@@ -24,7 +24,7 @@ import javafx.util.Duration;
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.4
+ * @version 0.0.5
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
@@ -32,6 +32,7 @@ public class MediaPanel extends JFXPanel {
     private String mediaURL = "";
     private MediaPlayer mediaPlayer;
     private MediaControl mediaControl;
+    private boolean isPaused = false;
 
     /**
      * Main constructor that will initialize the MediaPanel.
@@ -113,8 +114,38 @@ public class MediaPanel extends JFXPanel {
         }
     }
 
+    public void playMedia() {
+        if (mediaPlayer != null) {
+            mediaPlayer.play();
+        }
+    }
+
+    public void pauseMedia() {
+        if (mediaPlayer != null) {
+            mediaPlayer.pause();
+        }
+    }
+
+    public void seek(Duration time) {
+        if (mediaPlayer != null) {
+            mediaPlayer.seek(time);
+        }
+    }
+
     public String getMediaURL() {
         return mediaURL;
+    }
+
+    public boolean isMediaPaused() {
+        return isPaused;
+    }
+
+    public Duration getMediaTime() {
+        if (mediaPlayer != null) {
+            return mediaPlayer.getCurrentTime();
+        }
+
+        return new Duration(0);
     }
 
     /**
@@ -221,6 +252,7 @@ public class MediaPanel extends JFXPanel {
                         stopRequested = false;
                     } else {
                         Debug.Log("Playing media...", 1);
+                        isPaused = false;
                         playButton.setText("||");
                     }
                 }
@@ -229,6 +261,7 @@ public class MediaPanel extends JFXPanel {
             mp.setOnPaused(new Runnable() {
                 public void run() {
                     Debug.Log("Pausing media...", 1);
+                    isPaused = true;
                     playButton.setText(">");
                 }
             });

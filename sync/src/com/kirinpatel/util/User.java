@@ -1,13 +1,14 @@
 package com.kirinpatel.util;
 
+import java.io.Serializable;
 import java.util.Random;
 
 /**
  * @author Kirin Patel
- * @version 0.0.1
+ * @version 0.0.2
  * @date 6/17/17
  */
-public class User {
+public class User implements Serializable {
 
     private String username;
     private long userID;
@@ -20,6 +21,16 @@ public class User {
     @Override
     public String toString() {
         return username;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User)) {
+            return false;
+        } else {
+            User objU = (User) o;
+            return username.equals(objU.getUsername()) && userID == objU.getUserID();
+        }
     }
 
     public void setUsername(String username) {
