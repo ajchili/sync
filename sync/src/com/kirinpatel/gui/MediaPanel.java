@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.util.Debug;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -23,7 +24,7 @@ import javafx.util.Duration;
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.3
+ * @version 0.0.4
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
@@ -36,6 +37,7 @@ public class MediaPanel extends JFXPanel {
      * Main constructor that will initialize the MediaPanel.
      */
     public MediaPanel() {
+        Debug.Log("Creating MediaPanel...", 3);
         Platform.runLater(this::initFX);
     }
 
@@ -46,21 +48,20 @@ public class MediaPanel extends JFXPanel {
      * @param url Media URL
      */
     public MediaPanel(String url) {
+        Debug.Log("Creating MediaPanel...", 3);
         this.mediaURL = url;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX();
-            }
-        });
+        Platform.runLater(this::initFX);
     }
 
     /**
      * Initializes the FX panel.
      */
     private void initFX() {
+        Debug.Log("Initializing scene...", 3);
         Scene scene = createScene();
         setScene(scene);
+        Debug.Log("Scene initialized.", 3);
+        Debug.Log("MediaPanel created.", 3);
     }
 
     /**
@@ -95,16 +96,21 @@ public class MediaPanel extends JFXPanel {
     /**
      * Sets the media URL of the MediaPanel.
      *
-     * @param url Media URL
+     * @param mediaURL Media URL
      */
-    public void setMediaURL(String url) {
-        this.mediaURL = url;
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                initFX();
+    public void setMediaURL(String mediaURL) {
+        if (!this.mediaURL.equals(mediaURL)) {
+            if (mediaURL.isEmpty()) {
+                Debug.Log("Clearing MediaURL...", 1);
+            } else {
+                Debug.Log("Setting MediaURL (" + mediaURL + ")...", 1);
             }
-        });
+
+            this.mediaURL = mediaURL;
+            Platform.runLater(this::initFX);
+        } else {
+            Debug.Log("MediaURL does not refresh, please seek through the media.", 1);
+        }
     }
 
     public String getMediaURL() {
@@ -214,6 +220,7 @@ public class MediaPanel extends JFXPanel {
                         mp.pause();
                         stopRequested = false;
                     } else {
+                        Debug.Log("Playing media...", 1);
                         playButton.setText("||");
                     }
                 }
@@ -221,6 +228,7 @@ public class MediaPanel extends JFXPanel {
 
             mp.setOnPaused(new Runnable() {
                 public void run() {
+                    Debug.Log("Pausing media...", 1);
                     playButton.setText(">");
                 }
             });
@@ -246,6 +254,7 @@ public class MediaPanel extends JFXPanel {
             timeSlider.valueProperty().addListener(new InvalidationListener() {
                 public void invalidated(Observable ov) {
                     if (timeSlider.isValueChanging()) {
+                        Debug.Log("Seeking through media...", 1);
                         mp.seek(duration.multiply(timeSlider.getValue() / 100.0));
                     }
                 }
@@ -253,6 +262,7 @@ public class MediaPanel extends JFXPanel {
 
             volumeSlider.valueProperty().addListener(new InvalidationListener() {
                 public void invalidated(Observable ov) {
+                    Debug.Log("Setting volume...", 1);
                     mp.setVolume(volumeSlider.getValue() / 100.0);
                 }
             });

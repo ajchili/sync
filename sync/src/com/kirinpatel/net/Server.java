@@ -1,18 +1,24 @@
 package com.kirinpatel.net;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.gui.ServerGUI;
+import com.kirinpatel.util.Debug;
+import com.kirinpatel.util.Message;
 import com.kirinpatel.util.User;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.1
+ * @version 0.0.2
  * @date 6/16/17
  */
 public class Server {
@@ -20,12 +26,14 @@ public class Server {
     private ServerGUI gui;
     private ArrayList<User> connectedClients = new ArrayList<>();
     private static ServerThread server;
-    private static boolean closeConnections = false;
+    private static boolean isRunning = false;
+    private static boolean closeServer = false;
 
     public Server() {
+        Debug.Log("Starting server...", 1);
         gui = new ServerGUI();
 
-        connectedClients.add(new User(System.getProperty("user.name")));
+        connectedClients.add(new User(System.getProperty("user.name") + " (host)"));
         gui.serverControlPanel.updateConnectedClients(connectedClients);
 
         server = new ServerThread();
@@ -33,8 +41,8 @@ public class Server {
     }
 
     public static void stop() {
-        closeConnections = true;
-        server.stop();
+        Debug.Log("Stopping server...", 1);
+        closeServer = true;
     }
 
     class ServerThread implements Runnable {
@@ -42,58 +50,55 @@ public class Server {
         private ExecutorService connectionExecutor;
         private ServerSocket service;
         private Socket socket;
-        private boolean isRunning = false;
 
         public void run() {
-            start();
+            isRunning = true;
 
             connectionExecutor = Executors.newFixedThreadPool(10);
 
             try {
                 service = new ServerSocket(8000);
-                service.setReuseAddress(true);
 
+                Debug.Log("Server started.", 1);
                 while(isRunning) {
+                    Debug.Log("Awaiting connection...", 4);
                     socket = service.accept();
 
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
+            } catch(SocketException e) {
+                Debug.Log("Closing unused socket...", 4);
+                Debug.Log("Socket closed.", 4);
             } catch (IOException e) {
-                // TODO: Fix issue where socket is closed and crashes program
-                // e.printStackTrace();
+                e.printStackTrace();
             } finally {
                 connectionExecutor.shutdown();
 
                 while (!connectionExecutor.isTerminated()) {
 
                 }
-            }
-        }
 
-        public void start() {
-            isRunning = true;
+                Debug.Log("Server stopped.", 1);
+                new Main();
+            }
         }
 
         public void stop() {
             isRunning = false;
 
-            if (service != null) {
-                if (socket != null) {
-                    if (!socket.isClosed()) {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
+            if (socket != null && !socket.isClosed()) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+            }
 
-                if (!service.isClosed()) {
-                    try {
-                        service.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            if (service != null &&!service.isClosed()) {
+                try {
+                    service.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -102,6 +107,9 @@ public class Server {
     class ServerSocketTask implements Runnable {
 
         private Socket socket;
+        private ObjectInputStream input;
+        private ObjectOutputStream output;
+        private User user;
         private boolean isClientConnected = false;
 
         public ServerSocketTask(Socket socket) {
@@ -109,21 +117,86 @@ public class Server {
         }
 
         public void run() {
-            isClientConnected = true;
+            connectClientToServer();
 
-            while(isClientConnected) {
-                if (closeConnections) {
+            while (isClientConnected && isRunning) {
+                if (closeServer) {
                     stop();
+
+                    isClientConnected = false;
+                    break;
                 }
+
+                try {
+                    if (socket.getInputStream().available() > 0) {
+                        Message message = (Message) input.readObject();
+                        switch (message.getType()) {
+                            case 0:
+                                if ((int) message.getMessage() == 0) {
+                                    Debug.Log("Disconnecting client...", 4);
+                                    connectedClients.remove(user);
+                                    gui.serverControlPanel.updateConnectedClients(connectedClients);
+                                    isClientConnected = false;
+                                    Debug.Log("Client disconnected.", 4);
+                                }
+                                break;
+                            case 10:
+                                Debug.Log("Receiving client username...", 4);
+                                user = new User(message.getMessage().toString());
+                                Debug.Log("Received client username.", 4);
+                                connectedClients.add(user);
+                                gui.serverControlPanel.updateConnectedClients(connectedClients);
+                                break;
+                            default:
+                                Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
+                                break;
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            try {
+                Debug.Log("Closing socket...", 4);
+                socket.close();
+                Debug.Log("Socket closed.", 4);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
-        public void start() {
-            isClientConnected = true;
+        public void stop() {
+            try {
+                Debug.Log("Sending closing message to client...",4);
+                output.writeObject(new Message(0, 3));
+                output.flush();
+                Debug.Log("Closing message sent.",4);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            server.stop();
         }
 
-        public void stop() {
-            isClientConnected = false;
+        private synchronized void connectClientToServer() {
+            try {
+                Debug.Log("Establishing connection to client...", 4);
+                input = new ObjectInputStream(socket.getInputStream());
+                Message message = (Message) input.readObject();
+                isClientConnected = message.getType() == 0 && (int) message.getMessage() == 1;
+                output = new ObjectOutputStream(socket.getOutputStream());
+                output.writeObject(new Message(0, 2));
+                output.flush();
+                Debug.Log("Established connection to client.", 4);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

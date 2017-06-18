@@ -1,6 +1,7 @@
 package com.kirinpatel;
 
 import com.kirinpatel.net.*;
+import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
 import java.awt.*;
 import java.awt.event.*;
@@ -11,7 +12,7 @@ import javax.swing.*;
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.0.2
+ * @version 2.0.3
  */
 public class Main extends JFrame {
     
@@ -19,12 +20,11 @@ public class Main extends JFrame {
     
     /**
      * Creates launcher window.
-     * 
-     * @param title Title
      */
-    public Main(String title) {
-        super(title);
-        
+    public Main() {
+        super("sync");
+
+        Debug.Log("Starting sync launcher...", 3);
         setSize(400, 200);
         
         setResizable(false);
@@ -42,6 +42,7 @@ public class Main extends JFrame {
         setLocationRelativeTo(null);
         
         setVisible(true);
+        Debug.Log("Sync launcher displayed.", 3);
     }
     
     /**
@@ -50,7 +51,7 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        main = new Main("sync");
+        main = new Main();
     }
     
     /**
@@ -87,12 +88,13 @@ public class Main extends JFrame {
                     break;
                 case 1:
                     String ipAddress = UIMessage.getInput("sync", "Please enter the ip address of the server.");
-                    if (ipAddress == null) {
+                    if (ipAddress == null || ipAddress.isEmpty()) {
+                        Debug.Log("No IP Address provided!", 2);
                         setVisible(true);
-                        break;
+                    } else {
+                        new Client(ipAddress);
+                        dispose();
                     }
-
-                    dispose();
                     break;
             }
         }

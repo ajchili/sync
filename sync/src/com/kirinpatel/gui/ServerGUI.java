@@ -1,6 +1,7 @@
 package com.kirinpatel.gui;
 
 import com.kirinpatel.net.Server;
+import com.kirinpatel.util.Debug;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +10,7 @@ import java.awt.event.ComponentListener;
 
 /**
  * @author Kirin Patel
- * @version 0.0.1
+ * @version 0.0.2
  * @date 6/16/17
  */
 public class ServerGUI extends JFrame {
@@ -19,6 +20,8 @@ public class ServerGUI extends JFrame {
 
     public ServerGUI() {
         super("sync - Server");
+
+        Debug.Log("Starting server gui...", 3);
 
         setSize(new Dimension(800, 360));
         setMinimumSize(new Dimension(800, 360));
@@ -34,6 +37,8 @@ public class ServerGUI extends JFrame {
         add(serverControlPanel, BorderLayout.EAST);
 
         setVisible(true);
+
+        Debug.Log("Server gui displayed.", 3);
     }
 
     class ResizeListener implements ComponentListener {
@@ -55,8 +60,10 @@ public class ServerGUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            Server.stop();
+            Debug.Log("Closing server gui...", 3);
             dispose();
+            Debug.Log("Server gui closed.", 3);
+            Server.stop();
         }
     }
 }
