@@ -1,6 +1,5 @@
 package com.kirinpatel.net;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.gui.ClientGUI;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.5
+ * @version 0.0.6
  * @date 6/16/17
  */
 public class Client {
@@ -257,6 +256,7 @@ public class Client {
         private synchronized void sendMessages() {
             try {
                 Debug.Log("Sending chat messages to server...", 4);
+                output.reset();
                 output.writeObject(new Message(31, messages));
                 output.flush();
                 messages.clear();

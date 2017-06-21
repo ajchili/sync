@@ -7,20 +7,15 @@ import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
 import javafx.util.Duration;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.BindException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.5
+ * @version 0.0.6
  * @date 6/16/17
  */
 public class Server {
@@ -55,7 +50,7 @@ public class Server {
 
     public static void sendMessage(String message) {
         messages.add(message);
-        gui.serverControlPanel.setMessages(messages);
+        ServerGUI.serverControlPanel.setMessages(messages);
     }
 
     class ServerThread implements Runnable {
@@ -73,6 +68,7 @@ public class Server {
                 service = new ServerSocket(8000);
 
                 Debug.Log("Server started.", 1);
+                gui.setTitle(gui.getTitle() + getIPAddress());
                 while(isRunning) {
                     Debug.Log("Awaiting connection...", 4);
                     socket = service.accept();
@@ -122,6 +118,29 @@ public class Server {
                 }
             }
         }
+
+        /**
+         * Provides the public IP address of the server.
+         * Credit: https://stackoverflow.com/a/2939223
+         *
+         * @return Returns string value of public IP address
+         */
+        private String getIPAddress() {
+            Debug.Log("Obtaining server IP address...", 4);
+            try {
+                URL whatismyip = new URL("http://checkip.amazonaws.com");
+                BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
+
+                Debug.Log("Server IP address obtained.", 4);
+                return " (" +  in.readLine() + ":8000)";
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Debug.Log("Unable to obtain server IP address.", 5);
+            return "";
+        }
     }
 
     class ServerSocketTask implements Runnable {
@@ -130,11 +149,12 @@ public class Server {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private User user;
+        private String client = "client";
         private boolean isClientConnected = false;
         private String mediaURL = "";
         private boolean isPaused = false;
+        private ArrayList<String> messages = new ArrayList<>();
         private long lastClientUpdate = System.currentTimeMillis() - 4000;
-        private long lastMessageUpdate = System.currentTimeMillis();
         private Duration time = new Duration(0);
 
         public ServerSocketTask(Socket socket) {
@@ -158,30 +178,31 @@ public class Server {
                         switch (message.getType()) {
                             case 0:
                                 if ((int) message.getMessage() == 0) {
-                                    Debug.Log("Disconnecting client...", 4);
+                                    Debug.Log("Disconnecting " + client + "...", 4);
                                     connectedClients.remove(user);
                                     ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
                                     isClientConnected = false;
-                                    Debug.Log("Client disconnected.", 4);
+                                    Debug.Log("C" + client + " disconnected.".substring(1), 4);
                                 }
                                 break;
                             case 10:
-                                Debug.Log("Receiving client username...", 4);
+                                Debug.Log("Receiving " + client + " username...", 4);
                                 user = new User(message.getMessage().toString());
-                                Debug.Log("Received client username.", 4);
+                                Debug.Log("Received " + client + " username.", 4);
                                 connectedClients.add(user);
+                                client = client + " (" + user.getUsername() + ":" + user.getUserID() + ")";
                                 ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
                                 break;
                             case 24:
-                                Debug.Log("Receiving client time...",4);
+                                Debug.Log("Receiving " + client + " time...",4);
                                 time = (Duration) message.getMessage();
                                 break;
                             case 31:
-                                Debug.Log("Receiving client messages...", 4);
+                                Debug.Log("Receiving " + client + " messages...", 4);
                                 for (String m : (ArrayList<String>) message.getMessage()) {
                                     sendMessage(m);
                                 }
-                                Debug.Log("Client messages received.", 4);
+                                Debug.Log("Client " + client + " received.", 4);
                                 break;
                             default:
                                 if (message.getType() == 24) {
@@ -204,7 +225,7 @@ public class Server {
                     sendConnectedUsersToClient();
                 }
 
-                if (System.currentTimeMillis() > lastMessageUpdate + 1500) {
+                if (messages.size() < Server.messages.size()) {
                     sendMessagesToClient();
                 }
 
@@ -232,7 +253,7 @@ public class Server {
 
         public void stop() {
             try {
-                Debug.Log("Sending closing message to client...",4);
+                Debug.Log("Sending closing message to " + client + "...",4);
                 output.writeObject(new Message(0, 3));
                 output.flush();
                 Debug.Log("Closing message sent.",4);
@@ -245,14 +266,14 @@ public class Server {
 
         private synchronized void connectClientToServer() {
             try {
-                Debug.Log("Establishing connection to client...", 4);
+                Debug.Log("Establishing connection to " + client + "...", 4);
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
                 isClientConnected = message.getType() == 0 && (int) message.getMessage() == 1;
                 output = new ObjectOutputStream(socket.getOutputStream());
                 output.writeObject(new Message(0, 2));
                 output.flush();
-                Debug.Log("Established connection to client.", 4);
+                Debug.Log("Established connection to " + client + ".", 4);
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -261,7 +282,7 @@ public class Server {
         private synchronized void sendConnectedUsersToClient() {
             try {
                 lastClientUpdate = System.currentTimeMillis();
-                Debug.Log("Sending list connected clients...", 4);
+                Debug.Log("Sending list connected " + client + "...", 4);
                 output.reset();
                 output.writeObject(new Message(11, connectedClients));
                 output.flush();
@@ -273,12 +294,18 @@ public class Server {
 
         private synchronized void sendMessagesToClient() {
             try {
-                lastMessageUpdate = System.currentTimeMillis();
-                Debug.Log("Sending message log to client...", 4);
+                ArrayList<String> newMessages = new ArrayList<>();
+                ArrayList<String> messageCache = Server.messages;
+                for (int i = messages.size(); i < messageCache.size(); i++) {
+                    newMessages.add(messageCache.get(i));
+                }
+                messages.clear();
+                messages.addAll(messageCache);
+                Debug.Log("Sending message log to " + client + "...", 4);
                 output.flush();
-                output.writeObject(new Message(30, messages));
+                output.writeObject(new Message(30, newMessages));
                 output.flush();
-                Debug.Log("Message log sent to client.", 4);
+                Debug.Log("Message log sent to " + client + ".", 4);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -286,10 +313,10 @@ public class Server {
 
         private synchronized void sendMediaURL() {
             try {
-                Debug.Log("Sending media URL to client...", 4);
+                Debug.Log("Sending media URL to " + client + "...", 4);
                 output.writeObject(new Message(20, ServerGUI.mediaPanel.getMediaURL()));
                 output.flush();
-                Debug.Log("Media URL sent to client.", 4);
+                Debug.Log("Media URL sent to " + client + ".", 4);
                 mediaURL = ServerGUI.mediaPanel.getMediaURL();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -297,7 +324,7 @@ public class Server {
         }
 
         private synchronized void sendVideoState(boolean isPaused) {
-            Debug.Log("Sending media state to client...", 4);
+            Debug.Log("Sending media state to " + client + "...", 4);
             if (isPaused) {
                 try {
                     output.writeObject(new Message(22, null));
@@ -313,17 +340,17 @@ public class Server {
                     e.printStackTrace();
                 }
             }
-            Debug.Log("Media state sent to client.", 4);
+            Debug.Log("Media state sent to " + client + ".", 4);
             this.isPaused = ServerGUI.mediaPanel.isMediaPaused();
             sendVideoTime();
         }
 
         private synchronized void sendVideoTime() {
             try {
-                Debug.Log("Sending current media time to client...", 4);
+                Debug.Log("Sending current media time to " + client + "...", 4);
                 output.writeObject(new Message(23, time.add(new Duration(ServerGUI.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
                 output.flush();
-                Debug.Log("Current mecia time sent to client.", 4);
+                Debug.Log("Current mecia time sent to " + client + ".", 4);
             } catch (IOException e) {
                 e.printStackTrace();
             }

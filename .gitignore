@@ -12,3 +12,6 @@
 hs_err_pid*
 /sync/nbproject/private/
 /sync/build/
+sync/\.idea/workspace\.xml
+
+sync/\.idea/

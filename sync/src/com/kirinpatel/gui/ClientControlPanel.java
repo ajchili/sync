@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.3
+ * @version 0.0.4
  * @date 6/17/17
  */
 public class ClientControlPanel extends JPanel {
@@ -73,14 +73,13 @@ public class ClientControlPanel extends JPanel {
     }
 
     public void setMessages(ArrayList<String> messages) {
-        chatWindow.setText("");
-        for (String message : messages) {
-            if (messages.indexOf(message) != messages.size() - 1) {
-                chatWindow.append(message + "\n");
-            } else {
-                chatWindow.append(message);
-            }
+        if (chatWindow.getText().length() != 0) {
+            chatWindow.append("\n");
         }
+        for (String message : messages) {
+            chatWindow.append(message + "\n");
+        }
+        chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
     }
 
     class SendMessageListener implements ActionListener {
