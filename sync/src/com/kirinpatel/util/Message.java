@@ -11,7 +11,7 @@ import java.io.Serializable;
  * Message object used to send/comprehend data between clients and a server.
  *
  * @author Kirin Patel
- * @version 1.0.6
+ * @version 1.0.7
  */
 public class Message implements Serializable {
     
@@ -44,6 +44,11 @@ public class Message implements Serializable {
      *              Duration
      *          4: Client time
      *              Duration
+     *      3#: Messages
+     *          0: Messages
+     *              ArrayList<String>
+     *          1: Client messages
+     *              ArrayList<String>
      *
      * 
      * @param type Type of message being sent

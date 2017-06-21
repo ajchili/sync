@@ -1,6 +1,5 @@
 package com.kirinpatel.net;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
@@ -21,13 +20,13 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.4
+ * @version 0.0.5
  * @date 6/16/17
  */
 public class Server {
 
-    private ServerGUI gui;
-    private static ArrayList<User> connectedClients = new ArrayList<>();
+    private static ServerGUI gui;
+    public static ArrayList<User> connectedClients = new ArrayList<>();
     private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
     private static boolean isRunning = false;
@@ -52,6 +51,11 @@ public class Server {
         } else {
             closeServer = true;
         }
+    }
+
+    public static void sendMessage(String message) {
+        messages.add(message);
+        gui.serverControlPanel.setMessages(messages);
     }
 
     class ServerThread implements Runnable {
@@ -126,17 +130,15 @@ public class Server {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private User user;
-        private ArrayList<User> users = new ArrayList<>();
-        private ArrayList<String> messages = new ArrayList<>();
         private boolean isClientConnected = false;
         private String mediaURL = "";
         private boolean isPaused = false;
+        private long lastClientUpdate = System.currentTimeMillis() - 4000;
+        private long lastMessageUpdate = System.currentTimeMillis();
         private Duration time = new Duration(0);
 
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
-            users.addAll(connectedClients);
-            messages.addAll(Server.messages);
         }
 
         public void run() {
@@ -173,6 +175,14 @@ public class Server {
                             case 24:
                                 Debug.Log("Receiving client time...",4);
                                 time = (Duration) message.getMessage();
+                                break;
+                            case 31:
+                                Debug.Log("Receiving client messages...", 4);
+                                for (String m : (ArrayList<String>) message.getMessage()) {
+                                    sendMessage(m);
+                                }
+                                Debug.Log("Client messages received.", 4);
+                                break;
                             default:
                                 if (message.getType() == 24) {
                                     break;
@@ -190,11 +200,15 @@ public class Server {
                     e.printStackTrace();
                 }
 
-                if (users.size() != connectedClients.size()) {
+                if (System.currentTimeMillis() > lastClientUpdate + 5000) {
                     sendConnectedUsersToClient();
                 }
 
-                if (mediaURL != ServerGUI.mediaPanel.getMediaURL()) {
+                if (System.currentTimeMillis() > lastMessageUpdate + 1500) {
+                    sendMessagesToClient();
+                }
+
+                if (!mediaURL.equals(ServerGUI.mediaPanel.getMediaURL())) {
                     sendMediaURL();
                 }
 
@@ -222,7 +236,6 @@ public class Server {
                 output.writeObject(new Message(0, 3));
                 output.flush();
                 Debug.Log("Closing message sent.",4);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -247,11 +260,12 @@ public class Server {
 
         private synchronized void sendConnectedUsersToClient() {
             try {
+                lastClientUpdate = System.currentTimeMillis();
                 Debug.Log("Sending list connected clients...", 4);
+                output.reset();
                 output.writeObject(new Message(11, connectedClients));
                 output.flush();
                 Debug.Log("Connected clients list sent.", 4);
-                users = connectedClients;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -259,8 +273,10 @@ public class Server {
 
         private synchronized void sendMessagesToClient() {
             try {
+                lastMessageUpdate = System.currentTimeMillis();
                 Debug.Log("Sending message log to client...", 4);
-                output.writeObject(new Message(0, messages));
+                output.flush();
+                output.writeObject(new Message(30, messages));
                 output.flush();
                 Debug.Log("Message log sent to client.", 4);
             } catch (IOException e) {
@@ -268,14 +284,12 @@ public class Server {
             }
         }
 
-        private synchronized void pushMessageToClient(String message) {
-
-        }
-
         private synchronized void sendMediaURL() {
             try {
+                Debug.Log("Sending media URL to client...", 4);
                 output.writeObject(new Message(20, ServerGUI.mediaPanel.getMediaURL()));
                 output.flush();
+                Debug.Log("Media URL sent to client.", 4);
                 mediaURL = ServerGUI.mediaPanel.getMediaURL();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -283,6 +297,7 @@ public class Server {
         }
 
         private synchronized void sendVideoState(boolean isPaused) {
+            Debug.Log("Sending media state to client...", 4);
             if (isPaused) {
                 try {
                     output.writeObject(new Message(22, null));
@@ -298,14 +313,17 @@ public class Server {
                     e.printStackTrace();
                 }
             }
+            Debug.Log("Media state sent to client.", 4);
             this.isPaused = ServerGUI.mediaPanel.isMediaPaused();
             sendVideoTime();
         }
 
         private synchronized void sendVideoTime() {
             try {
+                Debug.Log("Sending current media time to client...", 4);
                 output.writeObject(new Message(23, time.add(new Duration(ServerGUI.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
                 output.flush();
+                Debug.Log("Current mecia time sent to client.", 4);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,15 +1,18 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.net.Client;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/17/17
  */
 public class ClientControlPanel extends JPanel {
@@ -43,8 +46,10 @@ public class ClientControlPanel extends JPanel {
         JPanel messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
         chatField.setToolTipText("Message Box");
+        chatField.addActionListener(new SendMessageListener());
         messagePanel.add(chatField, BorderLayout.CENTER);
         send = new JButton("Send");
+        send.addActionListener(new SendMessageListener());
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
         add(chatPanel);
@@ -65,5 +70,27 @@ public class ClientControlPanel extends JPanel {
         }
         connectedClients.setModel(listModel);
         Debug.Log("Connected clients updated in gui.", 3);
+    }
+
+    public void setMessages(ArrayList<String> messages) {
+        chatWindow.setText("");
+        for (String message : messages) {
+            if (messages.indexOf(message) != messages.size() - 1) {
+                chatWindow.append(message + "\n");
+            } else {
+                chatWindow.append(message);
+            }
+        }
+    }
+
+    class SendMessageListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!chatField.getText().isEmpty()) {
+                Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());
+                chatField.setText("");
+            }
+        }
     }
 }

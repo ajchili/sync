@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.4
+ * @version 0.0.5
  * @date 6/16/17
  */
 public class Client {
@@ -29,6 +29,7 @@ public class Client {
     private Socket socket;
     private ClientGUI gui;
     private static ClientThread clientThread;
+    private static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
 
@@ -44,6 +45,10 @@ public class Client {
     public static void stop() {
         Debug.Log("Stopping Client...", 1);
         clientThread.stop();
+    }
+
+    public static void sendMessage(String message) {
+        messages.add(message);
     }
 
     class ClientThread implements Runnable {
@@ -112,6 +117,11 @@ public class Client {
                                 ClientGUI.mediaPanel.seek(lastSentTime);
                                 Debug.Log("Media time set.", 4);
                                 break;
+                            case 30:
+                                Debug.Log("Receiving chat messages...", 4);
+                                ClientGUI.clientControlPanel.setMessages((ArrayList<String>) message.getMessage());
+                                Debug.Log("Chat messages received.", 4);
+                                break;
                             default:
                                 if (message.getType() == 23) {
                                     break;
@@ -127,6 +137,10 @@ public class Client {
                     }
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
+                }
+
+                if (messages.size() > 0) {
+                    sendMessages();
                 }
 
                 if (isPaused && !ClientGUI.mediaPanel.isMediaPaused()) {
@@ -238,6 +252,18 @@ public class Client {
             }
 
             lastSentTime = ClientGUI.mediaPanel.getMediaTime();
+        }
+
+        private synchronized void sendMessages() {
+            try {
+                Debug.Log("Sending chat messages to server...", 4);
+                output.writeObject(new Message(31, messages));
+                output.flush();
+                messages.clear();
+                Debug.Log("Chat messages to server.", 4);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
