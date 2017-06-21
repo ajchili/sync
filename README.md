@@ -21,7 +21,8 @@ a java based mutli-client video and audio syncing application
 		1. Port forward if you will be using sync past a local network, sync uses port `8000`
 			* If need be, add sync to your firewall
 		2. Obtain your IP Address
-			* This can be done by typing `what's my ip` into google
+			* ~~This can be done by typing `what's my ip` into google~~
+			* As of version [0.2.1](https://github.com/ajchili/sync/releases/tag/0.2.1), the IP Address of the server will be displayed in the title of the server window
 		3. Ensure your media is of `.mp4` format and accessible by a web browser
 		4. Load your media into sync and share your IP Address
 		5. Enjoy
