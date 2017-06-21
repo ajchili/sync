@@ -84,7 +84,7 @@ public class Client {
                                 if ((int) message.getMessage() == 3) {
                                     Debug.Log("Server closing...", 4);
                                     isServerClosed = true;
-                                    gui.setVisible(false);
+                                    gui.hide();
                                     Client.stop();
                                 }
                                 break;
