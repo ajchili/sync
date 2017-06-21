@@ -266,7 +266,7 @@ public class Server {
                 Debug.Log("Sending message log to client...", 4);
                 output.writeObject(new Message(0, messages));
                 output.flush();
-                Debug.Log("Message log sent to cleint.", 4);
+                Debug.Log("Message log sent to client.", 4);
             } catch (IOException e) {
                 e.printStackTrace();
             }
