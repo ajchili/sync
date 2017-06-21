@@ -39,7 +39,7 @@ public class Server {
         gui = new ServerGUI();
 
         connectedClients.add(new User(System.getProperty("user.name") + " (host)"));
-        gui.serverControlPanel.updateConnectedClients(connectedClients);
+        ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
 
         server = new ServerThread();
         new Thread(server).start();
@@ -158,7 +158,7 @@ public class Server {
                                 if ((int) message.getMessage() == 0) {
                                     Debug.Log("Disconnecting client...", 4);
                                     connectedClients.remove(user);
-                                    gui.serverControlPanel.updateConnectedClients(connectedClients);
+                                    ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
                                     isClientConnected = false;
                                     Debug.Log("Client disconnected.", 4);
                                 }
@@ -168,7 +168,7 @@ public class Server {
                                 user = new User(message.getMessage().toString());
                                 Debug.Log("Received client username.", 4);
                                 connectedClients.add(user);
-                                gui.serverControlPanel.updateConnectedClients(connectedClients);
+                                ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
                                 break;
                             case 24:
                                 Debug.Log("Receiving client time...",4);
@@ -196,15 +196,15 @@ public class Server {
                     sendConnectedUsersToClient();
                 }
 
-                if (mediaURL != gui.mediaPanel.getMediaURL()) {
+                if (mediaURL != ServerGUI.mediaPanel.getMediaURL()) {
                     sendMediaURL();
                 }
 
-                if (isPaused != gui.mediaPanel.isMediaPaused()) {
-                    sendVideoState(gui.mediaPanel.isMediaPaused());
+                if (isPaused != ServerGUI.mediaPanel.isMediaPaused()) {
+                    sendVideoState(ServerGUI.mediaPanel.isMediaPaused());
                 }
 
-                if (time.toMillis() < (gui.mediaPanel.getMediaTime().toMillis() - 2000) || time.toMillis() > (gui.mediaPanel.getMediaTime().toMillis() + 1000)) {
+                if (time.toMillis() < (ServerGUI.mediaPanel.getMediaTime().toMillis() - 2000) || time.toMillis() > (ServerGUI.mediaPanel.getMediaTime().toMillis() + 1000)) {
                     sendVideoTime();
                 }
             }
@@ -278,9 +278,9 @@ public class Server {
 
         private synchronized void sendMediaURL() {
             try {
-                output.writeObject(new Message(20, gui.mediaPanel.getMediaURL()));
+                output.writeObject(new Message(20, ServerGUI.mediaPanel.getMediaURL()));
                 output.flush();
-                mediaURL = gui.mediaPanel.getMediaURL();
+                mediaURL = ServerGUI.mediaPanel.getMediaURL();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -302,19 +302,19 @@ public class Server {
                     e.printStackTrace();
                 }
             }
-            this.isPaused = gui.mediaPanel.isMediaPaused();
+            this.isPaused = ServerGUI.mediaPanel.isMediaPaused();
             sendVideoTime();
         }
 
         private synchronized void sendVideoTime() {
             try {
-                output.writeObject(new Message(23, time.add(new Duration(gui.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
+                output.writeObject(new Message(23, time.add(new Duration(ServerGUI.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
                 output.flush();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            time = gui.mediaPanel.getMediaTime();
+            time = ServerGUI.mediaPanel.getMediaTime();
         }
     }
 }

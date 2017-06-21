@@ -91,12 +91,12 @@ public class Client {
                             case 11:
                                 Debug.Log("Receiving list of connected clients...", 4);
                                 Debug.Log("Connected clients list received.", 4);
-                                gui.clientControlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
+                                ClientGUI.clientControlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
                                 break;
                             case 20:
                                 Debug.Log("Receiving media URL...", 4);
                                 Debug.Log("Media URL received.", 4);
-                                gui.mediaPanel.setMediaURL(message.getMessage().toString());
+                                ClientGUI.mediaPanel.setMediaURL(message.getMessage().toString());
                                 break;
                             case 21:
                                 Debug.Log("Received play action.", 4);
@@ -109,7 +109,7 @@ public class Client {
                             case 23:
                                 Debug.Log("Receiving media time...", 4);
                                 lastSentTime = (Duration) message.getMessage();
-                                gui.mediaPanel.seek(lastSentTime);
+                                ClientGUI.mediaPanel.seek(lastSentTime);
                                 Debug.Log("Media time set.", 4);
                                 break;
                             default:
@@ -131,15 +131,15 @@ public class Client {
                     e.printStackTrace();
                 }
 
-                if (isPaused && !gui.mediaPanel.isMediaPaused()) {
-                    gui.mediaPanel.pauseMedia();
+                if (isPaused && !ClientGUI.mediaPanel.isMediaPaused()) {
+                    ClientGUI.mediaPanel.pauseMedia();
                 }
 
-                if (!isPaused && gui.mediaPanel.isMediaPaused()) {
-                    gui.mediaPanel.playMedia();
+                if (!isPaused && ClientGUI.mediaPanel.isMediaPaused()) {
+                    ClientGUI.mediaPanel.playMedia();
                 }
 
-                if (lastSentTime.toMillis() < (gui.mediaPanel.getMediaTime().toMillis() - 250) || lastSentTime.toMillis() > (gui.mediaPanel.getMediaTime().toMillis() + 50)) {
+                if (lastSentTime.toMillis() < (ClientGUI.mediaPanel.getMediaTime().toMillis() - 250) || lastSentTime.toMillis() > (ClientGUI.mediaPanel.getMediaTime().toMillis() + 50)) {
                     sendVideoTime();
                 }
             }
@@ -232,7 +232,7 @@ public class Client {
         private synchronized void sendVideoTime() {
             try {
                 Debug.Log("Sending current media time...", 4);
-                output.writeObject(new Message(24, gui.mediaPanel.getMediaTime()));
+                output.writeObject(new Message(24, ClientGUI.mediaPanel.getMediaTime()));
                 output.flush();
                 Debug.Log("Current media time sent.", 4);
             } catch (SocketException e) {
@@ -241,7 +241,7 @@ public class Client {
                 e.printStackTrace();
             }
 
-            lastSentTime = gui.mediaPanel.getMediaTime();
+            lastSentTime = ClientGUI.mediaPanel.getMediaTime();
         }
     }
 }
