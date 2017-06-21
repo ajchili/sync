@@ -21,13 +21,14 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.3
+ * @version 0.0.4
  * @date 6/16/17
  */
 public class Server {
 
     private ServerGUI gui;
     private static ArrayList<User> connectedClients = new ArrayList<>();
+    private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
     private static boolean isRunning = false;
     private static boolean closeServer = false;
@@ -92,7 +93,6 @@ public class Server {
 
                 Debug.Log("Server stopped.", 1);
 
-                new Main();
                 if (isBound) {
                     new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
                 }
@@ -127,6 +127,7 @@ public class Server {
         private ObjectOutputStream output;
         private User user;
         private ArrayList<User> users = new ArrayList<>();
+        private ArrayList<String> messages = new ArrayList<>();
         private boolean isClientConnected = false;
         private String mediaURL = "";
         private boolean isPaused = false;
@@ -135,6 +136,7 @@ public class Server {
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
             users.addAll(connectedClients);
+            messages.addAll(Server.messages);
         }
 
         public void run() {
@@ -253,11 +255,25 @@ public class Server {
                 output.writeObject(new Message(11, connectedClients));
                 output.flush();
                 Debug.Log("Connected clients list sent.", 4);
-                users.clear();
-                users.addAll(connectedClients);
+                users = connectedClients;
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        private synchronized void sendMessagesToClient() {
+            try {
+                Debug.Log("Sending message log to client...", 4);
+                output.writeObject(new Message(0, messages));
+                output.flush();
+                Debug.Log("Message log sent to cleint.", 4);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private synchronized void pushMessageToClient(String message) {
+
         }
 
         private synchronized void sendMediaURL() {

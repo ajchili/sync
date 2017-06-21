@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/16/17
  */
 public class ServerControlPanel extends JPanel {
@@ -90,6 +90,7 @@ public class ServerControlPanel extends JPanel {
             listModel.addElement(user);
         }
         connectedClients.setModel(listModel);
+        Debug.Log("Connected clients updated in gui.", 3);
     }
 
 }

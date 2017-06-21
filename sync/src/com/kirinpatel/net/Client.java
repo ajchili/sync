@@ -13,12 +13,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.3
+ * @version 0.0.4
  * @date 6/16/17
  */
 public class Client {
@@ -98,17 +99,19 @@ public class Client {
                                 gui.mediaPanel.setMediaURL(message.getMessage().toString());
                                 break;
                             case 21:
-                                Debug.Log("Receiving play...", 4);
+                                Debug.Log("Received play action.", 4);
                                 isPaused = false;
                                 break;
                             case 22:
-                                Debug.Log("Receiving pause...", 4);
+                                Debug.Log("Received pause action.", 4);
                                 isPaused = true;
                                 break;
                             case 23:
                                 Debug.Log("Receiving media time...", 4);
                                 lastSentTime = (Duration) message.getMessage();
                                 gui.mediaPanel.seek(lastSentTime);
+                                Debug.Log("Media time set.", 4);
+                                break;
                             default:
                                 if (message.getType() == 23) {
                                     break;
@@ -193,12 +196,10 @@ public class Client {
                     output.writeObject(new Message(0, 0));
                     output.flush();
                 } if (isServerClosed) {
-                    new Main();
                     new UIMessage("Server shutdown.", "The sync server that you were connected to has shutdown.", 0);
                     return;
                 } else {
                     Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
-                    new Main();
                     return;
                 }
             } catch (IOException e) {
@@ -234,6 +235,8 @@ public class Client {
                 output.writeObject(new Message(24, gui.mediaPanel.getMediaTime()));
                 output.flush();
                 Debug.Log("Current media time sent.", 4);
+            } catch (SocketException e) {
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
