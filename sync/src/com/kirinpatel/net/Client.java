@@ -125,9 +125,7 @@ public class Client {
                                 break;
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
 
@@ -176,9 +174,7 @@ public class Client {
                 Message message = (Message) input.readObject();
                 isConnected = message.getType() == 0 && (int) message.getMessage() == 2;
                 Debug.Log("Connected to server.", 4);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 

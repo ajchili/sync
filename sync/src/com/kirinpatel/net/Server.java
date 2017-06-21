@@ -186,9 +186,7 @@ public class Server {
                                 break;
                         }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
 
@@ -242,9 +240,7 @@ public class Server {
                 output.writeObject(new Message(0, 2));
                 output.flush();
                 Debug.Log("Established connection to client.", 4);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
