@@ -4,7 +4,7 @@ a java based mutli-client video and audio syncing application
 ## limitations
 * Only supports .mp4
 * No client drop detection
-* Many unfound bugs
+* Lots of bugs
 * Still in development
 * Potentially high bandwidth usage
 	* _I am currently unable to test the bandwidth usages of sync, however, the application communicates between clients/server multiple times per second for multiple queries._
@@ -15,12 +15,12 @@ a java based mutli-client video and audio syncing application
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
 
 * Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
-	* Messaging feature not compatibile with any other version
+	* Messaging feature not compatible with any other version
 	
 ## features
-* Realtime video and audio synchronization
+* Real-time video and audio synchronization
 * Fullscreen playback
-* Realtime chat
+* Real-time chat
 
 ## setup
 1. Check to see if Java is downloaded
