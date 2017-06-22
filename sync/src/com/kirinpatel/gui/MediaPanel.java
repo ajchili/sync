@@ -17,13 +17,14 @@ import javafx.scene.media.MediaView;
 import javafx.scene.paint.Paint;
 import javafx.util.Duration;
 
-import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.7
+ * @version 0.0.8
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
@@ -31,7 +32,9 @@ public class MediaPanel extends JFXPanel {
     private String mediaURL = "";
     private MediaPlayer mediaPlayer;
     private MediaControl mediaControl;
+    private HBox mediaBar;
     private boolean isPaused = false;
+    private boolean isFullscreen = false;
 
     /**
      * Main constructor that will initialize the MediaPanel.
@@ -39,6 +42,28 @@ public class MediaPanel extends JFXPanel {
     public MediaPanel() {
         Debug.Log("Creating MediaPanel...", 3);
         Platform.runLater(this::initFX);
+
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == 122 && mediaControl != null) {
+                    // TODO: Properly implement fullscreen
+                    // Stage stage = (Stage) mediaControl.getScene().getWindow();
+                    isFullscreen = !isFullscreen;
+                    // stage.setFullScreen(isFullscreen);
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+
+            }
+        });
     }
 
     /**
@@ -84,6 +109,16 @@ public class MediaPanel extends JFXPanel {
 
             mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
             mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
+
+            mediaControl.setOnMouseEntered(event -> {
+                Debug.Log("Displaying media bar.", 3);
+                mediaBar.setVisible(true);
+            });
+
+            mediaControl.setOnMouseExited(event -> {
+                Debug.Log("Hiding media bar.", 3);
+                mediaBar.setVisible(false);
+            });
         } else {
             if (mediaPlayer != null && mediaPlayer.getMedia() != null) {
                 mediaPlayer.pause();
@@ -164,7 +199,6 @@ public class MediaPanel extends JFXPanel {
         private Slider timeSlider;
         private Label playTime;
         private Slider volumeSlider;
-        private HBox mediaBar;
 
         public MediaControl(final MediaPlayer mp) {
             this.mp = mp;

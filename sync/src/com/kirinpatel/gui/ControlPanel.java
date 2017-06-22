@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.1
+ * @version 0.0.2
  * @date 6/21/17
  */
 public class ControlPanel extends JPanel {
@@ -88,6 +88,7 @@ public class ControlPanel extends JPanel {
 
     public void resizePanel(int width, int height) {
         width = ((width - (height * 16 / 9)) < 200) ? 200 : width - (height * 16 / 9);
+        if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 3));
         connectedClientsScroll.setPreferredSize(new Dimension(width, height / 3));
     }
 
