@@ -30,7 +30,7 @@ public class User implements Serializable {
             return false;
         } else {
             User objU = (User) o;
-            return username.equals(objU.getUsername()) && userID == objU.getUserID();
+            return username.equals(objU.username) && userID == objU.userID;
         }
     }
 
