@@ -183,7 +183,7 @@ public class Server {
                                     connectedClients.remove(user);
                                     ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                     isClientConnected = false;
-                                    Debug.Log("C" + client.substring(1) + " disconnected.".substring(1), 4);
+                                    Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
                                 }
                                 break;
                             case 10:
@@ -191,7 +191,7 @@ public class Server {
                                 user = new User(message.getMessage().toString());
                                 Debug.Log("Received " + client + " username.", 4);
                                 connectedClients.add(user);
-                                client += " (" + user.getUsername() + ":" + user.getUserID() + ")";
+                                client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
                                 ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                 break;
                             case 24:
@@ -274,9 +274,9 @@ public class Server {
                 output = new ObjectOutputStream(socket.getOutputStream());
                 output.writeObject(new Message(0, 2));
                 output.flush();
-                Debug.Log("Established connection to " + client + ".", 4);
+                Debug.Log("Established connection to " + client + '.', 4);
             } catch (IOException | ClassNotFoundException e) {
-                Debug.Log("Unable to establish connection to " + client + ".", 5);
+                Debug.Log("Unable to establish connection to " + client + '.', 5);
             }
         }
 
@@ -287,9 +287,9 @@ public class Server {
                 output.reset();
                 output.writeObject(new Message(11, connectedClients));
                 output.flush();
-                Debug.Log("Connected clients list sent to " + client + ".", 4);
+                Debug.Log("Connected clients list sent to " + client + '.', 4);
             } catch (IOException e) {
-                Debug.Log("Unable to send connected clients list to " + client + ".", 5);
+                Debug.Log("Unable to send connected clients list to " + client + '.', 5);
             }
         }
 
@@ -306,9 +306,9 @@ public class Server {
                 output.flush();
                 output.writeObject(new Message(30, newMessages));
                 output.flush();
-                Debug.Log("Message log sent to " + client + ".", 4);
+                Debug.Log("Message log sent to " + client + '.', 4);
             } catch (IOException e) {
-                Debug.Log("Unable to send message log to " + client + ".", 5);
+                Debug.Log("Unable to send message log to " + client + '.', 5);
             }
         }
 
@@ -317,10 +317,10 @@ public class Server {
                 Debug.Log("Sending media URL to " + client + "...", 4);
                 output.writeObject(new Message(20, ServerGUI.mediaPanel.getMediaURL()));
                 output.flush();
-                Debug.Log("Media URL sent to " + client + ".", 4);
+                Debug.Log("Media URL sent to " + client + '.', 4);
                 mediaURL = ServerGUI.mediaPanel.getMediaURL();
             } catch (IOException e) {
-                Debug.Log("Unable to send media URL to " + client + ".", 5);
+                Debug.Log("Unable to send media URL to " + client + '.', 5);
             }
         }
 
@@ -331,17 +331,17 @@ public class Server {
                     output.writeObject(new Message(22, null));
                     output.flush();
                 } catch (IOException e) {
-                    Debug.Log("Unable to send media state to " + client + ".", 5);
+                    Debug.Log("Unable to send media state to " + client + '.', 5);
                 }
             } else {
                 try {
                     output.writeObject(new Message(21, null));
                     output.flush();
                 } catch (IOException e) {
-                    Debug.Log("Unable to send media state to " + client + ".", 5);
+                    Debug.Log("Unable to send media state to " + client + '.', 5);
                 }
             }
-            Debug.Log("Media state sent to " + client + ".", 4);
+            Debug.Log("Media state sent to " + client + '.', 4);
             this.isPaused = ServerGUI.mediaPanel.isMediaPaused();
             sendVideoTime();
         }
@@ -351,9 +351,9 @@ public class Server {
                 Debug.Log("Sending current media time to " + client + "...", 4);
                 output.writeObject(new Message(23, time.add(new Duration(ServerGUI.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
                 output.flush();
-                Debug.Log("Current media time sent to " + client + ".", 4);
+                Debug.Log("Current media time sent to " + client + '.', 4);
             } catch (IOException e) {
-                Debug.Log("Unable to send current media time to " + client + ".", 5);
+                Debug.Log("Unable to send current media time to " + client + '.', 5);
             }
 
             time = ServerGUI.mediaPanel.getMediaTime();

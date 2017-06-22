@@ -13,7 +13,7 @@ public class Debug {
 
     public static void Log(String message, int type) {
         float time = (float) (System.currentTimeMillis() - Debug.START_TIME) / 1000;
-        String header = "[" + new DecimalFormat("0000000.000").format(time) + "]: ";
+        String header = '[' + new DecimalFormat("0000000.000").format(time) + "]: ";
         switch (type) {
             case 1:
                 header += "(INFO) - ";

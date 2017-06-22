@@ -136,7 +136,7 @@ public class ControlPanel extends JPanel {
         chatWindow.setText("");
         for (String message : messages) {
             if (messages.indexOf(message) != messages.size() - 1) {
-                chatWindow.append(message + "\n");
+                chatWindow.append(message + '\n');
             } else {
                 chatWindow.append(message);
             }
@@ -149,7 +149,7 @@ public class ControlPanel extends JPanel {
             chatWindow.append("\n");
         }
         for (String message : messages) {
-            chatWindow.append(message + "\n");
+            chatWindow.append(message + '\n');
         }
         chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
         chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
