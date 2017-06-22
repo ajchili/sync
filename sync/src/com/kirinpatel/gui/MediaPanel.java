@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.net.Client;
 import com.kirinpatel.util.Debug;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -15,6 +16,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Paint;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.awt.event.KeyEvent;
@@ -24,22 +26,26 @@ import java.awt.event.KeyListener;
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.8
+ * @version 0.0.9
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
 
+    private Scene scene;
+    public static Stage stage;
+    private int type;
     private String mediaURL = "";
     private MediaPlayer mediaPlayer;
     private MediaControl mediaControl;
     private HBox mediaBar;
     private boolean isPaused = false;
-    private boolean isFullscreen = false;
 
     /**
      * Main constructor that will initialize the MediaPanel.
      */
-    public MediaPanel() {
+    public MediaPanel(int type) {
+        this.type = type;
+
         Debug.Log("Creating MediaPanel...", 3);
         Platform.runLater(this::initFX);
 
@@ -52,10 +58,7 @@ public class MediaPanel extends JFXPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == 122 && mediaControl != null) {
-                    // TODO: Properly implement fullscreen
-                    // Stage stage = (Stage) mediaControl.getScene().getWindow();
-                    isFullscreen = !isFullscreen;
-                    // stage.setFullScreen(isFullscreen);
+                    Platform.runLater(() -> launchFullscreen());
                 }
             }
 
@@ -64,18 +67,6 @@ public class MediaPanel extends JFXPanel {
 
             }
         });
-    }
-
-    /**
-     * Secondary constructor that will initialize the MediaPanel with a
-     * specified URL.
-     *
-     * @param url Media URL
-     */
-    public MediaPanel(String url) {
-        Debug.Log("Creating MediaPanel...", 3);
-        this.mediaURL = url;
-        Platform.runLater(this::initFX);
     }
 
     /**
@@ -96,12 +87,16 @@ public class MediaPanel extends JFXPanel {
      */
     private Scene createScene() {
         Group root = new Group();
-        Scene scene = new Scene(root, Paint.valueOf("#000000"));
+        scene = new Scene(root, Paint.valueOf("#000000"));
 
         if (!mediaURL.equals("")) {
             Media media = new Media(mediaURL);
             mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setAutoPlay(false);
+            if (type == 1) {
+                mediaPlayer.setAutoPlay(Client.autoPlay);
+            } else {
+                mediaPlayer.setAutoPlay(false);
+            }
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             mediaControl = new MediaControl(mediaPlayer);
             mediaControl.setStyle("-fx-background-color: black;");
@@ -119,13 +114,69 @@ public class MediaPanel extends JFXPanel {
                 Debug.Log("Hiding media bar.", 3);
                 mediaBar.setVisible(false);
             });
-        } else {
-            if (mediaPlayer != null && mediaPlayer.getMedia() != null) {
-                mediaPlayer.pause();
-            }
         }
 
-        return (scene);
+        return scene;
+    }
+
+    public void resetStandardView() {
+        scene.setRoot(mediaControl);
+
+        mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
+        mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
+
+        mediaControl.setOnMouseEntered(event -> {
+            Debug.Log("Displaying media bar.", 3);
+            mediaBar.setVisible(true);
+        });
+
+        mediaControl.setOnMouseExited(event -> {
+            Debug.Log("Hiding media bar.", 3);
+            mediaBar.setVisible(false);
+        });
+
+        setScene(scene);
+    }
+
+    private void launchFullscreen() {
+        if (stage == null) {
+            stage = new Stage();
+        }
+
+        mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
+        mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
+
+        mediaControl.setOnMouseEntered(event -> {
+            Debug.Log("Displaying media bar.", 3);
+            mediaBar.setVisible(true);
+        });
+
+        mediaControl.setOnMouseExited(event -> {
+            Debug.Log("Hiding media bar.", 3);
+            mediaBar.setVisible(false);
+        });
+
+        stage.setScene(scene);
+        stage.setFullScreen(true);
+        stage.setOnCloseRequest(event -> {
+            stage.close();
+            if (type == 0) {
+                ServerGUI.mediaPanel.resetStandardView();
+            } else {
+                ClientGUI.mediaPanel.resetStandardView();
+            }
+        });
+        stage.show();
+    }
+
+    public void closeFullscreen() {
+        if (stage != null) {
+            Platform.runLater(() -> {
+                Debug.Log("Closing fullscreen view...", 3);
+                stage.close();
+                Debug.Log("Fullscreen view closed.", 3);
+            });
+        }
     }
 
     /**
@@ -217,11 +268,11 @@ public class MediaPanel extends JFXPanel {
             BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
             final Button playButton  = new Button(">");
-            mediaBar.getChildren().add(playButton);
+            if (type == 0) mediaBar.getChildren().add(playButton);
             p.getChildren().add(mediaBar);
 
             Label spacer = new Label("   ");
-            mediaBar.getChildren().add(spacer);
+            if (type == 0) mediaBar.getChildren().add(spacer);
 
             Label timeLabel = new Label("Time: ");
             mediaBar.getChildren().add(timeLabel);
@@ -313,6 +364,8 @@ public class MediaPanel extends JFXPanel {
                 Debug.Log("Setting volume...", 1);
                 mp.setVolume(volumeSlider.getValue() / 100.0);
             });
+
+            mediaBar.setVisible(false);
         }
 
         protected void updateValues() {

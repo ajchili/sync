@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.8
+ * @version 0.0.9
  * @date 6/16/17
  */
 public class Server {
@@ -152,13 +152,14 @@ public class Server {
         private String client = "client";
         private boolean isClientConnected = false;
         private String mediaURL = "";
-        private boolean isPaused = false;
+        private boolean isPaused;
         private ArrayList<String> messages = new ArrayList<>();
         private long lastClientUpdate = System.currentTimeMillis() - 9000;
         private Duration time = new Duration(0);
 
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
+            isPaused = !ServerGUI.mediaPanel.isMediaPaused();
         }
 
         public void run() {
@@ -182,7 +183,7 @@ public class Server {
                                     connectedClients.remove(user);
                                     ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                     isClientConnected = false;
-                                    Debug.Log("C" + client + " disconnected.".substring(1), 4);
+                                    Debug.Log("C" + client.substring(1) + " disconnected.".substring(1), 4);
                                 }
                                 break;
                             case 10:
@@ -234,10 +235,10 @@ public class Server {
                 }
 
                 if (isPaused != ServerGUI.mediaPanel.isMediaPaused()) {
-                    sendVideoState(ServerGUI.mediaPanel.isMediaPaused());
+                    sendVideoState();
                 }
 
-                if (time.toMillis() < (ServerGUI.mediaPanel.getMediaTime().toMillis() - 2000) || time.toMillis() > (ServerGUI.mediaPanel.getMediaTime().toMillis() + 1000)) {
+                if (time.toMillis() < (ServerGUI.mediaPanel.getMediaTime().toMillis() - 1750) || time.toMillis() > (ServerGUI.mediaPanel.getMediaTime().toMillis() + 1000)) {
                     sendVideoTime();
                 }
             }
@@ -323,9 +324,9 @@ public class Server {
             }
         }
 
-        private synchronized void sendVideoState(boolean isPaused) {
+        private synchronized void sendVideoState() {
             Debug.Log("Sending media state to " + client + "...", 4);
-            if (isPaused) {
+            if (ServerGUI.mediaPanel.isMediaPaused()) {
                 try {
                     output.writeObject(new Message(22, null));
                     output.flush();

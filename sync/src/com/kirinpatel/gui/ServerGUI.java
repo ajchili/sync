@@ -10,7 +10,7 @@ import java.awt.event.ComponentListener;
 
 /**
  * @author Kirin Patel
- * @version 0.0.3
+ * @version 0.0.4
  * @date 6/16/17
  */
 public class ServerGUI extends JFrame {
@@ -30,7 +30,7 @@ public class ServerGUI extends JFrame {
         setLocationRelativeTo(null);
         addComponentListener(new ResizeListener());
 
-        mediaPanel = new MediaPanel();
+        mediaPanel = new MediaPanel(0);
         add(mediaPanel, BorderLayout.CENTER);
         controlPanel = new ControlPanel(0);
         controlPanel.resizePanel(getWidth(), getHeight());
@@ -61,6 +61,7 @@ public class ServerGUI extends JFrame {
         @Override
         public void componentHidden(ComponentEvent e) {
             Debug.Log("Closing server gui...", 3);
+            mediaPanel.closeFullscreen();
             dispose();
             Debug.Log("Server gui closed.", 3);
             Server.stop();

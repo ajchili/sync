@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.7
+ * @version 0.0.8
  * @date 6/16/17
  */
 public class Client {
@@ -29,6 +29,7 @@ public class Client {
     private ClientGUI gui;
     private static ClientThread clientThread;
     private static ArrayList<String> messages = new ArrayList<>();
+    public static boolean autoPlay = false;
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
 
@@ -73,7 +74,6 @@ public class Client {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private boolean isConnected = false;
-        private boolean isPaused = false;
         private Duration lastSentTime = new Duration(0);
 
         public void run() {
@@ -94,21 +94,23 @@ public class Client {
                                 break;
                             case 11:
                                 Debug.Log("Receiving list of connected clients...", 4);
-                                Debug.Log("Connected clients list received.", 4);
                                 ClientGUI.controlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
+                                Debug.Log("Connected clients list received.", 4);
                                 break;
                             case 20:
                                 Debug.Log("Receiving media URL...", 4);
-                                Debug.Log("Media URL received.", 4);
                                 ClientGUI.mediaPanel.setMediaURL(message.getMessage().toString());
+                                Debug.Log("Media URL received.", 4);
                                 break;
                             case 21:
                                 Debug.Log("Received play action.", 4);
-                                isPaused = false;
+                                ClientGUI.mediaPanel.playMedia();
+                                autoPlay = true;
                                 break;
                             case 22:
                                 Debug.Log("Received pause action.", 4);
-                                isPaused = true;
+                                ClientGUI.mediaPanel.pauseMedia();
+                                autoPlay = false;
                                 break;
                             case 23:
                                 Debug.Log("Receiving media time...", 4);
@@ -140,14 +142,6 @@ public class Client {
 
                 if (messages.size() > 0) {
                     sendMessages();
-                }
-
-                if (isPaused && !ClientGUI.mediaPanel.isMediaPaused()) {
-                    ClientGUI.mediaPanel.pauseMedia();
-                }
-
-                if (!isPaused && ClientGUI.mediaPanel.isMediaPaused()) {
-                    ClientGUI.mediaPanel.playMedia();
                 }
 
                 if (lastSentTime.toMillis() < (ClientGUI.mediaPanel.getMediaTime().toMillis() - 250) || lastSentTime.toMillis() > (ClientGUI.mediaPanel.getMediaTime().toMillis() + 50)) {
