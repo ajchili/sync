@@ -17,7 +17,6 @@ a java based mutli-client video and audio syncing application
 3. Run sync
 	* Server setup
 		* It is recommended to specify the amount of ram that the application can use _(it is recommended to use a minimum of 2 Gigabytes of ram and a multi-core cpu)_
-		
 		1. Port forward if you will be using sync past a local network, sync uses port `8000`
 			* If need be, add sync to your firewall
 		2. Obtain your IP Address
