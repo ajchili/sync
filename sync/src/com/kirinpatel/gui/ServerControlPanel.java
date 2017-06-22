@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.4
+ * @version 0.0.5
  * @date 6/16/17
  */
 public class ServerControlPanel extends JPanel {
@@ -108,6 +108,7 @@ public class ServerControlPanel extends JPanel {
                 chatWindow.append(message);
             }
         }
+        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
     }
 
     class SendMessageListener implements ActionListener {

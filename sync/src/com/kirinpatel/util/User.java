@@ -5,17 +5,18 @@ import java.util.Random;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/17/17
  */
 public class User implements Serializable {
 
     private String username;
     private long userID;
+    private boolean wantsToPause = false;
 
     public User(String username) {
         this.username = username;
-        this.userID = new Random().nextLong();
+        this.userID = Math.abs(new Random().nextLong());
     }
 
     @Override
@@ -37,11 +38,19 @@ public class User implements Serializable {
         this.username = username;
     }
 
+    public void setWantsToPause(boolean wantsToPause) {
+        this.wantsToPause = wantsToPause;
+    }
+
     public String getUsername() {
         return username;
     }
 
     public long getUserID() {
         return userID;
+    }
+
+    public boolean getWantsToPause() {
+        return wantsToPause;
     }
 }

@@ -1,8 +1,7 @@
 package com.kirinpatel;
 
 import com.kirinpatel.net.*;
-import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -12,11 +11,9 @@ import javax.swing.*;
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.0.3
+ * @version 2.0.4
  */
 public class Main extends JFrame {
-    
-    public static Main main;
     
     /**
      * Creates launcher window.
@@ -51,7 +48,7 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        main = new Main();
+        new Main();
     }
     
     /**
