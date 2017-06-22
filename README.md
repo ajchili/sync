@@ -12,11 +12,11 @@ a java based mutli-client video and audio syncing application
 ## setup
 1. Check to see if Java is downloaded
 	* The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version. After downloading the latest version, run the installer. This will either install, update, or notify  you that Java is installed.
-2. Download [sync](https://www.github.com/ajchili/sync)
-	* **No released version, for pre-release testing, please fork or download the repository and run though an IDE.**
+2. Download [sync](https://www.github.com/ajchili/sync/releases)
+	* The latest version can be found in the link above
 3. Run sync
 	* Server setup
-		* It is recommended to specify the amount of ram that the application can use _(it is recommended to use a minimum of 2 Gigabytes of ram)_
+		* It is recommended to specify the amount of ram that the application can use _(it is recommended to use a minimum of 2 Gigabytes of ram and a multi-core cpu)_
 		
 		1. Port forward if you will be using sync past a local network, sync uses port `8000`
 			* If need be, add sync to your firewall
@@ -27,8 +27,6 @@ a java based mutli-client video and audio syncing application
 		4. Load your media into sync and share your IP Address
 		5. Enjoy
 	* Client setup
-		* For client setup, specifying the amount of ram is not required
-		
 		1. To prevent any communication issues, it is recommended to port forward and add sync to your firewall
 		2. Obtain the IP Address of the server you would like to connect to
 		3. Enjoy!
