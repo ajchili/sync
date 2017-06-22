@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.7
+ * @version 0.0.8
  * @date 6/16/17
  */
 public class Server {
@@ -33,7 +33,7 @@ public class Server {
         gui = new ServerGUI();
 
         connectedClients.add(new User(System.getProperty("user.name") + " (host)"));
-        ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
+        ServerGUI.controlPanel.updateConnectedClients(connectedClients);
 
         server = new ServerThread();
         new Thread(server).start();
@@ -50,7 +50,7 @@ public class Server {
 
     public static void sendMessage(String message) {
         messages.add(message);
-        ServerGUI.serverControlPanel.setMessages(messages);
+        ServerGUI.controlPanel.setMessages(messages);
     }
 
     class ServerThread implements Runnable {
@@ -180,7 +180,7 @@ public class Server {
                                 if ((int) message.getMessage() == 0) {
                                     Debug.Log("Disconnecting " + client + "...", 4);
                                     connectedClients.remove(user);
-                                    ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
+                                    ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                     isClientConnected = false;
                                     Debug.Log("C" + client + " disconnected.".substring(1), 4);
                                 }
@@ -191,7 +191,7 @@ public class Server {
                                 Debug.Log("Received " + client + " username.", 4);
                                 connectedClients.add(user);
                                 client += " (" + user.getUsername() + ":" + user.getUserID() + ")";
-                                ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
+                                ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                 break;
                             case 24:
                                 Debug.Log("Receiving " + client + " time...",4);

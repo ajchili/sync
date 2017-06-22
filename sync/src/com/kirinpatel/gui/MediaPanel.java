@@ -2,11 +2,7 @@ package com.kirinpatel.gui;
 
 import com.kirinpatel.util.Debug;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -18,13 +14,16 @@ import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Paint;
 import javafx.util.Duration;
+
+import java.awt.*;
 
 /**
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.6
+ * @version 0.0.7
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
@@ -72,7 +71,7 @@ public class MediaPanel extends JFXPanel {
      */
     private Scene createScene() {
         Group root = new Group();
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root, Paint.valueOf("#000000"));
 
         if (!mediaURL.equals("")) {
             Media media = new Media(mediaURL);
@@ -80,7 +79,7 @@ public class MediaPanel extends JFXPanel {
             mediaPlayer.setAutoPlay(false);
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             mediaControl = new MediaControl(mediaPlayer);
-            mediaControl.setStyle("-fx-background-color: #000000;");
+            mediaControl.setStyle("-fx-background-color: black;");
             scene.setRoot(mediaControl);
 
             mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
@@ -214,110 +213,89 @@ public class MediaPanel extends JFXPanel {
 
             mediaBar.getChildren().add(volumeSlider);
 
-            playButton.setOnAction(new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent e) {
-                    MediaPlayer.Status status = mp.getStatus();
+            playButton.setOnAction(e -> {
+                MediaPlayer.Status status = mp.getStatus();
 
-                    if (status == MediaPlayer.Status.UNKNOWN  || status == MediaPlayer.Status.HALTED)
-                    {
-                        return;
+                if (status == MediaPlayer.Status.UNKNOWN  || status == MediaPlayer.Status.HALTED)
+                {
+                    return;
+                }
+
+                if ( status == MediaPlayer.Status.PAUSED
+                        || status == MediaPlayer.Status.READY
+                        || status == MediaPlayer.Status.STOPPED)
+                {
+                    if (atEndOfMedia) {
+                        mp.seek(mp.getStartTime());
+                        atEndOfMedia = false;
                     }
-
-                    if ( status == MediaPlayer.Status.PAUSED
-                            || status == MediaPlayer.Status.READY
-                            || status == MediaPlayer.Status.STOPPED)
-                    {
-                        if (atEndOfMedia) {
-                            mp.seek(mp.getStartTime());
-                            atEndOfMedia = false;
-                        }
-                        mp.play();
-                    } else {
-                        mp.pause();
-                    }
+                    mp.play();
+                } else {
+                    mp.pause();
                 }
             });
 
-            mp.currentTimeProperty().addListener(new InvalidationListener()
-            {
-                public void invalidated(Observable ov) {
-                    updateValues();
+            mp.currentTimeProperty().addListener(ov -> updateValues());
+
+            mp.setOnPlaying(() -> {
+                if (stopRequested) {
+                    mp.pause();
+                    stopRequested = false;
+                } else {
+                    Debug.Log("Playing media...", 1);
+                    isPaused = false;
+                    playButton.setText("||");
                 }
             });
 
-            mp.setOnPlaying(new Runnable() {
-                public void run() {
-                    if (stopRequested) {
-                        mp.pause();
-                        stopRequested = false;
-                    } else {
-                        Debug.Log("Playing media...", 1);
-                        isPaused = false;
-                        playButton.setText("||");
-                    }
-                }
+            mp.setOnPaused(() -> {
+                Debug.Log("Pausing media...", 1);
+                isPaused = true;
+                playButton.setText(">");
             });
 
-            mp.setOnPaused(new Runnable() {
-                public void run() {
-                    Debug.Log("Pausing media...", 1);
-                    isPaused = true;
-                    playButton.setText(">");
-                }
-            });
-
-            mp.setOnReady(new Runnable() {
-                public void run() {
-                    duration = mp.getMedia().getDuration();
-                    updateValues();
-                }
+            mp.setOnReady(() -> {
+                duration = mp.getMedia().getDuration();
+                updateValues();
             });
 
             mp.setCycleCount(repeat ? MediaPlayer.INDEFINITE : 1);
-            mp.setOnEndOfMedia(new Runnable() {
-                public void run() {
-                    if (!repeat) {
-                        playButton.setText(">");
-                        stopRequested = true;
-                        atEndOfMedia = true;
-                    }
+            mp.setOnEndOfMedia(() -> {
+                if (!repeat) {
+                    playButton.setText(">");
+                    stopRequested = true;
+                    atEndOfMedia = true;
                 }
             });
 
-            timeSlider.valueProperty().addListener(new InvalidationListener() {
-                public void invalidated(Observable ov) {
-                    if (timeSlider.isValueChanging()) {
-                        Debug.Log("Seeking through media...", 1);
-                        mp.seek(duration.multiply(timeSlider.getValue() / 100.0));
-                    }
+            timeSlider.valueProperty().addListener(ov -> {
+                if (timeSlider.isValueChanging()) {
+                    Debug.Log("Seeking through media...", 1);
+                    mp.seek(duration.multiply(timeSlider.getValue() / 100.0));
                 }
             });
 
-            volumeSlider.valueProperty().addListener(new InvalidationListener() {
-                public void invalidated(Observable ov) {
-                    Debug.Log("Setting volume...", 1);
-                    mp.setVolume(volumeSlider.getValue() / 100.0);
-                }
+            volumeSlider.valueProperty().addListener(ov -> {
+                Debug.Log("Setting volume...", 1);
+                mp.setVolume(volumeSlider.getValue() / 100.0);
             });
         }
 
         protected void updateValues() {
             if (playTime != null && timeSlider != null && volumeSlider != null) {
-                Platform.runLater(new Runnable() {
-                    public void run() {
-                        Duration currentTime = mp.getCurrentTime();
-                        playTime.setText(formatTime(currentTime, duration));
-                        timeSlider.setDisable(duration.isUnknown());
-                        if (!timeSlider.isDisabled()
-                                && duration.greaterThan(Duration.ZERO)
-                                && !timeSlider.isValueChanging()) {
-                            timeSlider.setValue(currentTime.divide(duration).toMillis()
-                                    * 100.0);
-                        }
-                        if (!volumeSlider.isValueChanging()) {
-                            volumeSlider.setValue((int)Math.round(mp.getVolume()
-                                    * 100));
-                        }
+                Platform.runLater(() -> {
+                    Duration currentTime = mp.getCurrentTime();
+                    playTime.setText(formatTime(currentTime, duration));
+                    timeSlider.setDisable(duration.isUnknown());
+                    if (!timeSlider.isDisabled()
+                            && duration.greaterThan(Duration.ZERO)
+                            && !timeSlider.isValueChanging()) {
+                        timeSlider.setValue(currentTime.divide(duration).toMillis()
+                                * 100.0);
+                    }
+                    if (!volumeSlider.isValueChanging()) {
+                        volumeSlider.setValue((int)Math.round(mp.getVolume()
+                                * 100));
                     }
                 });
             }

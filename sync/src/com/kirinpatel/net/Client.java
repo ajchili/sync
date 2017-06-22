@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.6
+ * @version 0.0.7
  * @date 6/16/17
  */
 public class Client {
@@ -95,7 +95,7 @@ public class Client {
                             case 11:
                                 Debug.Log("Receiving list of connected clients...", 4);
                                 Debug.Log("Connected clients list received.", 4);
-                                ClientGUI.clientControlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
+                                ClientGUI.controlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
                                 break;
                             case 20:
                                 Debug.Log("Receiving media URL...", 4);
@@ -118,7 +118,7 @@ public class Client {
                                 break;
                             case 30:
                                 Debug.Log("Receiving chat messages...", 4);
-                                ClientGUI.clientControlPanel.setMessages((ArrayList<String>) message.getMessage());
+                                ClientGUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
                                 Debug.Log("Chat messages received.", 4);
                                 break;
                             default:

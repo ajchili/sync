@@ -10,13 +10,13 @@ import java.awt.event.ComponentListener;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/16/17
  */
 public class ClientGUI extends JFrame {
 
     public static MediaPanel mediaPanel;
-    public static ClientControlPanel clientControlPanel;
+    public static ControlPanel controlPanel;
 
     public ClientGUI() {
         super("sync - Client (" + Client.ipAddress + ":8000)");
@@ -32,9 +32,9 @@ public class ClientGUI extends JFrame {
 
         mediaPanel = new MediaPanel();
         add(mediaPanel, BorderLayout.CENTER);
-        clientControlPanel = new ClientControlPanel();
-        clientControlPanel.resizePanel(getWidth(), getHeight());
-        add(clientControlPanel, BorderLayout.EAST);
+        controlPanel = new ControlPanel(1);
+        controlPanel.resizePanel(getWidth(), getHeight());
+        add(controlPanel, BorderLayout.EAST);
 
         setVisible(true);
 
@@ -45,7 +45,7 @@ public class ClientGUI extends JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            clientControlPanel.resizePanel(getWidth(), getHeight());
+            controlPanel.resizePanel(getWidth(), getHeight());
         }
 
         @Override
