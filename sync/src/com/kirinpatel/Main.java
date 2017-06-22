@@ -1,11 +1,14 @@
 package com.kirinpatel;
 
-import com.kirinpatel.net.*;
-import com.kirinpatel.util.*;
-import java.awt.*;
-import java.awt.event.*;
+import com.kirinpatel.net.Client;
+import com.kirinpatel.net.Server;
+import com.kirinpatel.util.Debug;
+import com.kirinpatel.util.UIMessage;
+
 import javax.swing.*;
-import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * Main class that will run the application. This class, as of version 2.0, will

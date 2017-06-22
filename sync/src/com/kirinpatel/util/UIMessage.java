@@ -5,7 +5,7 @@
  */
 package com.kirinpatel.util;
 
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
 /**
  * Message JOptionPanes that will be displayed to user for message and error
