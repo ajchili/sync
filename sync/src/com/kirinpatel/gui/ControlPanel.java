@@ -90,9 +90,9 @@ public class ControlPanel extends JPanel {
         add(chatPanel);
 
         if (Main.isDarkModeEnabled) {
-            Color foreground = getBackground();
             setBackground(Color.black);
             connectedClients.setBackground(Color.black);
+            Color foreground = getBackground();
             connectedClients.setForeground(foreground);
             mediaControlPanel.setBackground(Color.black);
             urlField.setBackground(Color.black);
