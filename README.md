@@ -10,6 +10,11 @@ a java based mutli-client video and audio syncing application
 	* _I am currently unable to test the bandwidth usages of sync, however, the application communicates between clients/server multiple times per second for multiple queries._
 * Poor performance
 	* _**Currently, the best way to avoid a massive performance hit on a low-end machine is to use fullscreen mode.** This will run two windows but allow the playback to run on a separate thread than the regular gui and increases performance._
+	
+## features
+* Realtime video and audio synchronization
+* Fullscreen playback
+* Realtime chat
 
 ## setup
 1. Check to see if Java is downloaded
@@ -26,8 +31,8 @@ a java based mutli-client video and audio syncing application
 			* As of version [0.2.1](https://github.com/ajchili/sync/releases/tag/0.2.1), the IP Address of the server will be displayed in the title of the server window
 		3. Ensure your media is of `.mp4` format and accessible by a web browser
 		4. Load your media into sync and share your IP Address
-		5. Enjoy
+		5. Enjoy!
 	* Client setup
-		1. To prevent any communication issues, it is recommended to port forward and add sync to your firewall
+		1. To prevent any communication issues, it is recommended to add sync to your firewall
 		2. Obtain the IP Address of the server you would like to connect to
 		3. Enjoy!
