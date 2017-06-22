@@ -9,7 +9,13 @@ a java based mutli-client video and audio syncing application
 * Potentially high bandwidth usage
 	* _I am currently unable to test the bandwidth usages of sync, however, the application communicates between clients/server multiple times per second for multiple queries._
 * Poor performance
-	* _**Currently, the best way to avoid a massive performance hit on a low-end machine is to use fullscreen mode.** This will run two windows but allow the playback to run on a separate thread than the regular gui and increases performance._
+	* _**Currently, the best way to avoid a massive performance hit on a low-end machine is to use fullscreen mode.** This will run two windows but allows media playback to run on a separate thread than the regular gui which increases performance._
+
+## compatibility issues
+While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
+
+* Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
+	* Messaging feature not compatibile with any other version
 	
 ## features
 * Realtime video and audio synchronization
@@ -20,7 +26,8 @@ a java based mutli-client video and audio syncing application
 1. Check to see if Java is downloaded
 	* The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version. After downloading the latest version, run the installer. This will either install, update, or notify  you that Java is installed.
 2. Download [sync](https://www.github.com/ajchili/sync/releases)
-	* The latest version can be found in the link above
+	* The latest stable version can be found in the link above
+	* The latest development version can be obtained through the repository itself
 3. Run sync
 	* Server setup
 		* It is recommended to specify the amount of ram that the application can use _(it is recommended to use a minimum of 2 Gigabytes of ram and a multi-core cpu)_
