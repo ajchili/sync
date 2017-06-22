@@ -140,7 +140,7 @@ public class Client {
                     e.printStackTrace();
                 }
 
-                if (messages.size() > 0) {
+                if (!messages.isEmpty()) {
                     sendMessages();
                 }
 

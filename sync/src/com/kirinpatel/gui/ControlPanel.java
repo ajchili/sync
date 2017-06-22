@@ -145,7 +145,7 @@ public class ControlPanel extends JPanel {
     }
 
     public void addMessages(ArrayList<String> messages) {
-        if (chatWindow.getText().length() != 0) {
+        if (!chatWindow.getText().isEmpty()) {
             chatWindow.append("\n");
         }
         for (String message : messages) {
