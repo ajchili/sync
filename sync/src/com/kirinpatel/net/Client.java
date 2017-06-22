@@ -169,6 +169,8 @@ public class Client {
                 new UIMessage("Error joining server!", "Server is either full or not running!", 1);
                 Client.stop();
                 return;
+            } catch (SocketException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
