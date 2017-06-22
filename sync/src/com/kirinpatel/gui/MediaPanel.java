@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.util.Debug;
 import javafx.application.Platform;
@@ -19,6 +20,7 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -26,7 +28,7 @@ import java.awt.event.KeyListener;
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.9
+ * @version 0.0.10
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
@@ -99,21 +101,12 @@ public class MediaPanel extends JFXPanel {
             }
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             mediaControl = new MediaControl(mediaPlayer);
-            mediaControl.setStyle("-fx-background-color: black;");
             scene.setRoot(mediaControl);
 
             mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
             mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
 
-            mediaControl.setOnMouseEntered(event -> {
-                Debug.Log("Displaying media bar.", 3);
-                mediaBar.setVisible(true);
-            });
-
-            mediaControl.setOnMouseExited(event -> {
-                Debug.Log("Hiding media bar.", 3);
-                mediaBar.setVisible(false);
-            });
+            setupMouseCalculations();
         }
 
         return scene;
@@ -125,15 +118,7 @@ public class MediaPanel extends JFXPanel {
         mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
         mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
 
-        mediaControl.setOnMouseEntered(event -> {
-            Debug.Log("Displaying media bar.", 3);
-            mediaBar.setVisible(true);
-        });
-
-        mediaControl.setOnMouseExited(event -> {
-            Debug.Log("Hiding media bar.", 3);
-            mediaBar.setVisible(false);
-        });
+        setupMouseCalculations();
 
         setScene(scene);
     }
@@ -146,15 +131,7 @@ public class MediaPanel extends JFXPanel {
         mediaControl.mediaView.fitWidthProperty().bind(scene.widthProperty());
         mediaControl.mediaView.fitHeightProperty().bind(scene.heightProperty());
 
-        mediaControl.setOnMouseEntered(event -> {
-            Debug.Log("Displaying media bar.", 3);
-            mediaBar.setVisible(true);
-        });
-
-        mediaControl.setOnMouseExited(event -> {
-            Debug.Log("Hiding media bar.", 3);
-            mediaBar.setVisible(false);
-        });
+        setupMouseCalculations();
 
         stage.setScene(scene);
         stage.setFullScreen(true);
@@ -167,6 +144,25 @@ public class MediaPanel extends JFXPanel {
             }
         });
         stage.show();
+    }
+
+    private void setupMouseCalculations() {
+        mediaControl.setOnMouseMoved(event -> {
+            if (event.getY() > mediaControl.getHeight() - 20 && !mediaBar.isVisible()) {
+                Debug.Log("Displaying media bar.", 3);
+                mediaBar.setVisible(true);
+            } else if (event.getY() <  mediaControl.getHeight() - 20 && mediaBar.isVisible()) {
+                Debug.Log("Hiding media bar.", 3);
+                mediaBar.setVisible(false);
+            }
+        });
+
+        mediaControl.setOnMouseExited(event -> {
+            if (mediaBar.isVisible()) {
+                Debug.Log("Hiding media bar.", 3);
+                mediaBar.setVisible(false);
+            }
+        });
     }
 
     public void closeFullscreen() {
@@ -257,25 +253,22 @@ public class MediaPanel extends JFXPanel {
 
             StackPane p = new StackPane();
             p.getChildren().add(mediaView);
-            p.setStyle("-fx-background-color: black;");
+            setStyle("-fx-background-color: black;");
             StackPane.setAlignment(mediaView, Pos.CENTER);
 
             setCenter(p);
 
             mediaBar = new HBox();
             mediaBar.setAlignment(Pos.BOTTOM_CENTER);
+            StackPane.setAlignment(mediaView, Pos.BOTTOM_CENTER);
             mediaBar.setPadding(new Insets(5, 10, 5, 10));
-            BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
-            final Button playButton  = new Button(">");
+            final Button playButton = new Button(">");
             if (type == 0) mediaBar.getChildren().add(playButton);
             p.getChildren().add(mediaBar);
 
-            Label spacer = new Label("   ");
-            if (type == 0) mediaBar.getChildren().add(spacer);
-
-            Label timeLabel = new Label("Time: ");
-            mediaBar.getChildren().add(timeLabel);
+            if (type == 0) mediaBar.getChildren().add(new Label("   "));
+            mediaBar.getChildren().add(new Label("Time: "));
 
             timeSlider = new Slider();
             HBox.setHgrow(timeSlider, Priority.ALWAYS);
@@ -288,28 +281,24 @@ public class MediaPanel extends JFXPanel {
             playTime.setMinWidth(50);
             mediaBar.getChildren().add(playTime);
 
-            Label volumeLabel = new Label("Vol: ");
-            mediaBar.getChildren().add(volumeLabel);
+            mediaBar.getChildren().add(new Label("Vol: "));
 
             volumeSlider = new Slider();
             volumeSlider.setPrefWidth(70);
             volumeSlider.setMaxWidth(Region.USE_PREF_SIZE);
             volumeSlider.setMinWidth(30);
-
             mediaBar.getChildren().add(volumeSlider);
 
             playButton.setOnAction(e -> {
                 MediaPlayer.Status status = mp.getStatus();
 
-                if (status == MediaPlayer.Status.UNKNOWN  || status == MediaPlayer.Status.HALTED)
-                {
+                if (status == MediaPlayer.Status.UNKNOWN || status == MediaPlayer.Status.HALTED) {
                     return;
                 }
 
-                if ( status == MediaPlayer.Status.PAUSED
+                if (status == MediaPlayer.Status.PAUSED
                         || status == MediaPlayer.Status.READY
-                        || status == MediaPlayer.Status.STOPPED)
-                {
+                        || status == MediaPlayer.Status.STOPPED) {
                     if (atEndOfMedia) {
                         mp.seek(mp.getStartTime());
                         atEndOfMedia = false;
@@ -353,12 +342,14 @@ public class MediaPanel extends JFXPanel {
                 }
             });
 
-            timeSlider.valueProperty().addListener(ov -> {
-                if (timeSlider.isValueChanging()) {
-                    Debug.Log("Seeking through media...", 1);
-                    mp.seek(duration.multiply(timeSlider.getValue() / 100.0));
-                }
-            });
+            if (type == 0) {
+                timeSlider.valueProperty().addListener(ov -> {
+                    if (timeSlider.isValueChanging()) {
+                        Debug.Log("Seeking through media...", 1);
+                        mp.seek(duration.multiply(timeSlider.getValue() / 100.0));
+                    }
+                });
+            }
 
             volumeSlider.valueProperty().addListener(ov -> {
                 Debug.Log("Setting volume...", 1);
@@ -381,7 +372,7 @@ public class MediaPanel extends JFXPanel {
                                 * 100.0);
                     }
                     if (!volumeSlider.isValueChanging()) {
-                        volumeSlider.setValue((int)Math.round(mp.getVolume()
+                        volumeSlider.setValue((int) Math.round(mp.getVolume()
                                 * 100));
                     }
                 });
@@ -389,17 +380,16 @@ public class MediaPanel extends JFXPanel {
         }
 
         private String formatTime(Duration elapsed, Duration duration) {
-            int intElapsed = (int)Math.floor(elapsed.toSeconds());
+            int intElapsed = (int) Math.floor(elapsed.toSeconds());
             int elapsedHours = intElapsed / (60 * 60);
             if (elapsedHours > 0) {
                 intElapsed -= elapsedHours * 60 * 60;
             }
             int elapsedMinutes = intElapsed / 60;
-            int elapsedSeconds = intElapsed - elapsedHours * 60 * 60
-                    - elapsedMinutes * 60;
+            int elapsedSeconds = intElapsed - elapsedHours * 60 * 60 - elapsedMinutes * 60;
 
             if (duration.greaterThan(Duration.ZERO)) {
-                int intDuration = (int)Math.floor(duration.toSeconds());
+                int intDuration = (int) Math.floor(duration.toSeconds());
                 int durationHours = intDuration / (60 * 60);
                 if (durationHours > 0) {
                     intDuration -= durationHours * 60 * 60;
@@ -413,7 +403,7 @@ public class MediaPanel extends JFXPanel {
                             durationHours, durationMinutes, durationSeconds);
                 } else {
                     return String.format("%02d:%02d/%02d:%02d",
-                            elapsedMinutes, elapsedSeconds,durationMinutes,
+                            elapsedMinutes, elapsedSeconds, durationMinutes,
                             durationSeconds);
                 }
             } else {
@@ -421,11 +411,10 @@ public class MediaPanel extends JFXPanel {
                     return String.format("%d:%02d:%02d", elapsedHours,
                             elapsedMinutes, elapsedSeconds);
                 } else {
-                    return String.format("%02d:%02d",elapsedMinutes,
+                    return String.format("%02d:%02d", elapsedMinutes,
                             elapsedSeconds);
                 }
             }
         }
     }
-
 }

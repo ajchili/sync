@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
@@ -7,6 +8,7 @@ import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,15 +16,18 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.2
+ * @version 0.0.3
  * @date 6/21/17
  */
 public class ControlPanel extends JPanel {
 
     private JList connectedClients;
     private JScrollPane connectedClientsScroll;
+    private JPanel mediaControlPanel;
     private JTextField urlField;
     private JButton setUrl;
+    private JPanel chatPanel;
+    private JPanel messagePanel;
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
@@ -37,10 +42,11 @@ public class ControlPanel extends JPanel {
         connectedClients.setToolTipText("Connected Clients");
         connectedClients.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         connectedClientsScroll = new JScrollPane(connectedClients);
+        connectedClientsScroll.setBorder(null);
         add(connectedClientsScroll);
 
         if (type == 0) {
-            JPanel mediaControlPanel = new JPanel(new GridLayout(2, 1));
+            mediaControlPanel = new JPanel(new GridLayout(2, 1));
             urlField = new JTextField();
             urlField.setToolTipText("Media URL");
             mediaControlPanel.add(urlField);
@@ -66,13 +72,14 @@ public class ControlPanel extends JPanel {
             add(new JPanel());
         }
 
-        JPanel chatPanel = new JPanel(new BorderLayout());
+        chatPanel = new JPanel(new BorderLayout());
         chatWindow = new JTextArea();
         chatWindow.setEditable(false);
         chatWindow.setToolTipText("Chat Box");
         chatWindowScroll = new JScrollPane(chatWindow);
+        chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
-        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
         chatField.setToolTipText("Message Box");
         chatField.addActionListener(new ControlPanel.SendMessageListener(type));
@@ -82,6 +89,30 @@ public class ControlPanel extends JPanel {
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
         add(chatPanel);
+
+        if (Main.isDarkModeEnabled) {
+            Color foreground = getBackground();
+            setBackground(Color.black);
+            connectedClients.setBackground(Color.black);
+            connectedClients.setForeground(foreground);
+            mediaControlPanel.setBackground(Color.black);
+            urlField.setBackground(Color.black);
+            urlField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
+            urlField.setForeground(foreground);
+            setUrl.setBackground(Color.black);
+            setUrl.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
+            setUrl.setForeground(foreground);
+            chatPanel.setBackground(Color.black);
+            messagePanel.setBackground(Color.black);
+            chatWindow.setBackground(Color.black);
+            chatWindow.setForeground(foreground);
+            chatField.setBackground(Color.black);
+            chatField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
+            chatField.setForeground(foreground);
+            send.setBackground(Color.black);
+            send.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
+            send.setForeground(foreground);
+        }
 
         Debug.Log("ControlPanel created.", 3);
     }

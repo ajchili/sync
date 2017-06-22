@@ -5,16 +5,19 @@ import com.kirinpatel.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.border.Border;
 
 /**
  * Main class that will run the application. This class, as of version 2.0, will
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.0.4
+ * @version 2.1.0
  */
 public class Main extends JFrame {
-    
+
+    public static boolean isDarkModeEnabled = false;
+
     /**
      * Creates launcher window.
      */
@@ -25,19 +28,27 @@ public class Main extends JFrame {
         setSize(400, 200);
         
         setResizable(false);
-        setLayout(new GridLayout(1, 2));
+        setLayout(new BorderLayout());
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
 
         JButton hostServer = new JButton("Host");
         hostServer.addActionListener(new LauncherButtonEvent(0));
-        add(hostServer);
-        
+        buttonPanel.add(hostServer);
         JButton joinServer = new JButton("Join");
         joinServer.addActionListener(new LauncherButtonEvent(1));
-        add(joinServer);
-                
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        
+        buttonPanel.add(joinServer);
+        add(buttonPanel, BorderLayout.CENTER);
+
+        JCheckBox darkModeCheckBox = new JCheckBox("Dark mode");
+        darkModeCheckBox.addActionListener(e -> {
+            JCheckBox box = (JCheckBox) e.getSource();
+            isDarkModeEnabled = box.isSelected();
+        });
+        add(darkModeCheckBox, BorderLayout.SOUTH);
+
         setVisible(true);
         Debug.Log("Sync launcher displayed.", 3);
     }
