@@ -24,7 +24,7 @@ import javafx.util.Duration;
  * This class will create a media view. This view will allow for playback of .mp4 files from a URL.
  *
  * @author Kirin Patel
- * @version 0.0.5
+ * @version 0.0.6
  * @date 6/16/17
  */
 public class MediaPanel extends JFXPanel {
@@ -77,7 +77,7 @@ public class MediaPanel extends JFXPanel {
         if (!mediaURL.equals("")) {
             Media media = new Media(mediaURL);
             mediaPlayer = new MediaPlayer(media);
-            mediaPlayer.setAutoPlay(true);
+            mediaPlayer.setAutoPlay(false);
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             mediaControl = new MediaControl(mediaPlayer);
             mediaControl.setStyle("-fx-background-color: #000000;");

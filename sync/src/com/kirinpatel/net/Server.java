@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.6
+ * @version 0.0.7
  * @date 6/16/17
  */
 public class Server {
@@ -154,7 +154,7 @@ public class Server {
         private String mediaURL = "";
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis() - 4000;
+        private long lastClientUpdate = System.currentTimeMillis() - 9000;
         private Duration time = new Duration(0);
 
         public ServerSocketTask(Socket socket) {
@@ -190,7 +190,7 @@ public class Server {
                                 user = new User(message.getMessage().toString());
                                 Debug.Log("Received " + client + " username.", 4);
                                 connectedClients.add(user);
-                                client = client + " (" + user.getUsername() + ":" + user.getUserID() + ")";
+                                client += " (" + user.getUsername() + ":" + user.getUserID() + ")";
                                 ServerGUI.serverControlPanel.updateConnectedClients(connectedClients);
                                 break;
                             case 24:
@@ -221,7 +221,7 @@ public class Server {
                     e.printStackTrace();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 5000) {
+                if (System.currentTimeMillis() > lastClientUpdate + 10000) {
                     sendConnectedUsersToClient();
                 }
 
@@ -275,20 +275,20 @@ public class Server {
                 output.flush();
                 Debug.Log("Established connection to " + client + ".", 4);
             } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to establish connection to " + client + ".", 5);
             }
         }
 
         private synchronized void sendConnectedUsersToClient() {
             try {
                 lastClientUpdate = System.currentTimeMillis();
-                Debug.Log("Sending list connected " + client + "...", 4);
+                Debug.Log("Sending connected clients list to " + client + "...", 4);
                 output.reset();
                 output.writeObject(new Message(11, connectedClients));
                 output.flush();
-                Debug.Log("Connected clients list sent.", 4);
+                Debug.Log("Connected clients list sent to " + client + ".", 4);
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to send connected clients list to " + client + ".", 5);
             }
         }
 
@@ -307,7 +307,7 @@ public class Server {
                 output.flush();
                 Debug.Log("Message log sent to " + client + ".", 4);
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to send message log to " + client + ".", 5);
             }
         }
 
@@ -319,7 +319,7 @@ public class Server {
                 Debug.Log("Media URL sent to " + client + ".", 4);
                 mediaURL = ServerGUI.mediaPanel.getMediaURL();
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to send media URL to " + client + ".", 5);
             }
         }
 
@@ -330,14 +330,14 @@ public class Server {
                     output.writeObject(new Message(22, null));
                     output.flush();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Debug.Log("Unable to send media state to " + client + ".", 5);
                 }
             } else {
                 try {
                     output.writeObject(new Message(21, null));
                     output.flush();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Debug.Log("Unable to send media state to " + client + ".", 5);
                 }
             }
             Debug.Log("Media state sent to " + client + ".", 4);
@@ -352,7 +352,7 @@ public class Server {
                 output.flush();
                 Debug.Log("Current media time sent to " + client + ".", 4);
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to send current media time to " + client + ".", 5);
             }
 
             time = ServerGUI.mediaPanel.getMediaTime();
