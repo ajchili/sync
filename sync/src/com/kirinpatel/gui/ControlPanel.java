@@ -90,9 +90,9 @@ public class ControlPanel extends JPanel {
         add(chatPanel);
 
         if (Main.isDarkModeEnabled) {
+            Color foreground = Color.white;
             setBackground(Color.black);
             connectedClients.setBackground(Color.black);
-            Color foreground = getBackground();
             connectedClients.setForeground(foreground);
             mediaControlPanel.setBackground(Color.black);
             urlField.setBackground(Color.black);
@@ -118,7 +118,7 @@ public class ControlPanel extends JPanel {
 
     public void resizePanel(int width, int height) {
         width = ((width - (height * 16 / 9)) < 200) ? 200 : width - (height * 16 / 9);
-        if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 3));
+        if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 6));
         connectedClientsScroll.setPreferredSize(new Dimension(width, height / 3));
     }
 
