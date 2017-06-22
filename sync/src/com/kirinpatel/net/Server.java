@@ -350,7 +350,7 @@ public class Server {
                 Debug.Log("Sending current media time to " + client + "...", 4);
                 output.writeObject(new Message(23, time.add(new Duration(ServerGUI.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
                 output.flush();
-                Debug.Log("Current mecia time sent to " + client + ".", 4);
+                Debug.Log("Current media time sent to " + client + ".", 4);
             } catch (IOException e) {
                 e.printStackTrace();
             }
