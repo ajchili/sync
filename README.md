@@ -31,6 +31,3 @@ a java based mutli-client video and audio syncing application
 		1. To prevent any communication issues, it is recommended to port forward and add sync to your firewall
 		2. Obtain the IP Address of the server you would like to connect to
 		3. Enjoy!
-
-## how to contribute
-* To contribute to sync, fork and create a pull request. Then, make the changes that you think would benefit the program. If the changes help in any way I will merge your request.
