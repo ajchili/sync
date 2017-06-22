@@ -9,7 +9,7 @@ import java.text.DecimalFormat;
  */
 public class Debug {
 
-    private final static long START_TIME = System.currentTimeMillis();
+    private static final long START_TIME = System.currentTimeMillis();
 
     public static void Log(String message, int type) {
         float time = (float) (System.currentTimeMillis() - Debug.START_TIME) / 1000;
