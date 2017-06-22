@@ -89,7 +89,7 @@ public class MediaPanel extends JFXPanel {
         Group root = new Group();
         scene = new Scene(root, Paint.valueOf("#000000"));
 
-        if (!mediaURL.equals("")) {
+        if (!mediaURL.isEmpty()) {
             Media media = new Media(mediaURL);
             mediaPlayer = new MediaPlayer(media);
             if (type == 1) {
