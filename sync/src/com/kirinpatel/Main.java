@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.1.0
  */
 public class Main extends JFrame {
 

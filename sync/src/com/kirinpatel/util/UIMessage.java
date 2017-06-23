@@ -12,7 +12,6 @@ import javax.swing.*;
  * events.
  * 
  * @author Kirin Patel
- * @version 1.0.0
  */
 public class UIMessage {
     

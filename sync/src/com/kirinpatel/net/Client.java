@@ -1,6 +1,7 @@
 package com.kirinpatel.net;
 
 import com.kirinpatel.gui.ClientGUI;
+import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.8
  * @date 6/16/17
  */
 public class Client {
@@ -29,7 +29,6 @@ public class Client {
     private ClientGUI gui;
     private static ClientThread clientThread;
     private static ArrayList<String> messages = new ArrayList<>();
-    public static boolean autoPlay = false;
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
 
@@ -74,7 +73,7 @@ public class Client {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private boolean isConnected = false;
-        private Duration lastSentTime = new Duration(0);
+        private long lastSentTime = 0;
 
         public void run() {
             connectToServer();
@@ -99,23 +98,22 @@ public class Client {
                                 break;
                             case 20:
                                 Debug.Log("Receiving media URL...", 4);
-                                ClientGUI.mediaPanel.setMediaURL(message.getMessage().toString());
+                                PlaybackPanel.mediaPlayer.setMediaURL(message.getMessage().toString());
                                 Debug.Log("Media URL received.", 4);
                                 break;
                             case 21:
                                 Debug.Log("Received play action.", 4);
-                                ClientGUI.mediaPanel.playMedia();
-                                autoPlay = true;
+                                PlaybackPanel.mediaPlayer.play();
                                 break;
                             case 22:
                                 Debug.Log("Received pause action.", 4);
-                                ClientGUI.mediaPanel.pauseMedia();
-                                autoPlay = false;
+                                PlaybackPanel.mediaPlayer.pause();
                                 break;
                             case 23:
                                 Debug.Log("Receiving media time...", 4);
-                                lastSentTime = (Duration) message.getMessage();
-                                ClientGUI.mediaPanel.seek(lastSentTime);
+                                //if (((long) message.getMessage() - lastSentTime) < 0) PlaybackPanel.mediaPlayer.pause();
+                                lastSentTime = (long) message.getMessage();
+                                PlaybackPanel.mediaPlayer.seekTo(lastSentTime);
                                 Debug.Log("Media time set.", 4);
                                 break;
                             case 30:
@@ -144,7 +142,7 @@ public class Client {
                     sendMessages();
                 }
 
-                if (lastSentTime.toMillis() < (ClientGUI.mediaPanel.getMediaTime().toMillis() - 250) || lastSentTime.toMillis() > (ClientGUI.mediaPanel.getMediaTime().toMillis() + 50)) {
+                if (lastSentTime < (PlaybackPanel.mediaPlayer.getMediaTime() - 250) || lastSentTime > (PlaybackPanel.mediaPlayer.getMediaTime() + 50)) {
                     sendVideoTime();
                 }
             }
@@ -191,7 +189,6 @@ public class Client {
             Debug.Log("Client started.", 1);
 
             sendUsernameToServer();
-            sendVideoTime();
         }
 
         private synchronized void disconnectFromServer() {
@@ -200,11 +197,13 @@ public class Client {
                 if (output != null && !isServerClosed) {
                     output.writeObject(new Message(0, 0));
                     output.flush();
-                } if (isServerClosed) {
+                } else if (isServerClosed) {
                     new UIMessage("Server shutdown.", "The sync server that you were connected to has shutdown.", 0);
+                    System.exit(0);
                     return;
                 } else {
                     Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
+                    System.exit(0);
                     return;
                 }
             } catch (IOException e) {
@@ -221,6 +220,7 @@ public class Client {
 
             Debug.Log("Disconnected from server.", 4);
             Debug.Log("Client stopped.", 1);
+            System.exit(0);
         }
 
         private synchronized void sendUsernameToServer() {
@@ -237,7 +237,7 @@ public class Client {
         private synchronized void sendVideoTime() {
             try {
                 Debug.Log("Sending current media time...", 4);
-                output.writeObject(new Message(24, ClientGUI.mediaPanel.getMediaTime()));
+                output.writeObject(new Message(24, PlaybackPanel.mediaPlayer.getMediaTime()));
                 output.flush();
                 Debug.Log("Current media time sent.", 4);
             } catch (SocketException e) {
@@ -246,7 +246,7 @@ public class Client {
                 e.printStackTrace();
             }
 
-            lastSentTime = ClientGUI.mediaPanel.getMediaTime();
+            lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
         }
 
         private synchronized void sendMessages() {
