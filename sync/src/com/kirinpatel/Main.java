@@ -15,7 +15,6 @@ import java.awt.event.ActionListener;
  * also server as the launcher for the application.
  * 
  * @author Kirin Patel
- * @version 2.1.0
  */
 public class Main extends JFrame {
 
@@ -62,8 +61,7 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        // new Main();
-        Testing.StartTest();
+        new Main();
     }
     
     /**

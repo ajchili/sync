@@ -5,7 +5,6 @@ import java.util.Random;
 
 /**
  * @author Kirin Patel
- * @version 0.0.3
  * @date 6/17/17
  */
 public class User implements Serializable {

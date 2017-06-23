@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 /**
  * @author Kirin Patel
- * @version 0.0.3
  * @date 6/21/17
  */
 public class ControlPanel extends JPanel {
@@ -25,12 +24,9 @@ public class ControlPanel extends JPanel {
     private JPanel mediaControlPanel;
     private JTextField urlField;
     private JButton setUrl;
-    private JPanel chatPanel;
-    private JPanel messagePanel;
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
-    private JButton send;
 
     public ControlPanel(int type) {
         super(new GridLayout(3, 1));
@@ -51,18 +47,15 @@ public class ControlPanel extends JPanel {
             mediaControlPanel.add(urlField);
             setUrl = new JButton("Set Media URL");
             setUrl.addActionListener(e -> {
-                if (!urlField.getText().isEmpty() && urlField.getText().endsWith(".mp4")) {
-                    ServerGUI.mediaPanel.setMediaURL(urlField.getText());
+                if (!urlField.getText().isEmpty()) {
+                    PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
                 } else if (urlField.getText().isEmpty()) {
-                    if (!ServerGUI.mediaPanel.getMediaURL().isEmpty()) {
-                        ServerGUI.mediaPanel.setMediaURL("");
+                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
+                        PlaybackPanel.mediaPlayer.setMediaURL("");
                     } else {
                         Debug.Log("Media URL not specified!", 2);
                         new UIMessage("Error setting Media URL!", "The Media URL must be specified!", 1);
                     }
-                } else if (!urlField.getText().endsWith(".mp4")) {
-                    Debug.Log("Media URL is not .mp4 format!", 2);
-                    new UIMessage("Error setting Media URL!", "The Media URL must be of .mp4 format!", 1);
                 }
             });
             mediaControlPanel.add(setUrl);
@@ -71,19 +64,19 @@ public class ControlPanel extends JPanel {
             add(new JPanel());
         }
 
-        chatPanel = new JPanel(new BorderLayout());
+        JPanel chatPanel = new JPanel(new BorderLayout());
         chatWindow = new JTextArea();
         chatWindow.setEditable(false);
         chatWindow.setToolTipText("Chat Box");
         chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
-        messagePanel = new JPanel(new BorderLayout());
+        JPanel messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
         chatField.setToolTipText("Message Box");
         chatField.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(chatField, BorderLayout.CENTER);
-        send = new JButton("Send");
+        JButton send = new JButton("Send");
         send.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);

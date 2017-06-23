@@ -11,7 +11,6 @@ import java.io.Serializable;
  * Message object used to send/comprehend data between clients and a server.
  *
  * @author Kirin Patel
- * @version 1.0.7
  */
 public class Message implements Serializable {
     

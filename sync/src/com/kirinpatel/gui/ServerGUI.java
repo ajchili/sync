@@ -10,12 +10,11 @@ import java.awt.event.ComponentListener;
 
 /**
  * @author Kirin Patel
- * @version 0.0.4
  * @date 6/16/17
  */
 public class ServerGUI extends JFrame {
 
-    public static MediaPanel mediaPanel;
+    public static PlaybackPanel playbackPanel;
     public static ControlPanel controlPanel;
 
     public ServerGUI() {
@@ -30,8 +29,8 @@ public class ServerGUI extends JFrame {
         setLocationRelativeTo(null);
         addComponentListener(new ResizeListener());
 
-        mediaPanel = new MediaPanel(0);
-        add(mediaPanel, BorderLayout.CENTER);
+        playbackPanel = new PlaybackPanel(0);
+        add(playbackPanel, BorderLayout.CENTER);
         controlPanel = new ControlPanel(0);
         controlPanel.resizePanel(getWidth(), getHeight());
         add(controlPanel, BorderLayout.EAST);
@@ -61,7 +60,7 @@ public class ServerGUI extends JFrame {
         @Override
         public void componentHidden(ComponentEvent e) {
             Debug.Log("Closing server gui...", 3);
-            mediaPanel.closeFullscreen();
+            PlaybackPanel.mediaPlayer.releaseMediaPlayer();
             dispose();
             Debug.Log("Server gui closed.", 3);
             Server.stop();

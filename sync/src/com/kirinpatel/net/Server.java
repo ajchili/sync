@@ -1,5 +1,6 @@
 package com.kirinpatel.net;
 
+import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
@@ -14,7 +15,6 @@ import java.util.concurrent.Executors;
 
 /**
  * @author Kirin Patel
- * @version 0.0.9
  * @date 6/16/17
  */
 public class Server {
@@ -95,6 +95,8 @@ public class Server {
                 if (isBound) {
                     new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
                 }
+
+                System.exit(0);
             }
         }
 
@@ -154,11 +156,11 @@ public class Server {
         private boolean isPaused;
         private ArrayList<String> messages = new ArrayList<>();
         private long lastClientUpdate = System.currentTimeMillis() - 9000;
-        private Duration time = new Duration(0);
+        private long time = 0;
 
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
-            isPaused = !ServerGUI.mediaPanel.isMediaPaused();
+            isPaused = !PlaybackPanel.mediaPlayer.isPaused();
         }
 
         public void run() {
@@ -195,7 +197,8 @@ public class Server {
                                 break;
                             case 24:
                                 Debug.Log("Receiving " + client + " time...",4);
-                                time = (Duration) message.getMessage();
+                                if (((long) message.getMessage() - time) < 0) sendVideoState();
+                                time = (long) message.getMessage();
                                 break;
                             case 31:
                                 Debug.Log("Receiving " + client + " messages...", 4);
@@ -229,15 +232,15 @@ public class Server {
                     sendMessagesToClient();
                 }
 
-                if (!mediaURL.equals(ServerGUI.mediaPanel.getMediaURL())) {
+                if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) {
                     sendMediaURL();
                 }
 
-                if (isPaused != ServerGUI.mediaPanel.isMediaPaused()) {
+                if (isPaused != PlaybackPanel.mediaPlayer.isPaused()) {
                     sendVideoState();
                 }
 
-                if (time.toMillis() < (ServerGUI.mediaPanel.getMediaTime().toMillis() - 1750) || time.toMillis() > (ServerGUI.mediaPanel.getMediaTime().toMillis() + 1000)) {
+                if (time < (PlaybackPanel.mediaPlayer.getMediaTime() - 1750) || time > (PlaybackPanel.mediaPlayer.getMediaTime() + 1000)) {
                     sendVideoTime();
                 }
             }
@@ -276,6 +279,7 @@ public class Server {
                 Debug.Log("Established connection to " + client + '.', 4);
             } catch (IOException | ClassNotFoundException e) {
                 Debug.Log("Unable to establish connection to " + client + '.', 5);
+                System.out.println(socket.getInetAddress());
             }
         }
 
@@ -314,10 +318,10 @@ public class Server {
         private synchronized void sendMediaURL() {
             try {
                 Debug.Log("Sending media URL to " + client + "...", 4);
-                output.writeObject(new Message(20, ServerGUI.mediaPanel.getMediaURL()));
+                output.writeObject(new Message(20, PlaybackPanel.mediaPlayer.getMediaURL()));
                 output.flush();
                 Debug.Log("Media URL sent to " + client + '.', 4);
-                mediaURL = ServerGUI.mediaPanel.getMediaURL();
+                mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
             } catch (IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
             }
@@ -325,7 +329,7 @@ public class Server {
 
         private synchronized void sendVideoState() {
             Debug.Log("Sending media state to " + client + "...", 4);
-            if (ServerGUI.mediaPanel.isMediaPaused()) {
+            if (PlaybackPanel.mediaPlayer.isPaused()) {
                 try {
                     output.writeObject(new Message(22, null));
                     output.flush();
@@ -341,21 +345,24 @@ public class Server {
                 }
             }
             Debug.Log("Media state sent to " + client + '.', 4);
-            this.isPaused = ServerGUI.mediaPanel.isMediaPaused();
+            this.isPaused = PlaybackPanel.mediaPlayer.isPaused();
             sendVideoTime();
         }
 
         private synchronized void sendVideoTime() {
+            if (Math.abs(time - PlaybackPanel.mediaPlayer.getMediaTime()) > 5000) {
+                time = PlaybackPanel.mediaPlayer.getMediaTime();
+            }
             try {
                 Debug.Log("Sending current media time to " + client + "...", 4);
-                output.writeObject(new Message(23, time.add(new Duration(ServerGUI.mediaPanel.getMediaTime().toMillis() - time.toMillis()))));
+                output.writeObject(new Message(23, PlaybackPanel.mediaPlayer.getMediaTime() + (PlaybackPanel.mediaPlayer.getMediaTime() - time)));
                 output.flush();
                 Debug.Log("Current media time sent to " + client + '.', 4);
             } catch (IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
             }
 
-            time = ServerGUI.mediaPanel.getMediaTime();
+            time = PlaybackPanel.mediaPlayer.getMediaTime();
         }
     }
 }

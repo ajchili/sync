@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 
 /**
  * @author Kirin Patel
- * @version 1.0.0
  * @date 6/17/17
  */
 public class Debug {
