@@ -62,7 +62,8 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        new Main();
+        // new Main();
+        Testing.StartTest();
     }
     
     /**

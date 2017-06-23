@@ -6,7 +6,6 @@ import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
 import javafx.util.Duration;
-
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
