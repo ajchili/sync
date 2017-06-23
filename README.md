@@ -6,8 +6,8 @@ a java based mutli-client video and audio syncing application
 * No client drop detection
 * Lots of bugs
 * Still in development
-* Potentially high bandwidth usage
-	* _I am currently unable to test the bandwidth usages of sync, however, the application communicates between clients/server multiple times per second for multiple queries._
+* **Extremely high bandwidth usage**
+	* Sync will destroy your bandwidth connection in its current state. Rather than buffering playback and downloading media at a reasonable rate, sync will just download it all. At once. With all of your bandwidth.
 * Poor performance
 	* _**Currently, the best way to avoid a massive performance hit on a low-end machine is to use fullscreen mode.** This will run two windows but allows media playback to run on a separate thread than the regular gui which increases performance._
 
