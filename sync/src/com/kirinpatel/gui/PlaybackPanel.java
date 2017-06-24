@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.vlc.MediaPlayer;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
@@ -35,39 +36,39 @@ public class PlaybackPanel extends JPanel {
     }
 
     private void initControls() {
+        Color foreground = Color.white;
+        Color background = Color.black;
         JPanel controlPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-        controlPanel.setBackground(Color.BLACK);
+        controlPanel.setBackground(background);
 
         pauseMedia = new JButton("");
         pauseMedia.setBorder(null);
         pauseMedia.setEnabled(type == 0);
-        pauseMedia.setBackground(Color.BLACK);
-        pauseMedia.setForeground(Color.WHITE);
+        pauseMedia.setBackground(background);
+        pauseMedia.setForeground(foreground);
         controlPanel.add(pauseMedia);
 
         JPanel positionPanel = new JPanel(new BorderLayout());
-        positionPanel.setBackground(Color.BLACK);
+        positionPanel.setBackground(background);
         mediaPositionLabel = new JLabel("0:0:00 / 0:0:00");
         mediaPositionLabel.setOpaque(true);
-        mediaPositionLabel.setBackground(Color.BLACK);
-        mediaPositionLabel.setForeground(Color.WHITE);
+        mediaPositionLabel.setBackground(background);
+        mediaPositionLabel.setForeground(foreground);
         positionPanel.add(mediaPositionLabel, BorderLayout.EAST);
         mediaPosition = new JSlider(0, 0, 0);
-        mediaPosition.setBackground(Color.BLACK);
+        mediaPosition.setBackground(background);
         positionPanel.add(mediaPosition, BorderLayout.CENTER);
         controlPanel.add(positionPanel);
 
         JPanel volumePanel = new JPanel(new BorderLayout());
         JLabel mediaVolumeLabel = new JLabel("Volume: ");
         mediaVolumeLabel.setOpaque(true);
-        mediaVolumeLabel.setBackground(Color.BLACK);
-        mediaVolumeLabel.setForeground(Color.WHITE);
+        mediaVolumeLabel.setBackground(background);
+        mediaVolumeLabel.setForeground(foreground);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
         JSlider mediaVolume = new JSlider(0, 100, 100 - type * 75);
-        mediaVolume.addChangeListener(e -> {
-            mediaPlayer.setVolume(mediaVolume.getValue());
-        });
-        mediaVolume.setBackground(Color.BLACK);
+        mediaVolume.addChangeListener(e -> mediaPlayer.setVolume(mediaVolume.getValue()));
+        mediaVolume.setBackground(background);
         volumePanel.add(mediaVolume, BorderLayout.CENTER);
         controlPanel.add(volumePanel);
 
