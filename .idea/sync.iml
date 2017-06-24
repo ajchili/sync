@@ -7,7 +7,7 @@
       <excludeFolder url="file://$MODULE_DIR$/sync/build/classes" />
       <excludeFolder url="file://$MODULE_DIR$/sync/classes" />
     </content>
-    <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="vlcj" level="project" />
     <orderEntry type="library" name="slf4j" level="project" />
