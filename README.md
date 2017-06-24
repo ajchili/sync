@@ -3,11 +3,14 @@ a Java based multi-client video and audio syncing application
 
 ## limitations
 * No client drop detection
+* Currently does not work with OSX
+	* This will be fixed with a future update, this may take some time as a custom video player would need to be made. Look [here](https://github.com/caprica/vlcj-player/issues/3) for more information.
 * Lots of bugs
 * Still in development
+* Poor YouTube video playback
+	* Both the server and client experience poor video playback when using media from YouTube
 * _Potentially_ poor performance
-	* Performance after switching from JavaFX to vlcj has yet to be tested.
-* Does not work with OSX
+	* Performance after switching from JavaFX to vlcj has yet to be tested
 
 ## compatibility issues
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
@@ -19,7 +22,7 @@ While some of these issues become irrelevant or are fixed with updates, a server
 	
 ## setup
 1. Check to see if Java is downloaded
-	* The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version. After downloading the latest version, run the installer. This will either install, update, or notify  you that Java is installed.
+	* The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version. After downloading the latest version, run the installer. This will either install, update, or notify you that Java is installed.
 2. Download [vlc](http://www.videolan.org/vlc/index.html)
 3. Download [sync](https://www.github.com/ajchili/sync/releases)
 	* The latest stable version can be found in the link above
