@@ -84,24 +84,25 @@ public class ControlPanel extends JPanel {
 
         if (Main.isDarkModeEnabled) {
             Color foreground = Color.white;
-            setBackground(Color.black);
-            connectedClients.setBackground(Color.black);
+            Color background = Color.black;
+            setBackground(background);
+            connectedClients.setBackground(background);
             connectedClients.setForeground(foreground);
-            mediaControlPanel.setBackground(Color.black);
-            urlField.setBackground(Color.black);
+            mediaControlPanel.setBackground(background);
+            urlField.setBackground(background);
             urlField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
             urlField.setForeground(foreground);
-            setUrl.setBackground(Color.black);
+            setUrl.setBackground(background);
             setUrl.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
             setUrl.setForeground(foreground);
-            chatPanel.setBackground(Color.black);
-            messagePanel.setBackground(Color.black);
-            chatWindow.setBackground(Color.black);
+            chatPanel.setBackground(background);
+            messagePanel.setBackground(background);
+            chatWindow.setBackground(background);
             chatWindow.setForeground(foreground);
-            chatField.setBackground(Color.black);
+            chatField.setBackground(background);
             chatField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
             chatField.setForeground(foreground);
-            send.setBackground(Color.black);
+            send.setBackground(background);
             send.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
             send.setForeground(foreground);
         }
