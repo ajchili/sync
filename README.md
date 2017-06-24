@@ -7,6 +7,7 @@ a Java based multi-client video and audio syncing application
 * Still in development
 * _Potentially_ poor performance
 	* Performance after switching from JavaFX to vlcj has yet to be tested.
+* Does not work with OSX
 
 ## compatibility issues
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
