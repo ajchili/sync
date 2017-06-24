@@ -13,7 +13,7 @@ a Java based multi-client video and audio syncing application
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
 
 * Version [0.3.2](https://github.com/ajchili/sync/releases/tag/0.3.2)
-    * No longer compatible with future versions as the media player has been changed.
+    * No longer compatible with future versions as the media player has been changed
 * Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
 	* Messaging feature not compatible with any other version
 	
