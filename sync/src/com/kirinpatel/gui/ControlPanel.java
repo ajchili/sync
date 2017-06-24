@@ -48,7 +48,8 @@ public class ControlPanel extends JPanel {
             setUrl = new JButton("Set Media URL");
             setUrl.addActionListener(e -> {
                 if (!urlField.getText().isEmpty()) {
-                    PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
+                    if (urlField.getText().contains("media")) PlaybackPanel.mediaPlayer.setMediaURL("http://" + urlField.getText().replace("media", Server.ipAddress + ":8080"));
+                    else PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
                 } else if (urlField.getText().isEmpty()) {
                     if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
                         PlaybackPanel.mediaPlayer.setMediaURL("");
@@ -114,6 +115,7 @@ public class ControlPanel extends JPanel {
         width = ((width - (height * 16 / 9)) < 200) ? 200 : width - (height * 16 / 9);
         if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 6));
         connectedClientsScroll.setPreferredSize(new Dimension(width, height / 3));
+        chatWindowScroll.setPreferredSize(new Dimension(width, chatWindowScroll.getHeight()));
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
