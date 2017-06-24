@@ -56,6 +56,7 @@ public class Testing {
             }
         };
         frame.setVisible(true);
+        mediaPlayerComponent.getMediaPlayer().setVolume(0);
         mediaPlayerComponent.getMediaPlayer().playMedia("http://www.kirinpatel.com/ftp/fairytail/season2/FT%2049%20-%20The%20Day%20of%20the%20Fateful%20Encounter%20L@mBerT.mp4");
     }
 
@@ -84,11 +85,13 @@ public class Testing {
         @Override
         protected void onDisplay(DirectMediaPlayer mediaPlayer, int[] rgbBuffer) {
             // Simply copy buffer to the image and repaint
+            float xScale = (float) videoSurface.getWidth() / width;
+            float yScale = (float) videoSurface.getHeight() / height;
             image.setRGB(0, 0, width, height, rgbBuffer, 0, width);
             BufferedImage after = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_ARGB);
             AffineTransform at = new AffineTransform();
-            at.scale((float) frame.getWidth() / width, (float) frame.getHeight() / height);
-            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+            at.scale(xScale, yScale);
+            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             videoSurface.repaint();
         }
