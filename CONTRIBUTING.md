@@ -6,9 +6,9 @@
 2. Open project in your desired IDE _(we use intellij)_
 3. Ensure that these libraries and applications are downloaded/installed
     * Libraries that should be added to the project _(version numers in bold)_
-        * **3.10.1** [vlcj](https://github.com/caprica/vlcj)
+        * **3.10.1** [vlcj](http://capricasoftware.co.uk/downloads/vlcj/vlcj-3.10.1-dist.zip)
             * Documentation for vlcj can be found [here](http://capricasoftware.co.uk/#/projects/vlcj)
-        * **1.7.25** [slf4j](https://www.slf4j.org/)
+        * **1.7.25** [slf4j](https://www.slf4j.org/dist/slf4j-1.7.25.zip)
             *  This is required by vlcj, however, we never touch it so don't pay any attention to it
     * Applications
         * [vlc](http://www.videolan.org/vlc/index.html)
