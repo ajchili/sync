@@ -64,9 +64,7 @@ public class PlaybackPanel extends JPanel {
         mediaVolumeLabel.setForeground(Color.WHITE);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
         JSlider mediaVolume = new JSlider(0, 100, 100 - type * 75);
-        mediaVolume.addChangeListener(e -> {
-            mediaPlayer.setVolume(mediaVolume.getValue());
-        });
+        mediaVolume.addChangeListener(e -> mediaPlayer.setVolume(mediaVolume.getValue()));
         mediaVolume.setBackground(Color.BLACK);
         volumePanel.add(mediaVolume, BorderLayout.CENTER);
         controlPanel.add(volumePanel);
