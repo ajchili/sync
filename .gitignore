@@ -12,10 +12,6 @@ hs_err_pid*
 /sync/nbproject/private/
 /sync/build/
 
-\.idea/workspace\.xml
-\.idea/
-
-
 sync/classes/production/sync/jna-4\.1\.0\.jar
 sync/classes/production/sync/jna-platform-4\.1\.0\.jar
 sync/classes/production/sync/slf4j-api-1\.7\.25\.jar
