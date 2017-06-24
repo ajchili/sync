@@ -113,6 +113,7 @@ public class ControlPanel extends JPanel {
         width = ((width - (height * 16 / 9)) < 200) ? 200 : width - (height * 16 / 9);
         if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 6));
         connectedClientsScroll.setPreferredSize(new Dimension(width, height / 3));
+        chatWindowScroll.setPreferredSize(new Dimension(width, chatWindowScroll.getHeight()));
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
