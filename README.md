@@ -16,7 +16,8 @@ a Java based multi-client video and audio syncing application
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
 
 * Version [0.3.2](https://github.com/ajchili/sync/releases/tag/0.3.2)
-    * No longer compatible with future versions as the media player has been changed
+	* No longer compatible with future versions as the media player has been changed
+	* Last version compatible with OS X, see limitations for more information
 * Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
 	* Messaging feature not compatible with any other version
 	
@@ -29,13 +30,22 @@ While some of these issues become irrelevant or are fixed with updates, a server
 	* The latest development version can be obtained through the repository itself
 4. Run sync
 	* Server setup
-		* It is recommended to specify the amount of ram that the application can use _(it is recommended to use a minimum of 2 Gigabytes of ram and a multi-core cpu)_
-		1. Port forward if you will be using sync past a local network, sync uses port `8000`
+		* It is recommended to specify the amount of ram that the application can use _(it is recommended to use a minimum of 2 Gigabytes of ram, a multi-core cpu, _and a beefy internet connection. **The beefy internet connection is only required when using offline media.**_)_
+		1. Port forward if you will be using sync past a local network, sync uses ports `8000` and `8080`
 			* If need be, add sync to your firewall
+			* **Please note, you DO NOT need to port forward port `8080` if you intend to use online media. However, if you intend on sharing media from your device, this port must be forwarded.**
 		2. Obtain your IP Address
 			* ~~This can be done by typing `what's my ip` into google~~
 			* As of version [0.2.1](https://github.com/ajchili/sync/releases/tag/0.2.1), the IP Address of the server will be displayed in the title of the server window
-		3. Obtain the url of your media, the media must be accessible by a browser
+		3. Obtain your media
+			* Online media
+				1. Obtain the url of the media you would like to play
+				2. Put link _(including `http://` or `https://`)_ into the url field
+			* Offline media
+				1. Select and copy our media file
+				2. Navigate to `/tomcat/webapp/media/`
+				3. Paste media in folder
+				4. Put link _(formatting it to be `media/FILENAME.EXTENSION`)_ into the url field
 		4. Load your media into sync and share your IP Address
 		5. Enjoy!
 	* Client setup
