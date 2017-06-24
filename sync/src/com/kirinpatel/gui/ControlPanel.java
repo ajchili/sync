@@ -48,7 +48,8 @@ public class ControlPanel extends JPanel {
             setUrl = new JButton("Set Media URL");
             setUrl.addActionListener(e -> {
                 if (!urlField.getText().isEmpty()) {
-                    PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
+                    if (urlField.getText().contains("media")) PlaybackPanel.mediaPlayer.setMediaURL("http://" + urlField.getText().replace("media", Server.ipAddress + ":8080"));
+                    else PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
                 } else if (urlField.getText().isEmpty()) {
                     if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
                         PlaybackPanel.mediaPlayer.setMediaURL("");

@@ -2,6 +2,7 @@ package com.kirinpatel.net;
 
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.gui.ServerGUI;
+import com.kirinpatel.tomcat.TomcatServer;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
@@ -23,6 +24,7 @@ public class Server {
     public static ArrayList<User> connectedClients = new ArrayList<>();
     private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
+    public static String ipAddress = "";
     private static boolean isRunning = false;
     private static boolean closeServer = false;
     private static boolean isBound = false;
@@ -36,6 +38,9 @@ public class Server {
 
         server = new ServerThread();
         new Thread(server).start();
+        new Thread(() -> {
+            new TomcatServer();
+        }).start();
     }
 
     public static void stop() {
@@ -128,19 +133,19 @@ public class Server {
          */
         private String getIPAddress() {
             Debug.Log("Obtaining server IP address...", 4);
+            String ip = "";
             try {
                 URL whatismyip = new URL("http://checkip.amazonaws.com");
                 BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
                 Debug.Log("Server IP address obtained.", 4);
-                return " (" +  in.readLine() + ":8000)";
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+                ipAddress = in.readLine();
+                ip = " (" +  ipAddress + ":8000)";
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to obtain server IP address.", 5);
             }
-            Debug.Log("Unable to obtain server IP address.", 5);
-            return "";
+
+            return ip;
         }
     }
 

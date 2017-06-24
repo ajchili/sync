@@ -2,13 +2,15 @@
   <artifact type="jar" name="sync:jar">
     <output-path>$USER_HOME$/Desktop/dsf</output-path>
     <root id="archive" name="sync.jar">
+      <element id="module-output" name="sync" />
+      <element id="directory" name="maven">
+        <element id="library" level="project" name="slf4j" />
+        <element id="library" level="project" name="Tomcat" />
+        <element id="library" level="project" name="vlcj" />
+      </element>
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$USER_HOME$/Desktop/dsf/META-INF/MANIFEST.MF" />
       </element>
-      <element id="module-output" name="sync" />
-      <element id="library" level="project" name="vlcj" />
-      <element id="library" level="project" name="slf4j" />
-      <element id="library" level="project" name="Tomcat" />
     </root>
   </artifact>
 </component>
