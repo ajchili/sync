@@ -60,7 +60,7 @@ public class ServerGUI extends JFrame {
         @Override
         public void componentHidden(ComponentEvent e) {
             Debug.Log("Closing server gui...", 3);
-            PlaybackPanel.mediaPlayer.releaseMediaPlayer();
+            PlaybackPanel.mediaPlayer.release();
             dispose();
             Debug.Log("Server gui closed.", 3);
             Server.stop();

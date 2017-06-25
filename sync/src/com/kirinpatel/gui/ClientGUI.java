@@ -60,7 +60,7 @@ public class ClientGUI extends JFrame {
         @Override
         public void componentHidden(ComponentEvent e) {
             Debug.Log("Closing client gui...", 3);
-            PlaybackPanel.mediaPlayer.releaseMediaPlayer();
+            PlaybackPanel.mediaPlayer.release();
             dispose();
             Debug.Log("Client gui closed.", 3);
             Client.stop();

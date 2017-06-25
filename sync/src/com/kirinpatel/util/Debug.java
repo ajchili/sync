@@ -29,6 +29,9 @@ public class Debug {
             case 5:
                 header += "(NETWORK ERROR) - ";
                 break;
+            case 6:
+                header += "(vlcj) - ";
+                break;
             default:
                 break;
         }
