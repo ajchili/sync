@@ -4,8 +4,7 @@ import java.io.Serializable;
 import java.util.Random;
 
 /**
- * @author Kirin Patel
- * @date 6/17/17
+ * Simple object that holds all user information in one place.
  */
 public class User implements Serializable {
 

@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -23,7 +24,8 @@ public class ControlPanel extends JPanel {
     private JScrollPane connectedClientsScroll;
     private JPanel mediaControlPanel;
     private JTextField urlField;
-    private JButton setUrl;
+    private JButton setURL;
+    private JButton setOfflineURL;
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
@@ -45,21 +47,32 @@ public class ControlPanel extends JPanel {
             urlField = new JTextField();
             urlField.setToolTipText("Media URL");
             mediaControlPanel.add(urlField);
-            setUrl = new JButton("Set Media URL");
-            setUrl.addActionListener(e -> {
-                if (!urlField.getText().isEmpty()) {
-                    if (urlField.getText().contains("media")) PlaybackPanel.mediaPlayer.setMediaURL("http://" + urlField.getText().replace("media", Server.ipAddress + ":8080"));
-                    else PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
-                } else if (urlField.getText().isEmpty()) {
-                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
-                        PlaybackPanel.mediaPlayer.setMediaURL("");
-                    } else {
+            JPanel mediaControlButtonPanel = new JPanel(new GridLayout(1, 2));
+            setURL = new JButton("Set URL");
+            setURL.addActionListener(e -> {
+                if (!urlField.getText().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
+                else {
+                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL("");
+                    else {
                         Debug.Log("Media URL not specified!", 2);
                         new UIMessage("Error setting Media URL!", "The Media URL must be specified!", 1);
                     }
                 }
             });
-            mediaControlPanel.add(setUrl);
+            mediaControlButtonPanel.add(setURL);
+            setOfflineURL = new JButton("Choose file");
+            setOfflineURL.addActionListener(e -> {
+                JFileChooser mediaSelector = new JFileChooser("tomcat/webapps/media");
+                mediaSelector.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                mediaSelector.showOpenDialog(ControlPanel.this);
+                if (mediaSelector.getSelectedFile() != null && mediaSelector.getSelectedFile().getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
+                    PlaybackPanel.mediaPlayer.setMediaURL("http://" + Server.ipAddress + ":8080/" + mediaSelector.getSelectedFile().getName());
+                } else if (mediaSelector.getSelectedFile() != null) {
+                    new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
+                }
+            });
+            mediaControlButtonPanel.add(setOfflineURL);
+            mediaControlPanel.add(mediaControlButtonPanel);
             add(mediaControlPanel);
         } else {
             add(new JPanel());
@@ -93,9 +106,9 @@ public class ControlPanel extends JPanel {
             urlField.setBackground(background);
             urlField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
             urlField.setForeground(foreground);
-            setUrl.setBackground(background);
-            setUrl.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
-            setUrl.setForeground(foreground);
+            setURL.setBackground(background);
+            setURL.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
+            setURL.setForeground(foreground);
             chatPanel.setBackground(background);
             messagePanel.setBackground(background);
             chatWindow.setBackground(background);

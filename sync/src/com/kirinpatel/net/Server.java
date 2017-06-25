@@ -165,7 +165,7 @@ public class Server {
 
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
-            isPaused = !PlaybackPanel.mediaPlayer.isPaused();
+            isPaused = PlaybackPanel.mediaPlayer.isPaused();
         }
 
         public void run() {
@@ -282,6 +282,8 @@ public class Server {
                 output.writeObject(new Message(0, 2));
                 output.flush();
                 Debug.Log("Established connection to " + client + '.', 4);
+                sendVideoState();
+                sendVideoTime();
             } catch (IOException | ClassNotFoundException e) {
                 Debug.Log("Unable to establish connection to " + client + '.', 5);
                 System.out.println(socket.getInetAddress());
@@ -334,40 +336,33 @@ public class Server {
 
         private synchronized void sendVideoState() {
             Debug.Log("Sending media state to " + client + "...", 4);
-            if (PlaybackPanel.mediaPlayer.isPaused()) {
-                try {
-                    output.writeObject(new Message(22, null));
-                    output.flush();
-                } catch (IOException e) {
-                    Debug.Log("Unable to send media state to " + client + '.', 5);
-                }
-            } else {
-                try {
-                    output.writeObject(new Message(21, null));
-                    output.flush();
-                } catch (IOException e) {
-                    Debug.Log("Unable to send media state to " + client + '.', 5);
-                }
+            int state = 21 + (PlaybackPanel.mediaPlayer.isPaused() ? 1 : 0);
+            try {
+                output.writeObject(new Message(state, null));
+                output.flush();
+
+                Debug.Log("Media state sent to " + client + '.', 4);
+                isPaused = PlaybackPanel.mediaPlayer.isPaused();
+            } catch (IOException e) {
+                Debug.Log("Unable to send media state to " + client + '.', 5);
             }
-            Debug.Log("Media state sent to " + client + '.', 4);
-            this.isPaused = PlaybackPanel.mediaPlayer.isPaused();
-            sendVideoTime();
         }
 
         private synchronized void sendVideoTime() {
             if (Math.abs(time - PlaybackPanel.mediaPlayer.getMediaTime()) > 5000) {
                 time = PlaybackPanel.mediaPlayer.getMediaTime();
+                sendVideoState();
             }
+
             try {
                 Debug.Log("Sending current media time to " + client + "...", 4);
                 output.writeObject(new Message(23, PlaybackPanel.mediaPlayer.getMediaTime() + (PlaybackPanel.mediaPlayer.getMediaTime() - time)));
                 output.flush();
                 Debug.Log("Current media time sent to " + client + '.', 4);
+                time = PlaybackPanel.mediaPlayer.getMediaTime();
             } catch (IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
             }
-
-            time = PlaybackPanel.mediaPlayer.getMediaTime();
         }
     }
 }

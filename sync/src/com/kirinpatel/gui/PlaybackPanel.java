@@ -17,6 +17,7 @@ public class PlaybackPanel extends JPanel {
     public JButton pauseMedia;
     public JLabel mediaPositionLabel;
     public JSlider mediaPosition;
+    public JSlider mediaVolume;
     public final int type;
 
     public PlaybackPanel(int type) {
@@ -24,7 +25,6 @@ public class PlaybackPanel extends JPanel {
 
         this.type = type;
 
-        new NativeDiscovery().discover();
         initMediaPlayer();
     }
 
@@ -66,7 +66,7 @@ public class PlaybackPanel extends JPanel {
         mediaVolumeLabel.setBackground(background);
         mediaVolumeLabel.setForeground(foreground);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
-        JSlider mediaVolume = new JSlider(0, 100, 100 - type * 75);
+        mediaVolume = new JSlider(0, 100, 100 - type * 75);
         mediaVolume.addChangeListener(e -> mediaPlayer.setVolume(mediaVolume.getValue()));
         mediaVolume.setBackground(background);
         volumePanel.add(mediaVolume, BorderLayout.CENTER);
