@@ -9,10 +9,6 @@ import org.apache.catalina.startup.Tomcat;
 
 import java.io.File;
 
-/**
- * @author Kirin Patel
- * @date 6/23/17
- */
 public class TomcatServer {
 
     private Tomcat tomcat;

@@ -1,6 +1,5 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
@@ -14,10 +13,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
-/**
- * @author Kirin Patel
- * @date 6/21/17
- */
 public class ControlPanel extends JPanel {
 
     private JList connectedClients;

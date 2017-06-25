@@ -15,8 +15,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 
-/**
- */
 public class MediaPlayer extends JPanel {
 
     private final PlaybackPanel playbackPanel;
