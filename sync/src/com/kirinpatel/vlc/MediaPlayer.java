@@ -241,7 +241,7 @@ public class MediaPlayer extends JPanel {
             length = mediaPlayer.getLength();
             playbackPanel.pauseMedia.setText(">");
 
-            mediaPlayer.setMarqueeText("Pausing");
+            mediaPlayer.setMarqueeText("Paused");
             mediaPlayer.setMarqueeSize(60);
             mediaPlayer.setMarqueeOpacity(200);
             mediaPlayer.setMarqueeColour(Color.white);

@@ -27,7 +27,7 @@ public class KeyDispatcher implements KeyEventDispatcher {
                         }
                         break;
                     case 32:
-                        if (playbackPanel.isFullscreen) {
+                        if (playbackPanel.isFullscreen && playbackPanel.pauseMedia.isEnabled()) {
                             if (playbackPanel.mediaPlayer.isPaused()) playbackPanel.mediaPlayer.play();
                             else playbackPanel.mediaPlayer.pause();
                         }

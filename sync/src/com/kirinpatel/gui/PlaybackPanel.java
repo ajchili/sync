@@ -26,7 +26,6 @@ public class PlaybackPanel extends JPanel {
     PlaybackPanel(int type) {
         super(new BorderLayout());
         setBackground(Color.BLACK);
-
         this.type = type;
 
         addMouseMotionListener(new MouseMotionListener() {
@@ -40,6 +39,7 @@ public class PlaybackPanel extends JPanel {
                 if (e.getY() >= getHeight() - getHeight() / 12) {
                     showBar = true;
                     controlPanel.setVisible(true);
+                    revalidate();
                     repaint();
                 } else {
                     new Thread(() -> {
@@ -49,6 +49,7 @@ public class PlaybackPanel extends JPanel {
 
                             if (!showBar) {
                                 controlPanel.setVisible(false);
+                                revalidate();
                                 repaint();
                             }
                         } catch(InterruptedException e1) {
