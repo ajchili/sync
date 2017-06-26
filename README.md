@@ -1,20 +1,5 @@
 # sync
 a Java based multi-client video and audio syncing application
-
-## limitations
-* Lots of bugs
-* Still in development
-* No client drop detection
-
-## compatibility issues
-While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
-
-* Version [0.4.0](https://github.com/ajchili/sync/releases/tag/0.4.0) & [0.5.0](https://github.com/ajchili/sync/releases/tag/0.5.0)
-	* No OS X support
-* Version [0.3.2](https://github.com/ajchili/sync/releases/tag/0.3.2)
-	* No longer compatible with future versions as the media player has been changed
-* Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
-	* Messaging feature not incompatible with other version
 	
 ## setup
 1. Check to see if Java is installed
@@ -49,3 +34,13 @@ While some of these issues become irrelevant or are fixed with updates, a server
 		1. Obtain the IP Address of the server you would like to connect to
 		2. Connect to the server
 		3. Enjoy!
+
+## compatibility issues
+While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
+
+* Version [0.4.0](https://github.com/ajchili/sync/releases/tag/0.4.0) & [0.5.0](https://github.com/ajchili/sync/releases/tag/0.5.0)
+	* No OS X support
+* Version [0.3.2](https://github.com/ajchili/sync/releases/tag/0.3.2)
+	* No longer compatible with future versions as the media player has been changed
+* Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
+	* Messaging feature not incompatible with other version
