@@ -54,8 +54,7 @@ public class MediaPlayer extends JPanel {
 
     private void initControls() {
         Debug.Log("Initializing media player controls...", 3);
-        playbackPanel.mediaPosition.setMaximum(1000);
-        if (playbackPanel.type == 0) {
+        if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
             playbackPanel.pauseMedia.addActionListener(e -> {
                 if (isPaused) mediaPlayer.play();
                 else mediaPlayer.pause();
@@ -95,6 +94,7 @@ public class MediaPlayer extends JPanel {
                 }
             });
         }
+        playbackPanel.mediaPosition.setMaximum(1000);
         Debug.Log("Media player controls initialized.", 3);
     }
 
@@ -158,7 +158,7 @@ public class MediaPlayer extends JPanel {
      * @param value Time
      * @return Time in displayable string format
      */
-    private static String formatTime(long value) {
+    public static String formatTime(long value) {
         value /= 1000;
         int hours = (int) value / 3600;
         int remainder = (int) value - hours * 3600;
@@ -227,12 +227,13 @@ public class MediaPlayer extends JPanel {
         @Override
         public void paused(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
             isPaused = true;
+            length = mediaPlayer.getLength();
             playbackPanel.pauseMedia.setText(">");
         }
 
         @Override
         public void stopped(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-
+            
         }
 
         @Override

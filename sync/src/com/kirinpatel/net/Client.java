@@ -6,7 +6,6 @@ import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
-import javafx.util.Duration;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -102,18 +101,15 @@ public class Client {
                                 Debug.Log("Media URL received.", 4);
                                 break;
                             case 21:
-                                Debug.Log("Received play action.", 4);
-                                PlaybackPanel.mediaPlayer.play();
+                                Debug.Log("Received media state.", 4);
+                                if ((boolean) message.getMessage()) PlaybackPanel.mediaPlayer.pause();
+                                else PlaybackPanel.mediaPlayer.play();
                                 break;
                             case 22:
-                                Debug.Log("Received pause action.", 4);
-                                PlaybackPanel.mediaPlayer.pause();
-                                break;
-                            case 23:
                                 Debug.Log("Receiving media time...", 4);
-                                //if (((long) message.getMessage() - lastSentTime) < 0) PlaybackPanel.mediaPlayer.pause();
                                 lastSentTime = (long) message.getMessage();
                                 PlaybackPanel.mediaPlayer.seekTo(lastSentTime);
+                                sendVideoState();
                                 Debug.Log("Media time set.", 4);
                                 break;
                             case 30:
@@ -207,7 +203,8 @@ public class Client {
                     return;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
+                System.exit(0);
             }
 
             try {
@@ -237,9 +234,10 @@ public class Client {
         private synchronized void sendVideoTime() {
             try {
                 Debug.Log("Sending current media time...", 4);
-                output.writeObject(new Message(24, PlaybackPanel.mediaPlayer.getMediaTime()));
+                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
                 output.flush();
                 Debug.Log("Current media time sent.", 4);
+                sendVideoState();
             } catch (SocketException e) {
 
             } catch (IOException e) {
@@ -247,6 +245,19 @@ public class Client {
             }
 
             lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
+        }
+
+        private synchronized void sendVideoState() {
+            try {
+                Debug.Log("Sending current media state...", 4);
+                output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
+                output.flush();
+                Debug.Log("Current media state sent.", 4);
+            } catch (SocketException e) {
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         private synchronized void sendMessages() {

@@ -5,6 +5,7 @@ import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
+import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,9 +25,11 @@ public class ControlPanel extends JPanel {
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
+    private final int type;
 
     public ControlPanel(int type) {
         super(new GridLayout(3, 1));
+        this.type = type;
 
         Debug.Log("Creating ControlPanel...", 3);
 
@@ -78,6 +81,8 @@ public class ControlPanel extends JPanel {
         JPanel chatPanel = new JPanel(new BorderLayout());
         chatWindow = new JTextArea();
         chatWindow.setEditable(false);
+        chatWindow.setLineWrap(true);
+        chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
         chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
@@ -97,21 +102,27 @@ public class ControlPanel extends JPanel {
         Debug.Log("ControlPanel created.", 3);
     }
 
-    public void resizePanel(int width, int height) {
-        width = ((width - (height * 16 / 9)) < 200) ? 200 : width - (height * 16 / 9);
-        if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 6));
-        connectedClientsScroll.setPreferredSize(new Dimension(width, height / 3));
-        chatWindowScroll.setPreferredSize(new Dimension(width, chatWindowScroll.getHeight()));
+    public void resizePanel(int height) {
+        connectedClientsScroll.setPreferredSize(new Dimension(200, height / 3));
+        if (urlField != null) urlField.setPreferredSize(new Dimension(200, height / 6));
+        if (setURL != null) setURL.setPreferredSize(new Dimension(100, height / 6));
+        if (setOfflineURL != null) setOfflineURL.setPreferredSize(new Dimension(100, height / 6));
+        chatWindowScroll.setPreferredSize(new Dimension(200, chatWindowScroll.getHeight()));
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
         Debug.Log("Updating connected clients in gui...", 3);
+        updateConnectedClientsTime(users);
+        Debug.Log("Connected clients updated in gui.", 3);
+    }
+
+    public void updateConnectedClientsTime(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            listModel.addElement(user);
+            if (type == 0) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ")");
+            else listModel.addElement(user);
         }
         connectedClients.setModel(listModel);
-        Debug.Log("Connected clients updated in gui.", 3);
     }
 
     public void setMessages(ArrayList<String> messages) {

@@ -4,14 +4,13 @@ import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 
 public class PlaybackPanel extends JPanel {
 
     public static MediaPlayer mediaPlayer;
     private JPanel controlPanel;
-    public JButton pauseMedia;
+    public static JButton pauseMedia;
     public JLabel mediaPositionLabel;
     public JSlider mediaPosition;
     public JSlider mediaVolume;
@@ -19,11 +18,43 @@ public class PlaybackPanel extends JPanel {
     private JFrame fullscreen;
     private JPanel fullscreenPanel;
     public boolean isFullscreen = false;
+    private boolean showBar = false;
 
     PlaybackPanel(int type) {
         super(new BorderLayout());
+        setBackground(Color.BLACK);
 
         this.type = type;
+
+        addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (e.getY() >= getHeight() - getHeight() / 12) {
+                    showBar = true;
+                    controlPanel.setVisible(true);
+                    repaint();
+                } else {
+                    new Thread(() -> {
+                        try {
+                            showBar = false;
+                            Thread.sleep(2000);
+
+                            if (!showBar) {
+                                controlPanel.setVisible(false);
+                                repaint();
+                            }
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    }).start();
+                }
+            }
+        });
 
         initMediaPlayer();
     }
@@ -42,6 +73,35 @@ public class PlaybackPanel extends JPanel {
         fullscreen = new JFrame();
         fullscreen.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         fullscreen.setUndecorated(true);
+        fullscreen.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (e.getY() >= Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 50) {
+                    showBar = true;
+                    controlPanel.setVisible(true);
+                    repaint();
+                } else {
+                    new Thread(() -> {
+                        try {
+                            showBar = false;
+                            Thread.sleep(2000);
+
+                            if (!showBar) {
+                                controlPanel.setVisible(false);
+                                repaint();
+                            }
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    }).start();
+                }
+            }
+        });
         fullscreen.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -117,7 +177,7 @@ public class PlaybackPanel extends JPanel {
         mediaVolumeLabel.setForeground(foreground);
         mediaVolumeLabel.setFocusable(false);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
-        mediaVolume = new JSlider(0, 100, 100 - type * 75);
+        mediaVolume = new JSlider(0, 100, 25);
         mediaVolume.addChangeListener(e -> mediaPlayer.setVolume(mediaVolume.getValue()));
         mediaVolume.setBackground(background);
         mediaVolume.setFocusable(false);

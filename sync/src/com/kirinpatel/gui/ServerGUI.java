@@ -28,7 +28,7 @@ public class ServerGUI extends JFrame {
         playbackPanel = new PlaybackPanel(0);
         add(playbackPanel, BorderLayout.CENTER);
         controlPanel = new ControlPanel(0);
-        controlPanel.resizePanel(getWidth(), getHeight());
+        controlPanel.resizePanel(getHeight());
         add(controlPanel, BorderLayout.EAST);
 
         setVisible(true);
@@ -40,7 +40,7 @@ public class ServerGUI extends JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            controlPanel.resizePanel(getWidth(), getHeight());
+            controlPanel.resizePanel(getHeight());
         }
 
         @Override
