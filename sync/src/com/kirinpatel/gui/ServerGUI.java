@@ -8,10 +8,6 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-/**
- * @author Kirin Patel
- * @date 6/16/17
- */
 public class ServerGUI extends JFrame {
 
     public static PlaybackPanel playbackPanel;

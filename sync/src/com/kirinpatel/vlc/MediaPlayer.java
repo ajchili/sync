@@ -12,6 +12,8 @@ import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 
@@ -26,6 +28,7 @@ public class MediaPlayer extends JPanel {
     private long length = -1;
     private String mediaURL = "";
     private boolean hasAutoPaused = false;
+    private boolean isScrubbing = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
         Debug.Log("Creating MediaPlayer...", 6);
@@ -58,22 +61,55 @@ public class MediaPlayer extends JPanel {
                 else mediaPlayer.pause();
             });
 
+            playbackPanel.mediaPosition.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    isScrubbing = true;
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    isScrubbing = false;
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            });
+
             playbackPanel.mediaPosition.addChangeListener(e -> {
-                int position = playbackPanel.mediaPosition.getValue();
-                mediaPlayer.setTime(position * getMediaLength() / 1000);
+                if (isScrubbing) {
+                    int position = playbackPanel.mediaPosition.getValue();
+                    mediaPlayer.setTime(position * getMediaLength() / 1000);
+                }
             });
         }
         Debug.Log("Media player controls initialized.", 3);
     }
 
     public void play() {
-        Debug.Log("Playing media.", 6);
-        mediaPlayer.play();
+        if (!mediaURL.isEmpty() && isPaused) {
+            Debug.Log("Playing media.", 6);
+            mediaPlayer.play();
+        }
     }
 
     public void pause() {
-        Debug.Log("Pausing media.", 6);
-        mediaPlayer.pause();
+        if (!mediaURL.isEmpty() && !isPaused) {
+            Debug.Log("Pausing media.", 6);
+            mediaPlayer.pause();
+        }
     }
 
     public void release() {
@@ -216,9 +252,11 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void timeChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, long l) {
-            time = l;
-            playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(length));
-            if (playbackPanel.type != 0) playbackPanel.mediaPosition.setValue((int) (time * 1000 / length));
+            if (!isScrubbing) {
+                time = l;
+                playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(length));
+                playbackPanel.mediaPosition.setValue((int) (time * 1000 / length));
+            }
         }
 
         @Override

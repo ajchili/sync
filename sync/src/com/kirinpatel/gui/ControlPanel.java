@@ -44,6 +44,7 @@ public class ControlPanel extends JPanel {
             mediaControlPanel.add(urlField);
             JPanel mediaControlButtonPanel = new JPanel(new GridLayout(1, 2));
             setURL = new JButton("Set URL");
+            setURL.setInputMap(0, null);
             setURL.addActionListener(e -> {
                 if (!urlField.getText().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
                 else {
@@ -56,6 +57,7 @@ public class ControlPanel extends JPanel {
             });
             mediaControlButtonPanel.add(setURL);
             setOfflineURL = new JButton("Choose file");
+            setOfflineURL.setInputMap(0, null);
             setOfflineURL.addActionListener(e -> {
                 JFileChooser mediaSelector = new JFileChooser("tomcat/webapps/media");
                 mediaSelector.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -86,6 +88,7 @@ public class ControlPanel extends JPanel {
         chatField.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(chatField, BorderLayout.CENTER);
         JButton send = new JButton("Send");
+        send.setInputMap(0, null);
         send.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);

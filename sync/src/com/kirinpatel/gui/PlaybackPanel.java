@@ -6,21 +6,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class PlaybackPanel extends JPanel {
 
     public static MediaPlayer mediaPlayer;
+    private JPanel controlPanel;
     public JButton pauseMedia;
     public JLabel mediaPositionLabel;
     public JSlider mediaPosition;
     public JSlider mediaVolume;
     public final int type;
     private JFrame fullscreen;
-    private boolean isFullscreen = false;
+    private JPanel fullscreenPanel;
+    public boolean isFullscreen = false;
 
-    public PlaybackPanel(int type) {
+    PlaybackPanel(int type) {
         super(new BorderLayout());
 
         this.type = type;
@@ -36,30 +36,12 @@ public class PlaybackPanel extends JPanel {
     }
 
     public void initFullscreen() {
+        removeAll();
+
+        isFullscreen = true;
         fullscreen = new JFrame();
         fullscreen.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         fullscreen.setUndecorated(true);
-        fullscreen.addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == 32 && type == 0) {
-                   if(mediaPlayer.isPaused()) mediaPlayer.play();
-                   else mediaPlayer.pause();
-                } else if (e.getKeyCode() == 122 || e.getKeyCode() == 27) {
-                    fullscreen.hide();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-            }
-        });
         fullscreen.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -81,39 +63,38 @@ public class PlaybackPanel extends JPanel {
                 closeFullscreen();
             }
         });
-        remove(mediaPlayer);
-        fullscreen.add(mediaPlayer);
+        fullscreenPanel = new JPanel(new BorderLayout());
+        fullscreenPanel.add(mediaPlayer, BorderLayout.CENTER);
+        fullscreenPanel.add(controlPanel, BorderLayout.SOUTH);
+        fullscreen.add(fullscreenPanel);
         fullscreen.setVisible(true);
     }
 
     public void closeFullscreen() {
-        fullscreen.remove(mediaPlayer);
+        isFullscreen = false;
+        fullscreenPanel.removeAll();
         fullscreen.dispose();
         add(mediaPlayer, BorderLayout.CENTER);
+        add(controlPanel, BorderLayout.SOUTH);
+        mediaPlayer.repaint();
+        controlPanel.repaint();
+        repaint();
     }
 
     private void initControls() {
         Color foreground = Color.white;
         Color background = Color.black;
-        JPanel controlPanel = new JPanel(new GridLayout(1, 4, 10, 0));
+        controlPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         controlPanel.setBackground(background);
 
         pauseMedia = new JButton("");
         pauseMedia.setBorder(null);
+        pauseMedia.setInputMap(0, null);
         pauseMedia.setEnabled(type == 0);
         pauseMedia.setBackground(background);
         pauseMedia.setForeground(foreground);
+        pauseMedia.setFocusable(false);
         controlPanel.add(pauseMedia);
-
-        JButton fullscreen = new JButton("Fullscreen");
-        fullscreen.setBorder(null);
-        fullscreen.setBackground(background);
-        fullscreen.setForeground(foreground);
-        fullscreen.addActionListener(e -> {
-            if (!isFullscreen) initFullscreen();
-        });
-        controlPanel.add(fullscreen);
-
 
         JPanel positionPanel = new JPanel(new BorderLayout());
         positionPanel.setBackground(background);
@@ -121,9 +102,11 @@ public class PlaybackPanel extends JPanel {
         mediaPositionLabel.setOpaque(true);
         mediaPositionLabel.setBackground(background);
         mediaPositionLabel.setForeground(foreground);
+        mediaPositionLabel.setFocusable(false);
         positionPanel.add(mediaPositionLabel, BorderLayout.EAST);
         mediaPosition = new JSlider(0, 0, 0);
         mediaPosition.setBackground(background);
+        mediaPosition.setFocusable(false);
         positionPanel.add(mediaPosition, BorderLayout.CENTER);
         controlPanel.add(positionPanel);
 
@@ -132,13 +115,18 @@ public class PlaybackPanel extends JPanel {
         mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setBackground(background);
         mediaVolumeLabel.setForeground(foreground);
+        mediaVolumeLabel.setFocusable(false);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
         mediaVolume = new JSlider(0, 100, 100 - type * 75);
         mediaVolume.addChangeListener(e -> mediaPlayer.setVolume(mediaVolume.getValue()));
         mediaVolume.setBackground(background);
+        mediaVolume.setFocusable(false);
         volumePanel.add(mediaVolume, BorderLayout.CENTER);
         controlPanel.add(volumePanel);
 
         add(controlPanel, BorderLayout.SOUTH);
+
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyDispatcher(this));
     }
 }
