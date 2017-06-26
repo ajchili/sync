@@ -11,60 +11,59 @@ import java.io.Serializable;
  * Message object used to send/comprehend data between clients and a server.
  */
 public class Message implements Serializable {
-    
+
     private int type;
     private Object message;
-    
+
     /**
      * Main constructor that will create the message with a given type and the
      * provided message.
+     * <p>
+     * Types:
+     * 0: Connection Messages
+     * 0: Disconnecting
+     * 1: Connecting
+     * 2: Connected
+     * 3: Closing
+     * 1#: Username Messages
+     * 0: Sending client name
+     * User
+     * 1: Sending connected clients
+     * ArrayList<User>
+     * 2#: Media Messages
+     * 0: MediaURL
+     * String
+     * 1: Media state
+     * boolean
+     * 2: Seek to point
+     * long
+     * 3#: Messages
+     * 0: Messages
+     * ArrayList<String>
+     * 1: Client messages
+     * ArrayList<String>
      *
-     *  Types:
-     *      0: Connection Messages
-     *          0: Disconnecting
-     *          1: Connecting
-     *          2: Connected
-     *          3: Closing
-     *      1#: Username Messages
-     *          0: Sending client name
-     *              User
-     *          1: Sending connected clients
-     *              ArrayList<User>
-     *      2#: Media Messages
-     *          0: MediaURL
-     *              String
-     *          1: Media state
-     *              boolean
-     *          2: Seek to point
-     *              long
-     *      3#: Messages
-     *          0: Messages
-     *              ArrayList<String>
-     *          1: Client messages
-     *              ArrayList<String>
-     *
-     * 
-     * @param type Type of message being sent
+     * @param type    Type of message being sent
      * @param message Message to be sent
      */
     public Message(int type, Object message) {
         this.type = type;
         this.message = message;
     }
-    
+
     /**
      * Provides printable version of message.
-     * 
+     *
      * @return Returns message
      */
     @Override
     public String toString() {
         return "[" + type + "] " + message.toString();
     }
-    
+
     /**
      * Determines if provided message is equal to this one.
-     * 
+     *
      * @param o Message object
      * @return Returns if equal
      */
@@ -77,19 +76,19 @@ public class Message implements Serializable {
             return (type == objM.type) && (message.equals(objM.message));
         }
     }
-    
+
     /**
      * Provides type of message.
-     * 
+     *
      * @return Returns message type
      */
     public int getType() {
         return type;
     }
-    
+
     /**
      * Provides message.
-     * 
+     *
      * @return Returns message
      */
     public Object getMessage() {

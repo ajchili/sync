@@ -16,11 +16,11 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static ServerGUI gui;
     public static ArrayList<User> connectedClients = new ArrayList<>();
+    public static String ipAddress = "";
+    private static ServerGUI gui;
     private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
-    public static String ipAddress = "";
     private static boolean isRunning = false;
     private static boolean closeServer = false;
     private static boolean isBound = false;
@@ -82,12 +82,12 @@ public class Server {
             } catch(SocketException e) {
                 Debug.Log("Closing unused socket...", 4);
                 Debug.Log("Socket closed.", 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             } finally {
                 connectionExecutor.shutdown();
 
-                while (!connectionExecutor.isTerminated()) {
+                while(!connectionExecutor.isTerminated()) {
 
                 }
 
@@ -107,15 +107,15 @@ public class Server {
             if (socket != null && !socket.isClosed()) {
                 try {
                     socket.close();
-                } catch (IOException e) {
+                } catch(IOException e) {
                     e.printStackTrace();
                 }
             }
 
-            if (service != null &&!service.isClosed()) {
+            if (service != null && !service.isClosed()) {
                 try {
                     service.close();
-                } catch (IOException e) {
+                } catch(IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -136,8 +136,8 @@ public class Server {
 
                 Debug.Log("Server IP address obtained.", 4);
                 ipAddress = in.readLine();
-                ip = " (" +  ipAddress + ":8000)";
-            } catch (IOException e) {
+                ip = " (" + ipAddress + ":8000)";
+            } catch(IOException e) {
                 Debug.Log("Unable to obtain server IP address.", 5);
             }
 
@@ -166,7 +166,7 @@ public class Server {
         public void run() {
             connectClientToServer();
 
-            while (isClientConnected && isRunning) {
+            while(isClientConnected && isRunning) {
                 if (closeServer) {
                     stop();
 
@@ -179,7 +179,7 @@ public class Server {
                 try {
                     if (socket.getInputStream().available() > 0) {
                         Message message = (Message) input.readObject();
-                        switch (message.getType()) {
+                        switch(message.getType()) {
                             case 0:
                                 if ((int) message.getMessage() == 0) {
                                     Debug.Log("Disconnecting " + client + "...", 4);
@@ -198,14 +198,14 @@ public class Server {
                                 ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                 break;
                             case 21:
-                                Debug.Log("Receiving " + client + " media state (" + ((boolean) message.getMessage() == isPaused) + ")...",4);
+                                Debug.Log("Receiving " + client + " media state (" + ((boolean) message.getMessage() == isPaused) + ")...", 4);
                                 if ((boolean) message.getMessage() != isPaused) sendVideoState();
                                 break;
                             case 22:
-                                Debug.Log("Receiving " + client + " time (" + time + ":" + message.getMessage() + ")...",4);
+                                Debug.Log("Receiving " + client + " time (" + time + ":" + message.getMessage() + ")...", 4);
                                 time = (long) message.getMessage();
                                 ServerGUI.controlPanel.updateConnectedClientsTime(connectedClients);
-                                if (user!= null) user.setTime(time);
+                                if (user != null) user.setTime(time);
                                 break;
                             case 31:
                                 Debug.Log("Receiving " + client + " messages...", 4);
@@ -227,7 +227,7 @@ public class Server {
                                 break;
                         }
                     }
-                } catch (IOException | ClassNotFoundException e) {
+                } catch(IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
 
@@ -256,18 +256,18 @@ public class Server {
                 Debug.Log("Closing socket...", 4);
                 socket.close();
                 Debug.Log("Socket closed.", 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
         }
 
         public void stop() {
             try {
-                Debug.Log("Sending closing message to " + client + "...",4);
+                Debug.Log("Sending closing message to " + client + "...", 4);
                 output.writeObject(new Message(0, 3));
                 output.flush();
-                Debug.Log("Closing message sent.",4);
-            } catch (IOException e) {
+                Debug.Log("Closing message sent.", 4);
+            } catch(IOException e) {
                 e.printStackTrace();
             }
 
@@ -292,14 +292,14 @@ public class Server {
                             Thread.sleep(2000);
                             PlaybackPanel.mediaPlayer.play();
                             PlaybackPanel.pauseMedia.setEnabled(true);
-                        } catch (InterruptedException e) {
+                        } catch(InterruptedException e) {
                             e.printStackTrace();
                         }
                     }).start();
                 }
                 sendVideoState();
                 sendVideoTime();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch(IOException | ClassNotFoundException e) {
                 Debug.Log("Unable to establish connection to " + client + '.', 5);
                 System.out.println(socket.getInetAddress());
             }
@@ -313,7 +313,7 @@ public class Server {
                 output.writeObject(new Message(11, connectedClients));
                 output.flush();
                 Debug.Log("Connected clients list sent to " + client + '.', 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 Debug.Log("Unable to send connected clients list to " + client + '.', 5);
             }
         }
@@ -332,7 +332,7 @@ public class Server {
                 output.writeObject(new Message(30, newMessages));
                 output.flush();
                 Debug.Log("Message log sent to " + client + '.', 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 Debug.Log("Unable to send message log to " + client + '.', 5);
             }
         }
@@ -344,7 +344,7 @@ public class Server {
                 output.flush();
                 Debug.Log("Media URL sent to " + client + '.', 4);
                 mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
-            } catch (IOException e) {
+            } catch(IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
             }
         }
@@ -356,13 +356,14 @@ public class Server {
                 output.flush();
                 Debug.Log("Media state sent to " + client + '.', 4);
                 isPaused = PlaybackPanel.mediaPlayer.isPaused();
-            } catch (IOException e) {
+            } catch(IOException e) {
                 Debug.Log("Unable to send media state to " + client + '.', 5);
             }
         }
 
         private synchronized void sendVideoTime() {
-            if (Math.abs(PlaybackPanel.mediaPlayer.getMediaTime() - time) > 3000) time = PlaybackPanel.mediaPlayer.getMediaTime();
+            if (Math.abs(PlaybackPanel.mediaPlayer.getMediaTime() - time) > 3000)
+                time = PlaybackPanel.mediaPlayer.getMediaTime();
 
             try {
                 Debug.Log("Sending current media time to " + client + "...", 4);
@@ -370,8 +371,8 @@ public class Server {
                 output.flush();
                 Debug.Log("Current media time sent to " + client + '.', 4);
                 time = PlaybackPanel.mediaPlayer.getMediaTime();
-                if (user!= null) user.setTime(time);
-            } catch (IOException e) {
+                if (user != null) user.setTime(time);
+            } catch(IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
             }
         }

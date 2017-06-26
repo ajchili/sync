@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class ControlPanel extends JPanel {
 
+    private final int type;
     private JList connectedClients;
     private JScrollPane connectedClientsScroll;
     private JPanel mediaControlPanel;
@@ -25,7 +26,6 @@ public class ControlPanel extends JPanel {
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
-    private final int type;
 
     public ControlPanel(int type) {
         super(new GridLayout(3, 1));

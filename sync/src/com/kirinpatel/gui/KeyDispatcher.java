@@ -19,7 +19,7 @@ public class KeyDispatcher implements KeyEventDispatcher {
     public boolean dispatchKeyEvent(KeyEvent e) {
         switch(e.getID()) {
             case KeyEvent.KEY_PRESSED:
-                switch (e.getKeyCode()) {
+                switch(e.getKeyCode()) {
                     case 27:
                         if (playbackPanel.isFullscreen) {
                             Debug.Log("Closing fullscreen...", 3);
@@ -28,7 +28,7 @@ public class KeyDispatcher implements KeyEventDispatcher {
                         break;
                     case 32:
                         if (playbackPanel.isFullscreen) {
-                            if(playbackPanel.mediaPlayer.isPaused()) playbackPanel.mediaPlayer.play();
+                            if (playbackPanel.mediaPlayer.isPaused()) playbackPanel.mediaPlayer.play();
                             else playbackPanel.mediaPlayer.pause();
                         }
                         break;

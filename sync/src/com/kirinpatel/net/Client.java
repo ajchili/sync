@@ -24,12 +24,12 @@ public class Client {
 
     public static String ipAddress;
     public static User user;
-    private Socket socket;
-    private ClientGUI gui;
     private static ClientThread clientThread;
     private static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
+    private Socket socket;
+    private ClientGUI gui;
 
     public Client(String ipAddress) {
         Debug.Log("Starting client...", 1);
@@ -77,11 +77,11 @@ public class Client {
         public void run() {
             connectToServer();
 
-            while (isConnected && isRunning) {
+            while(isConnected && isRunning) {
                 try {
                     if (socket.getInputStream().available() > 0) {
                         Message message = (Message) input.readObject();
-                        switch (message.getType()) {
+                        switch(message.getType()) {
                             case 0:
                                 if ((int) message.getMessage() == 3) {
                                     Debug.Log("Server closing...", 4);
@@ -130,7 +130,7 @@ public class Client {
                                 break;
                         }
                     }
-                } catch (IOException | ClassNotFoundException e) {
+                } catch(IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
 
@@ -155,17 +155,17 @@ public class Client {
                 Debug.Log("Connecting to server...", 4);
                 socket = new Socket(Client.ipAddress, 8000);
                 socket.setKeepAlive(true);
-            } catch (UnknownHostException e) {
+            } catch(UnknownHostException e) {
                 new UIMessage("Error joining server!", "The IP Address provided is not running!", 1);
                 Client.stop();
                 return;
-            } catch (ConnectException e) {
+            } catch(ConnectException e) {
                 new UIMessage("Error joining server!", "Server is either full or not running!", 1);
                 Client.stop();
                 return;
-            } catch (SocketException e) {
+            } catch(SocketException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
 
@@ -177,7 +177,7 @@ public class Client {
                 Message message = (Message) input.readObject();
                 isConnected = message.getType() == 0 && (int) message.getMessage() == 2;
                 Debug.Log("Connected to server.", 4);
-            } catch (IOException | ClassNotFoundException e) {
+            } catch(IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
@@ -202,7 +202,7 @@ public class Client {
                     System.exit(0);
                     return;
                 }
-            } catch (IOException e) {
+            } catch(IOException e) {
                 Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
                 System.exit(0);
             }
@@ -211,7 +211,7 @@ public class Client {
                 Debug.Log("Closing socket...", 4);
                 socket.close();
                 Debug.Log("Socket closed.", 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
 
@@ -226,7 +226,7 @@ public class Client {
                 output.writeObject(new Message(10, user.getUsername()));
                 output.flush();
                 Debug.Log("Username sent to server.", 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
         }
@@ -238,9 +238,9 @@ public class Client {
                 output.flush();
                 Debug.Log("Current media time sent.", 4);
                 sendVideoState();
-            } catch (SocketException e) {
+            } catch(SocketException e) {
 
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
 
@@ -253,9 +253,9 @@ public class Client {
                 output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
                 output.flush();
                 Debug.Log("Current media state sent.", 4);
-            } catch (SocketException e) {
+            } catch(SocketException e) {
 
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
         }
@@ -268,7 +268,7 @@ public class Client {
                 output.flush();
                 messages.clear();
                 Debug.Log("Chat messages to server.", 4);
-            } catch (IOException e) {
+            } catch(IOException e) {
                 e.printStackTrace();
             }
         }

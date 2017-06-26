@@ -1,13 +1,15 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.gui.PlaybackPanel;
-
 import com.kirinpatel.util.Debug;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.direct.*;
+import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
+import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
+import uk.co.caprica.vlcj.player.direct.RenderCallback;
+import uk.co.caprica.vlcj.player.direct.RenderCallbackAdapter;
 import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 import javax.swing.*;
@@ -15,7 +17,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.*;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 
 public class MediaPlayer extends JPanel {
 
@@ -50,6 +53,22 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setPlaySubItems(true);
         mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
         Debug.Log("MediaPlayer created.", 6);
+    }
+
+    /**
+     * Credit: https://github.com/caprica/vlcj-player/blob/master/src/main/java/uk/co/caprica/vlcjplayer/time/Time.java
+     *
+     * @param value Time
+     * @return Time in displayable string format
+     */
+    public static String formatTime(long value) {
+        value /= 1000;
+        int hours = (int) value / 3600;
+        int remainder = (int) value - hours * 3600;
+        int minutes = remainder / 60;
+        remainder = remainder - minutes * 60;
+        int seconds = remainder;
+        return String.format("%d:%02d:%02d", hours, minutes, seconds);
     }
 
     private void initControls() {
@@ -123,14 +142,6 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setVolume(volume);
     }
 
-    public void setMediaURL(String mediaURL) {
-        if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
-            Debug.Log("Setting media url.", 6);
-            mediaPlayer.playMedia(mediaURL);
-            initControls();
-        }
-    }
-
     public void seekTo(long time) {
         Debug.Log("Seeking media player (" + time + ").", 6);
         mediaPlayer.setTime(time);
@@ -144,28 +155,20 @@ public class MediaPlayer extends JPanel {
         return mediaURL;
     }
 
+    public void setMediaURL(String mediaURL) {
+        if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
+            Debug.Log("Setting media url.", 6);
+            mediaPlayer.playMedia(mediaURL);
+            initControls();
+        }
+    }
+
     public long getMediaTime() {
         return time == -1 ? 0 : time;
     }
 
     public long getMediaLength() {
         return length == -1 ? 0 : length;
-    }
-
-    /**
-     * Credit: https://github.com/caprica/vlcj-player/blob/master/src/main/java/uk/co/caprica/vlcjplayer/time/Time.java
-     *
-     * @param value Time
-     * @return Time in displayable string format
-     */
-    public static String formatTime(long value) {
-        value /= 1000;
-        int hours = (int) value / 3600;
-        int remainder = (int) value - hours * 3600;
-        int minutes = remainder / 60;
-        remainder = remainder - minutes * 60;
-        int seconds = remainder;
-        return String.format("%d:%02d:%02d", hours, minutes, seconds);
     }
 
     protected void paintComponent(Graphics g) {
@@ -233,7 +236,7 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void stopped(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            
+
         }
 
         @Override

@@ -43,7 +43,7 @@ public class TomcatServer {
         try {
             tomcat.start();
             Debug.Log("Tomcat server started.", 4);
-        } catch (LifecycleException e) {
+        } catch(LifecycleException e) {
             Debug.Log("Unable to start tomcat started.", 5);
         }
         tomcat.getServer().await();

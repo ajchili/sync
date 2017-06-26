@@ -4,20 +4,23 @@ import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 public class PlaybackPanel extends JPanel {
 
     public static MediaPlayer mediaPlayer;
-    private JPanel controlPanel;
     public static JButton pauseMedia;
+    public final int type;
     public JLabel mediaPositionLabel;
     public JSlider mediaPosition;
     public JSlider mediaVolume;
-    public final int type;
+    public boolean isFullscreen = false;
+    private JPanel controlPanel;
     private JFrame fullscreen;
     private JPanel fullscreenPanel;
-    public boolean isFullscreen = false;
     private boolean showBar = false;
 
     PlaybackPanel(int type) {
@@ -48,7 +51,7 @@ public class PlaybackPanel extends JPanel {
                                 controlPanel.setVisible(false);
                                 repaint();
                             }
-                        } catch (InterruptedException e1) {
+                        } catch(InterruptedException e1) {
                             e1.printStackTrace();
                         }
                     }).start();
@@ -95,7 +98,7 @@ public class PlaybackPanel extends JPanel {
                                 controlPanel.setVisible(false);
                                 repaint();
                             }
-                        } catch (InterruptedException e1) {
+                        } catch(InterruptedException e1) {
                             e1.printStackTrace();
                         }
                     }).start();

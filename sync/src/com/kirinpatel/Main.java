@@ -24,7 +24,7 @@ public class Main extends JFrame {
 
         Debug.Log("Starting sync launcher...", 3);
         setSize(400, 200);
-        
+
         setResizable(false);
         setLayout(new GridLayout(1, 2));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -40,16 +40,16 @@ public class Main extends JFrame {
         setVisible(true);
         Debug.Log("Sync launcher displayed.", 3);
     }
-    
+
     /**
      * Main method.
-     * 
+     *
      * @param args Command line arguments
      */
     public static void main(String[] args) {
         new Main();
     }
-    
+
     /**
      * Custom ActionListener that will serve to enable usability of Launcher
      * JButtons.
@@ -57,26 +57,26 @@ public class Main extends JFrame {
     class LauncherButtonEvent implements ActionListener {
 
         private int type;
-        
+
         /**
          * Main constructor that will establish the ActionListener with the
          * given type.
-         * 
+         *
          * @param type Type
          */
         public LauncherButtonEvent(int type) {
             this.type = type;
         }
-        
+
         /**
          * Code that will be executed on ActionEvent.
-         * 
+         *
          * @param e ActionEvent
          */
         @Override
         public void actionPerformed(ActionEvent e) {
             setVisible(false);
-            
+
             switch(type) {
                 case 0:
                     new Server();
