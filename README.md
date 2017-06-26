@@ -3,7 +3,9 @@ a Java based multi-client video and audio syncing application
 	
 ## setup
 1. Check to see if Java is installed
-	* The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version. After downloading the latest version, run the installer. This will either install, update, or notify you that Java is installed.
+	1. The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version
+	2. After downloading the latest version, run the installer
+	3. This will either install, update, or notify you that Java is installed
 2. Download and install [vlc](http://www.videolan.org/vlc/index.html)
 3. Download [sync](https://www.github.com/ajchili/sync/releases)
 	* The latest stable version can be found in the link above
@@ -11,13 +13,13 @@ a Java based multi-client video and audio syncing application
 4. Run sync
 	* Server setup
 		* It is recommended to:
-			* A sync to your firewall
+			* Add sync to your firewall
 			* Specify the amount of ram that the application can use _(2 gigabytes of ram minimum)_
 			* Use a multi-core cpu
 			* Have an unresricted and a beefy internet connection _(the beefy internet connection is only required when using offline media)_
 		1. Port forward if you will be using sync past a local network, sync uses ports `8000` and `8080`
-			* Please look at the [Port Forward](https://portforward.com/router.htm) website if you do not know how to port forward
-			* **Please note, port forwarding port `8080` is only required for offline media.**
+			* Please look at the [Port Forward](https://portforward.com/router.htm) website if you do not know how to port forward or need any help port forwarding
+			* _Please note, port forwarding port `8080` is only required for offline media_
 		2. Obtain your IP Address, this will be in the title of the sync server window
 		3. Obtain your media
 			* Online media
