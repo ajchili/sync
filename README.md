@@ -13,7 +13,7 @@ a Java based multi-client video and audio syncing application
 4. Run sync
 	* Server setup
 		* It is recommended to:
-			* Add sync and the Java runtime to your firewall
+			* Add sync to your firewall _(to ensure that Tomcat will run flawlessly, allow all Java entries to be permitted)_
 			* Specify the amount of ram that the application can use _(2 gigabytes of ram minimum)_
 			* Use a multi-core cpu
 			* Have an unresricted and a beefy internet connection _(the beefy internet connection is only required when using offline media)_
@@ -33,7 +33,7 @@ a Java based multi-client video and audio syncing application
 		5. Enjoy!
 	* Client setup
 		* It is recommended to:
-			* Add sync and the Java runtime to your firewall
+			* Add sync to your firewall
 		1. Obtain the IP Address of the server you would like to connect to
 		2. Connect to the server
 		3. Enjoy!
