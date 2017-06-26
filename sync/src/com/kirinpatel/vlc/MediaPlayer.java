@@ -225,6 +225,14 @@ public class MediaPlayer extends JPanel {
             isPaused = false;
             length = mediaPlayer.getLength();
             playbackPanel.pauseMedia.setText("||");
+
+            mediaPlayer.setMarqueeText("Playing");
+            mediaPlayer.setMarqueeSize(60);
+            mediaPlayer.setMarqueeOpacity(200);
+            mediaPlayer.setMarqueeColour(Color.white);
+            mediaPlayer.setMarqueeTimeout(5000);
+            mediaPlayer.setMarqueeLocation(50, 400);
+            mediaPlayer.enableMarquee(true);
         }
 
         @Override
@@ -232,6 +240,14 @@ public class MediaPlayer extends JPanel {
             isPaused = true;
             length = mediaPlayer.getLength();
             playbackPanel.pauseMedia.setText(">");
+
+            mediaPlayer.setMarqueeText("Pausing");
+            mediaPlayer.setMarqueeSize(60);
+            mediaPlayer.setMarqueeOpacity(200);
+            mediaPlayer.setMarqueeColour(Color.white);
+            mediaPlayer.setMarqueeTimeout(5000);
+            mediaPlayer.setMarqueeLocation(50, 400);
+            mediaPlayer.enableMarquee(true);
         }
 
         @Override
