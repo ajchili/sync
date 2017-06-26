@@ -1,35 +1,35 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
+import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
-/**
- * @author Kirin Patel
- * @date 6/21/17
- */
 public class ControlPanel extends JPanel {
 
     private JList connectedClients;
     private JScrollPane connectedClientsScroll;
     private JPanel mediaControlPanel;
     private JTextField urlField;
-    private JButton setUrl;
+    private JButton setURL;
+    private JButton setOfflineURL;
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
+    private final int type;
 
     public ControlPanel(int type) {
         super(new GridLayout(3, 1));
+        this.type = type;
 
         Debug.Log("Creating ControlPanel...", 3);
 
@@ -45,20 +45,34 @@ public class ControlPanel extends JPanel {
             urlField = new JTextField();
             urlField.setToolTipText("Media URL");
             mediaControlPanel.add(urlField);
-            setUrl = new JButton("Set Media URL");
-            setUrl.addActionListener(e -> {
-                if (!urlField.getText().isEmpty()) {
-                    PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
-                } else if (urlField.getText().isEmpty()) {
-                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
-                        PlaybackPanel.mediaPlayer.setMediaURL("");
-                    } else {
+            JPanel mediaControlButtonPanel = new JPanel(new GridLayout(1, 2));
+            setURL = new JButton("Set URL");
+            setURL.setInputMap(0, null);
+            setURL.addActionListener(e -> {
+                if (!urlField.getText().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
+                else {
+                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL("");
+                    else {
                         Debug.Log("Media URL not specified!", 2);
                         new UIMessage("Error setting Media URL!", "The Media URL must be specified!", 1);
                     }
                 }
             });
-            mediaControlPanel.add(setUrl);
+            mediaControlButtonPanel.add(setURL);
+            setOfflineURL = new JButton("Choose file");
+            setOfflineURL.setInputMap(0, null);
+            setOfflineURL.addActionListener(e -> {
+                JFileChooser mediaSelector = new JFileChooser("tomcat/webapps/media");
+                mediaSelector.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                mediaSelector.showOpenDialog(ControlPanel.this);
+                if (mediaSelector.getSelectedFile() != null && mediaSelector.getSelectedFile().getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
+                    PlaybackPanel.mediaPlayer.setMediaURL("http://" + Server.ipAddress + ":8080/" + mediaSelector.getSelectedFile().getName());
+                } else if (mediaSelector.getSelectedFile() != null) {
+                    new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
+                }
+            });
+            mediaControlButtonPanel.add(setOfflineURL);
+            mediaControlPanel.add(mediaControlButtonPanel);
             add(mediaControlPanel);
         } else {
             add(new JPanel());
@@ -67,6 +81,8 @@ public class ControlPanel extends JPanel {
         JPanel chatPanel = new JPanel(new BorderLayout());
         chatWindow = new JTextArea();
         chatWindow.setEditable(false);
+        chatWindow.setLineWrap(true);
+        chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
         chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
@@ -77,60 +93,36 @@ public class ControlPanel extends JPanel {
         chatField.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(chatField, BorderLayout.CENTER);
         JButton send = new JButton("Send");
+        send.setInputMap(0, null);
         send.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
         add(chatPanel);
 
-        if (Main.isDarkModeEnabled) {
-            Color foreground = Color.white;
-            Color background = Color.black;
-            setBackground(background);
-            connectedClients.setBackground(background);
-            connectedClients.setForeground(foreground);
-
-            mediaControlPanel.setBackground(background);
-
-            urlField.setBackground(background);
-            urlField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
-            urlField.setForeground(foreground);
-
-            setUrl.setBackground(background);
-            setUrl.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
-            setUrl.setForeground(foreground);
-
-            chatPanel.setBackground(background);
-            messagePanel.setBackground(background);
-
-            chatWindow.setBackground(background);
-            chatWindow.setForeground(foreground);
-
-            chatField.setBackground(background);
-            chatField.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(7, 2, 7, 2), BorderFactory.createLineBorder(foreground, 3, true)));
-            chatField.setForeground(foreground);
-
-            send.setBackground(background);
-            send.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2), BorderFactory.createLineBorder(foreground, 3, true)));
-            send.setForeground(foreground);
-        }
-
         Debug.Log("ControlPanel created.", 3);
     }
 
-    public void resizePanel(int width, int height) {
-        width = ((width - (height * 16 / 9)) < 200) ? 200 : width - (height * 16 / 9);
-        if (urlField != null) urlField.setPreferredSize(new Dimension(width, height / 6));
-        connectedClientsScroll.setPreferredSize(new Dimension(width, height / 3));
+    public void resizePanel(int height) {
+        connectedClientsScroll.setPreferredSize(new Dimension(200, height / 3));
+        if (urlField != null) urlField.setPreferredSize(new Dimension(200, height / 6));
+        if (setURL != null) setURL.setPreferredSize(new Dimension(100, height / 6));
+        if (setOfflineURL != null) setOfflineURL.setPreferredSize(new Dimension(100, height / 6));
+        chatWindowScroll.setPreferredSize(new Dimension(200, chatWindowScroll.getHeight()));
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
         Debug.Log("Updating connected clients in gui...", 3);
+        updateConnectedClientsTime(users);
+        Debug.Log("Connected clients updated in gui.", 3);
+    }
+
+    public void updateConnectedClientsTime(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            listModel.addElement(user);
+            if (type == 0) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ")");
+            else listModel.addElement(user);
         }
         connectedClients.setModel(listModel);
-        Debug.Log("Connected clients updated in gui.", 3);
     }
 
     public void setMessages(ArrayList<String> messages) {

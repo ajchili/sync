@@ -8,10 +8,6 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-/**
- * @author Kirin Patel
- * @date 6/16/17
- */
 public class ClientGUI extends JFrame {
 
     public static PlaybackPanel playbackPanel;
@@ -32,7 +28,7 @@ public class ClientGUI extends JFrame {
         playbackPanel = new PlaybackPanel(1);
         add(playbackPanel, BorderLayout.CENTER);
         controlPanel = new ControlPanel(1);
-        controlPanel.resizePanel(getWidth(), getHeight());
+        controlPanel.resizePanel(getHeight());
         add(controlPanel, BorderLayout.EAST);
 
         setVisible(true);
@@ -44,7 +40,7 @@ public class ClientGUI extends JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            controlPanel.resizePanel(getWidth(), getHeight());
+            controlPanel.resizePanel(getHeight());
         }
 
         @Override
@@ -60,7 +56,7 @@ public class ClientGUI extends JFrame {
         @Override
         public void componentHidden(ComponentEvent e) {
             Debug.Log("Closing client gui...", 3);
-            PlaybackPanel.mediaPlayer.releaseMediaPlayer();
+            PlaybackPanel.mediaPlayer.release();
             dispose();
             Debug.Log("Client gui closed.", 3);
             Client.stop();

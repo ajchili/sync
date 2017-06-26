@@ -4,6 +4,7 @@
 .mtj.tmp/
 
 # Package Files #
+*.jar
 *.war
 *.ear
 
@@ -11,11 +12,5 @@
 hs_err_pid*
 /sync/nbproject/private/
 /sync/build/
-
-sync/classes/production/sync/jna-4\.1\.0\.jar
-sync/classes/production/sync/jna-platform-4\.1\.0\.jar
-sync/classes/production/sync/slf4j-api-1\.7\.25\.jar
-sync/classes/production/sync/slf4j-nop-1\.7\.25\.jar
-sync/classes/production/sync/vlcj-3\.10\.1\.jar
 
 \.idea/workspace\.xml

@@ -1,30 +1,61 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.vlc.MediaPlayer;
-import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
-/**
- * @author Kirin Patel
- * @date 6/23/17
- */
 public class PlaybackPanel extends JPanel {
 
     public static MediaPlayer mediaPlayer;
-    public JButton pauseMedia;
+    private JPanel controlPanel;
+    public static JButton pauseMedia;
     public JLabel mediaPositionLabel;
     public JSlider mediaPosition;
+    public JSlider mediaVolume;
     public final int type;
+    private JFrame fullscreen;
+    private JPanel fullscreenPanel;
+    public boolean isFullscreen = false;
+    private boolean showBar = false;
 
-    public PlaybackPanel(int type) {
+    PlaybackPanel(int type) {
         super(new BorderLayout());
+        setBackground(Color.BLACK);
 
         this.type = type;
 
-        new NativeDiscovery().discover();
+        addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (e.getY() >= getHeight() - getHeight() / 12) {
+                    showBar = true;
+                    controlPanel.setVisible(true);
+                    repaint();
+                } else {
+                    new Thread(() -> {
+                        try {
+                            showBar = false;
+                            Thread.sleep(2000);
+
+                            if (!showBar) {
+                                controlPanel.setVisible(false);
+                                repaint();
+                            }
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    }).start();
+                }
+            }
+        });
+
         initMediaPlayer();
     }
 
@@ -35,17 +66,94 @@ public class PlaybackPanel extends JPanel {
         initControls();
     }
 
+    public void initFullscreen() {
+        removeAll();
+
+        isFullscreen = true;
+        fullscreen = new JFrame();
+        fullscreen.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+        fullscreen.setUndecorated(true);
+        fullscreen.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (e.getY() >= Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 50) {
+                    showBar = true;
+                    controlPanel.setVisible(true);
+                    repaint();
+                } else {
+                    new Thread(() -> {
+                        try {
+                            showBar = false;
+                            Thread.sleep(2000);
+
+                            if (!showBar) {
+                                controlPanel.setVisible(false);
+                                repaint();
+                            }
+                        } catch (InterruptedException e1) {
+                            e1.printStackTrace();
+                        }
+                    }).start();
+                }
+            }
+        });
+        fullscreen.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                closeFullscreen();
+            }
+        });
+        fullscreenPanel = new JPanel(new BorderLayout());
+        fullscreenPanel.add(mediaPlayer, BorderLayout.CENTER);
+        fullscreenPanel.add(controlPanel, BorderLayout.SOUTH);
+        fullscreen.add(fullscreenPanel);
+        fullscreen.setVisible(true);
+    }
+
+    public void closeFullscreen() {
+        isFullscreen = false;
+        fullscreenPanel.removeAll();
+        fullscreen.dispose();
+        add(mediaPlayer, BorderLayout.CENTER);
+        add(controlPanel, BorderLayout.SOUTH);
+        mediaPlayer.repaint();
+        controlPanel.repaint();
+        repaint();
+    }
+
     private void initControls() {
         Color foreground = Color.white;
         Color background = Color.black;
-        JPanel controlPanel = new JPanel(new GridLayout(1, 3, 10, 0));
+        controlPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         controlPanel.setBackground(background);
 
         pauseMedia = new JButton("");
         pauseMedia.setBorder(null);
+        pauseMedia.setInputMap(0, null);
         pauseMedia.setEnabled(type == 0);
         pauseMedia.setBackground(background);
         pauseMedia.setForeground(foreground);
+        pauseMedia.setFocusable(false);
         controlPanel.add(pauseMedia);
 
         JPanel positionPanel = new JPanel(new BorderLayout());
@@ -54,9 +162,11 @@ public class PlaybackPanel extends JPanel {
         mediaPositionLabel.setOpaque(true);
         mediaPositionLabel.setBackground(background);
         mediaPositionLabel.setForeground(foreground);
+        mediaPositionLabel.setFocusable(false);
         positionPanel.add(mediaPositionLabel, BorderLayout.EAST);
         mediaPosition = new JSlider(0, 0, 0);
         mediaPosition.setBackground(background);
+        mediaPosition.setFocusable(false);
         positionPanel.add(mediaPosition, BorderLayout.CENTER);
         controlPanel.add(positionPanel);
 
@@ -65,13 +175,18 @@ public class PlaybackPanel extends JPanel {
         mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setBackground(background);
         mediaVolumeLabel.setForeground(foreground);
+        mediaVolumeLabel.setFocusable(false);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
-        JSlider mediaVolume = new JSlider(0, 100, 100 - type * 75);
+        mediaVolume = new JSlider(0, 100, 25);
         mediaVolume.addChangeListener(e -> mediaPlayer.setVolume(mediaVolume.getValue()));
         mediaVolume.setBackground(background);
+        mediaVolume.setFocusable(false);
         volumePanel.add(mediaVolume, BorderLayout.CENTER);
         controlPanel.add(volumePanel);
 
         add(controlPanel, BorderLayout.SOUTH);
+
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyDispatcher(this));
     }
 }

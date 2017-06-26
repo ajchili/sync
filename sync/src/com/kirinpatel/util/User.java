@@ -4,14 +4,13 @@ import java.io.Serializable;
 import java.util.Random;
 
 /**
- * @author Kirin Patel
- * @date 6/17/17
+ * Simple object that holds all user information in one place.
  */
 public class User implements Serializable {
 
     private String username;
     private long userID;
-    private boolean wantsToPause = false;
+    private long time = -1;
 
     public User(String username) {
         this.username = username;
@@ -37,8 +36,8 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    public void setWantsToPause(boolean wantsToPause) {
-        this.wantsToPause = wantsToPause;
+    public void setTime(long time) {
+        this.time = time;
     }
 
     public String getUsername() {
@@ -49,7 +48,7 @@ public class User implements Serializable {
         return userID;
     }
 
-    public boolean getWantsToPause() {
-        return wantsToPause;
+    public long getTime() {
+        return time;
     }
 }

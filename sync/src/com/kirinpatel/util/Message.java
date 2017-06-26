@@ -9,8 +9,6 @@ import java.io.Serializable;
 
 /**
  * Message object used to send/comprehend data between clients and a server.
- *
- * @author Kirin Patel
  */
 public class Message implements Serializable {
     
@@ -35,14 +33,10 @@ public class Message implements Serializable {
      *      2#: Media Messages
      *          0: MediaURL
      *              String
-     *          1: Play media
-     *              null
-     *          2: Pause media
-     *              null
-     *          3: Seek to point
-     *              Duration
-     *          4: Client time
-     *              Duration
+     *          1: Media state
+     *              boolean
+     *          2: Seek to point
+     *              long
      *      3#: Messages
      *          0: Messages
      *              ArrayList<String>

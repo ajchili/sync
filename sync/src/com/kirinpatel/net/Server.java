@@ -2,27 +2,25 @@ package com.kirinpatel.net;
 
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.gui.ServerGUI;
+import com.kirinpatel.tomcat.TomcatServer;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
-import javafx.util.Duration;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author Kirin Patel
- * @date 6/16/17
- */
 public class Server {
 
     private static ServerGUI gui;
     public static ArrayList<User> connectedClients = new ArrayList<>();
     private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
+    public static String ipAddress = "";
     private static boolean isRunning = false;
     private static boolean closeServer = false;
     private static boolean isBound = false;
@@ -36,6 +34,9 @@ public class Server {
 
         server = new ServerThread();
         new Thread(server).start();
+        new Thread(() -> {
+            new TomcatServer();
+        }).start();
     }
 
     public static void stop() {
@@ -128,19 +129,19 @@ public class Server {
          */
         private String getIPAddress() {
             Debug.Log("Obtaining server IP address...", 4);
+            String ip = "";
             try {
                 URL whatismyip = new URL("http://checkip.amazonaws.com");
                 BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
                 Debug.Log("Server IP address obtained.", 4);
-                return " (" +  in.readLine() + ":8000)";
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
+                ipAddress = in.readLine();
+                ip = " (" +  ipAddress + ":8000)";
             } catch (IOException e) {
-                e.printStackTrace();
+                Debug.Log("Unable to obtain server IP address.", 5);
             }
-            Debug.Log("Unable to obtain server IP address.", 5);
-            return "";
+
+            return ip;
         }
     }
 
@@ -153,14 +154,13 @@ public class Server {
         private String client = "client";
         private boolean isClientConnected = false;
         private String mediaURL = "";
-        private boolean isPaused;
+        private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
         private long lastClientUpdate = System.currentTimeMillis() - 9000;
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
             this.socket = socket;
-            isPaused = !PlaybackPanel.mediaPlayer.isPaused();
         }
 
         public void run() {
@@ -173,6 +173,8 @@ public class Server {
                     isClientConnected = false;
                     break;
                 }
+
+                connectedClients.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
 
                 try {
                     if (socket.getInputStream().available() > 0) {
@@ -195,10 +197,15 @@ public class Server {
                                 client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
                                 ServerGUI.controlPanel.updateConnectedClients(connectedClients);
                                 break;
-                            case 24:
-                                Debug.Log("Receiving " + client + " time...",4);
-                                if (((long) message.getMessage() - time) < 0) sendVideoState();
+                            case 21:
+                                Debug.Log("Receiving " + client + " media state (" + ((boolean) message.getMessage() == isPaused) + ")...",4);
+                                if ((boolean) message.getMessage() != isPaused) sendVideoState();
+                                break;
+                            case 22:
+                                Debug.Log("Receiving " + client + " time (" + time + ":" + message.getMessage() + ")...",4);
                                 time = (long) message.getMessage();
+                                ServerGUI.controlPanel.updateConnectedClientsTime(connectedClients);
+                                if (user!= null) user.setTime(time);
                                 break;
                             case 31:
                                 Debug.Log("Receiving " + client + " messages...", 4);
@@ -277,6 +284,21 @@ public class Server {
                 output.writeObject(new Message(0, 2));
                 output.flush();
                 Debug.Log("Established connection to " + client + '.', 4);
+                if (!PlaybackPanel.mediaPlayer.isPaused()) {
+                    PlaybackPanel.mediaPlayer.pause();
+                    PlaybackPanel.pauseMedia.setEnabled(false);
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2000);
+                            PlaybackPanel.mediaPlayer.play();
+                            PlaybackPanel.pauseMedia.setEnabled(true);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
+                sendVideoState();
+                sendVideoTime();
             } catch (IOException | ClassNotFoundException e) {
                 Debug.Log("Unable to establish connection to " + client + '.', 5);
                 System.out.println(socket.getInetAddress());
@@ -328,41 +350,30 @@ public class Server {
         }
 
         private synchronized void sendVideoState() {
-            Debug.Log("Sending media state to " + client + "...", 4);
-            if (PlaybackPanel.mediaPlayer.isPaused()) {
-                try {
-                    output.writeObject(new Message(22, null));
-                    output.flush();
-                } catch (IOException e) {
-                    Debug.Log("Unable to send media state to " + client + '.', 5);
-                }
-            } else {
-                try {
-                    output.writeObject(new Message(21, null));
-                    output.flush();
-                } catch (IOException e) {
-                    Debug.Log("Unable to send media state to " + client + '.', 5);
-                }
+            try {
+                Debug.Log("Sending media state to " + client + "...", 4);
+                output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
+                output.flush();
+                Debug.Log("Media state sent to " + client + '.', 4);
+                isPaused = PlaybackPanel.mediaPlayer.isPaused();
+            } catch (IOException e) {
+                Debug.Log("Unable to send media state to " + client + '.', 5);
             }
-            Debug.Log("Media state sent to " + client + '.', 4);
-            this.isPaused = PlaybackPanel.mediaPlayer.isPaused();
-            sendVideoTime();
         }
 
         private synchronized void sendVideoTime() {
-            if (Math.abs(time - PlaybackPanel.mediaPlayer.getMediaTime()) > 5000) {
-                time = PlaybackPanel.mediaPlayer.getMediaTime();
-            }
+            if (Math.abs(PlaybackPanel.mediaPlayer.getMediaTime() - time) > 3000) time = PlaybackPanel.mediaPlayer.getMediaTime();
+
             try {
                 Debug.Log("Sending current media time to " + client + "...", 4);
-                output.writeObject(new Message(23, PlaybackPanel.mediaPlayer.getMediaTime() + (PlaybackPanel.mediaPlayer.getMediaTime() - time)));
+                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime() + Math.abs(PlaybackPanel.mediaPlayer.getMediaTime() - time)));
                 output.flush();
                 Debug.Log("Current media time sent to " + client + '.', 4);
+                time = PlaybackPanel.mediaPlayer.getMediaTime();
+                if (user!= null) user.setTime(time);
             } catch (IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
             }
-
-            time = PlaybackPanel.mediaPlayer.getMediaTime();
         }
     }
 }

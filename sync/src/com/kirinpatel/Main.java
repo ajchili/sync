@@ -13,12 +13,8 @@ import java.awt.event.ActionListener;
 /**
  * Main class that will run the application. This class, as of version 2.0, will
  * also server as the launcher for the application.
- * 
- * @author Kirin Patel
  */
 public class Main extends JFrame {
-
-    public static boolean isDarkModeEnabled = false;
 
     /**
      * Creates launcher window.
@@ -30,26 +26,16 @@ public class Main extends JFrame {
         setSize(400, 200);
         
         setResizable(false);
-        setLayout(new BorderLayout());
+        setLayout(new GridLayout(1, 2));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
-
         JButton hostServer = new JButton("Host");
         hostServer.addActionListener(new LauncherButtonEvent(0));
-        buttonPanel.add(hostServer);
+        add(hostServer);
         JButton joinServer = new JButton("Join");
         joinServer.addActionListener(new LauncherButtonEvent(1));
-        buttonPanel.add(joinServer);
-        add(buttonPanel, BorderLayout.CENTER);
-
-        JCheckBox darkModeCheckBox = new JCheckBox("Dark mode");
-        darkModeCheckBox.addActionListener(e -> {
-            JCheckBox box = (JCheckBox) e.getSource();
-            isDarkModeEnabled = box.isSelected();
-        });
-        add(darkModeCheckBox, BorderLayout.SOUTH);
+        add(joinServer);
 
         setVisible(true);
         Debug.Log("Sync launcher displayed.", 3);

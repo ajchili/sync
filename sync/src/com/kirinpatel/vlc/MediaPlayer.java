@@ -1,99 +1,155 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.gui.PlaybackPanel;
+
 import com.kirinpatel.util.Debug;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
+import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
+import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
-import uk.co.caprica.vlcj.player.MediaPlayerFactory;
-import uk.co.caprica.vlcj.player.embedded.DefaultAdaptiveRuntimeFullScreenStrategy;
+import uk.co.caprica.vlcj.player.direct.*;
+import uk.co.caprica.vlcj.player.direct.format.RV32BufferFormat;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.*;
 
-/**
- * @author Kirin Patel
- * @date 6/23/17
- */
-public class MediaPlayer extends EmbeddedMediaPlayerComponent {
+public class MediaPlayer extends JPanel {
 
-    private final MediaPlayerFactory factory;
-    private final uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer;
-    private final Canvas videoSurface;
     private final PlaybackPanel playbackPanel;
-    private String mediaUrl = "";
-    private long time = -1;
-    private long mediaLength = -1;
+    private final BufferedImage image;
+    private final DirectMediaPlayer mediaPlayer;
+    private BufferedImage scale;
     private boolean isPaused = false;
+    private long time = -1;
+    private long length = -1;
+    private String mediaURL = "";
+    private boolean hasAutoPaused = false;
+    private boolean isScrubbing = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
-        factory = getMediaPlayerFactory();
-        mediaPlayer = getMediaPlayer();
-        videoSurface = getVideoSurface();
+        Debug.Log("Creating MediaPlayer...", 6);
+        new NativeDiscovery().discover();
+        setOpaque(true);
+
         this.playbackPanel = playbackPanel;
 
+        image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(1280, 720);
+        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(1280, 720);
+        DirectMediaPlayerComponent mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
+            @Override
+            protected RenderCallback onGetRenderCallback() {
+                return new MediaRenderCallback();
+            }
+        };
+        mediaPlayer = mediaPlayerComponent.getMediaPlayer();
         mediaPlayer.setStandardMediaOptions();
         mediaPlayer.setPlaySubItems(true);
         mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
+        Debug.Log("MediaPlayer created.", 6);
     }
 
-    private void initPlaybackPanelActions() {
-        playbackPanel.mediaPosition.setMaximum(1000);
-        if (playbackPanel.type == 0) {
+    private void initControls() {
+        Debug.Log("Initializing media player controls...", 3);
+        if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
             playbackPanel.pauseMedia.addActionListener(e -> {
-                if (playbackPanel.pauseMedia.getText().equals("||")) mediaPlayer.pause();
-                else mediaPlayer.play();
+                if (isPaused) mediaPlayer.play();
+                else mediaPlayer.pause();
+            });
+
+            playbackPanel.mediaPosition.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    isScrubbing = true;
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    isScrubbing = false;
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
             });
 
             playbackPanel.mediaPosition.addChangeListener(e -> {
-                int position = playbackPanel.mediaPosition.getValue();
-                mediaPlayer.setTime(position * getMediaLength() / 1000);
+                if (isScrubbing) {
+                    int position = playbackPanel.mediaPosition.getValue();
+                    mediaPlayer.setTime(position * getMediaLength() / 1000);
+                }
             });
         }
-    }
-
-    public void setMediaURL(String mediaUrl) {
-        if (!mediaUrl.isEmpty() && !mediaUrl.equals(this.mediaUrl)) {
-            mediaPlayer.playMedia(mediaUrl);
-            initPlaybackPanelActions();
-        }
-    }
-
-    public void releaseMediaPlayer() {
-        mediaPlayer.stop();
-        mediaPlayer.release();
+        playbackPanel.mediaPosition.setMaximum(1000);
+        Debug.Log("Media player controls initialized.", 3);
     }
 
     public void play() {
-        mediaPlayer.play();
+        if (!mediaURL.isEmpty() && isPaused) {
+            Debug.Log("Playing media.", 6);
+            mediaPlayer.play();
+        }
     }
 
     public void pause() {
-        mediaPlayer.pause();
+        if (!mediaURL.isEmpty() && !isPaused) {
+            Debug.Log("Pausing media.", 6);
+            mediaPlayer.pause();
+        }
+    }
+
+    public void release() {
+        Debug.Log("Releasing media player...", 6);
+        mediaPlayer.stop();
+        mediaPlayer.release();
+        Debug.Log("Media player released.", 6);
     }
 
     public void setVolume(int volume) {
         mediaPlayer.setVolume(volume);
     }
 
-    public void seekTo(long time) {
-        mediaPlayer.setTime(time);
+    public void setMediaURL(String mediaURL) {
+        if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
+            Debug.Log("Setting media url.", 6);
+            mediaPlayer.playMedia(mediaURL);
+            initControls();
+        }
     }
 
-    public String getMediaURL() {
-        return mediaUrl;
+    public void seekTo(long time) {
+        Debug.Log("Seeking media player (" + time + ").", 6);
+        mediaPlayer.setTime(time);
     }
 
     public boolean isPaused() {
         return isPaused;
     }
 
+    public String getMediaURL() {
+        return mediaURL;
+    }
+
     public long getMediaTime() {
-        return time == -1? 0 : time;
+        return time == -1 ? 0 : time;
     }
 
     public long getMediaLength() {
-        return mediaLength == -1 ? 0 : mediaLength;
+        return length == -1 ? 0 : length;
     }
 
     /**
@@ -102,7 +158,7 @@ public class MediaPlayer extends EmbeddedMediaPlayerComponent {
      * @param value Time
      * @return Time in displayable string format
      */
-    private static String formatTime(long value) {
+    public static String formatTime(long value) {
         value /= 1000;
         int hours = (int) value / 3600;
         int remainder = (int) value - hours * 3600;
@@ -112,11 +168,36 @@ public class MediaPlayer extends EmbeddedMediaPlayerComponent {
         return String.format("%d:%02d:%02d", hours, minutes, seconds);
     }
 
+    protected void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
+        g2.drawImage(scale, null, 0, 0);
+    }
+
+    class MediaRenderCallback extends RenderCallbackAdapter {
+
+        public MediaRenderCallback() {
+            super(new int[1280 * 720]);
+        }
+
+        @Override
+        protected void onDisplay(DirectMediaPlayer directMediaPlayer, int[] buffer) {
+            float xScale = (float) getWidth() / 1280;
+            float yScale = (float) getHeight() / 720;
+            image.setRGB(0, 0, 1280, 720, buffer, 0, 1280);
+            BufferedImage after = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+            AffineTransform at = new AffineTransform();
+            at.scale(xScale, yScale);
+            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            scale = scaleOp.filter(image, after);
+            repaint();
+        }
+    }
+
     class MediaEventListener implements MediaPlayerEventListener {
 
         @Override
         public void mediaChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t, String s) {
-            mediaUrl = s;
+            mediaURL = s;
         }
 
         @Override
@@ -126,25 +207,33 @@ public class MediaPlayer extends EmbeddedMediaPlayerComponent {
 
         @Override
         public void buffering(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
-            if (v == 100.0) Debug.Log("Media buffered.", 1);
+            if (v == 100.0) {
+                Debug.Log("Media buffered.", 1);
+                if (!hasAutoPaused) {
+                    mediaPlayer.pause();
+                    hasAutoPaused = true;
+                    mediaPlayer.setVolume(playbackPanel.mediaVolume.getValue());
+                }
+            }
         }
 
         @Override
         public void playing(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            mediaLength = mediaPlayer.getLength();
-            playbackPanel.pauseMedia.setText("||");
             isPaused = false;
+            length = mediaPlayer.getLength();
+            playbackPanel.pauseMedia.setText("||");
         }
 
         @Override
         public void paused(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            playbackPanel.pauseMedia.setText(">");
             isPaused = true;
+            length = mediaPlayer.getLength();
+            playbackPanel.pauseMedia.setText(">");
         }
 
         @Override
         public void stopped(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-
+            
         }
 
         @Override
@@ -159,14 +248,16 @@ public class MediaPlayer extends EmbeddedMediaPlayerComponent {
 
         @Override
         public void finished(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            playbackPanel.pauseMedia.setText("");
+
         }
 
         @Override
         public void timeChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, long l) {
-            time = l;
-            playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(mediaLength));
-            if (playbackPanel.type != 0) playbackPanel.mediaPosition.setValue((int) (time * 1000 / mediaLength));
+            if (!isScrubbing) {
+                time = l;
+                playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(length));
+                playbackPanel.mediaPosition.setValue((int) (time * 1000 / length));
+            }
         }
 
         @Override
@@ -291,7 +382,7 @@ public class MediaPlayer extends EmbeddedMediaPlayerComponent {
 
         @Override
         public void newMedia(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            if (playbackPanel.type == 0) pause();
+
         }
 
         @Override
