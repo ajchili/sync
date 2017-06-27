@@ -137,6 +137,8 @@ public class Server {
                 Debug.Log("Server IP address obtained.", 4);
                 ipAddress = in.readLine();
                 ip = " (" + ipAddress + ":8000)";
+            } catch(MalformedURLException e) {
+                e.printStackTrace();
             } catch(IOException e) {
                 Debug.Log("Unable to obtain server IP address.", 5);
             }
