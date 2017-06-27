@@ -202,7 +202,7 @@ public class Server {
                                 if ((boolean) message.getMessage() != isPaused) sendVideoState();
                                 break;
                             case 22:
-                                Debug.Log("Receiving " + client + " time (" + time + ":" + message.getMessage() + ")...", 4);
+                                Debug.Log("Receiving " + client + " time (" + time + ':' + message.getMessage() + ")...", 4);
                                 time = (long) message.getMessage();
                                 ServerGUI.controlPanel.updateConnectedClientsTime(connectedClients);
                                 if (user != null) user.setTime(time);

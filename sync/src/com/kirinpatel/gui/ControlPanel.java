@@ -119,7 +119,7 @@ public class ControlPanel extends JPanel {
     public void updateConnectedClientsTime(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            if (type == 0) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ")");
+            if (type == 0) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
             else listModel.addElement(user);
         }
         connectedClients.setModel(listModel);
