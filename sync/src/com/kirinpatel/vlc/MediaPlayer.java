@@ -1,7 +1,7 @@
 package com.kirinpatel.vlc;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.util.Debug;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
@@ -23,6 +23,8 @@ import java.awt.image.BufferedImage;
 
 public class MediaPlayer extends JPanel {
 
+    private final int WIDTH;
+    private final int HEIGHT;
     private final PlaybackPanel playbackPanel;
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
@@ -32,16 +34,21 @@ public class MediaPlayer extends JPanel {
     private long length = -1;
     private String mediaURL = "";
     private boolean isScrubbing = false;
+    public boolean isBuffering = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
         Debug.Log("Creating MediaPlayer...", 6);
         new NativeDiscovery().discover();
+        setBackground(Color.BLACK);
         setOpaque(true);
+
+        WIDTH = (int) (1920 * Main.videoQuality);
+        HEIGHT = (int) (1080 * Main.videoQuality);
 
         this.playbackPanel = playbackPanel;
 
-        image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(1280, 720);
-        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(1280, 720);
+        image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
+        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(WIDTH, HEIGHT);
         DirectMediaPlayerComponent mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
             @Override
             protected RenderCallback onGetRenderCallback() {
@@ -113,6 +120,7 @@ public class MediaPlayer extends JPanel {
                 }
             });
         }
+
         PlaybackPanel.pauseMedia.setText(">");
         playbackPanel.mediaPosition.setMaximum(1000);
         Debug.Log("Media player controls initialized.", 3);
@@ -144,6 +152,15 @@ public class MediaPlayer extends JPanel {
         Debug.Log("Media player released.", 6);
     }
 
+    public void setMediaURL(String mediaURL) {
+        if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
+            Debug.Log("Setting media url.", 6);
+            mediaPlayer.prepareMedia(mediaURL);
+            mediaPlayer.parseMedia();
+            initControls();
+        }
+    }
+
     public void setVolume(int volume) {
         mediaPlayer.setVolume(volume);
     }
@@ -159,15 +176,6 @@ public class MediaPlayer extends JPanel {
 
     public String getMediaURL() {
         return mediaURL;
-    }
-
-    public void setMediaURL(String mediaURL) {
-        if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
-            Debug.Log("Setting media url.", 6);
-            mediaPlayer.prepareMedia(mediaURL);
-            mediaPlayer.parseMedia();
-            initControls();
-        }
     }
 
     public long getMediaTime() {
@@ -186,14 +194,14 @@ public class MediaPlayer extends JPanel {
     class MediaRenderCallback extends RenderCallbackAdapter {
 
         public MediaRenderCallback() {
-            super(new int[1280 * 720]);
+            super(new int[WIDTH * HEIGHT]);
         }
 
         @Override
         protected void onDisplay(DirectMediaPlayer directMediaPlayer, int[] buffer) {
-            float xScale = (float) getWidth() / 1280;
-            float yScale = (float) getHeight() / 720;
-            image.setRGB(0, 0, 1280, 720, buffer, 0, 1280);
+            float xScale = (float) getWidth() / WIDTH;
+            float yScale = (float) getHeight() / HEIGHT;
+            image.setRGB(0, 0, WIDTH, HEIGHT, buffer, 0, WIDTH);
             BufferedImage after = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
             AffineTransform at = new AffineTransform();
             at.scale(xScale, yScale);
@@ -217,9 +225,8 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void buffering(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
-            if (v == 100.0) {
-                Debug.Log("Media buffered.", 1);
-            }
+            if (v == 100.0) Debug.Log("Media buffered.", 1);
+            else isBuffering = isPaused;
         }
 
         @Override
@@ -259,7 +266,9 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void finished(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-
+            isPaused = true;
+            PlaybackPanel.pauseMedia.setText(">");
+            playbackPanel.mediaPosition.setValue(0);
         }
 
         @Override
