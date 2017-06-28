@@ -18,3 +18,5 @@ hs_err_pid*
 \.idea/uiDesigner\.xml
 
 launcherData\.dat
+
+tomcat/webapps/media/*

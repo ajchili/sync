@@ -3,10 +3,7 @@ package com.kirinpatel.net;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.tomcat.TomcatServer;
-import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.Message;
-import com.kirinpatel.util.UIMessage;
-import com.kirinpatel.util.User;
+import com.kirinpatel.util.*;
 
 import java.io.*;
 import java.net.*;
@@ -37,6 +34,15 @@ public class Server {
         new Thread(server).start();
         tomcatServer = new TomcatServer();
         new Thread(() -> tomcatServer.start()).start();
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+                PortValidator.isAvailable(8000);
+                PortValidator.isAvailable(8080);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
     public static void stop() {

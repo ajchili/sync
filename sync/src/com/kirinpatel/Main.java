@@ -6,7 +6,6 @@ import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 public class Main extends JFrame {
 
     public static boolean hideUI;
+    public static double videoQuality = 1.0;
     private static Main main;
     private static String ipAddress = "";
 
@@ -54,6 +54,12 @@ public class Main extends JFrame {
             hideUI = ((JCheckBox) e.getSource()).isSelected();
         });
         settingsPanel.add(hideUIBox);
+        JComboBox qualityBox = new JComboBox();
+        qualityBox.setModel(new DefaultComboBoxModel(new String[]{"Video Quality: 1.0", "Video Quality: 0.8", "Video Quality: 0.6", "Video Quality: 0.4", "Video Quality: 0.2"}));
+        qualityBox.addActionListener(e -> {
+            videoQuality = Double.parseDouble((((JComboBox) e.getSource()).getSelectedItem().toString()).replace("Video Quality: ", ""));
+        });
+        settingsPanel.add(qualityBox);
         add(settingsPanel, BorderLayout.SOUTH);
 
         setVisible(true);
