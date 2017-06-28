@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.util.Debug;
 
@@ -28,8 +29,10 @@ public class ClientGUI extends JFrame {
         playbackPanel = new PlaybackPanel(1);
         add(playbackPanel, BorderLayout.CENTER);
         controlPanel = new ControlPanel(1);
-        controlPanel.resizePanel(getHeight());
-        add(controlPanel, BorderLayout.EAST);
+        if (!Main.hideUI) {
+            controlPanel.resizePanel(getHeight());
+            add(controlPanel, BorderLayout.EAST);
+        }
 
         setVisible(true);
 
@@ -40,7 +43,7 @@ public class ClientGUI extends JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            controlPanel.resizePanel(getHeight());
+            if (!Main.hideUI) controlPanel.resizePanel(getHeight());
         }
 
         @Override

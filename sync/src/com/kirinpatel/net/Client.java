@@ -1,5 +1,6 @@
 package com.kirinpatel.net;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.gui.ClientGUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Debug;
@@ -16,10 +17,6 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-/**
- * @author Kirin Patel
- * @date 6/16/17
- */
 public class Client {
 
     public static String ipAddress;
@@ -118,10 +115,6 @@ public class Client {
                                 Debug.Log("Chat messages received.", 4);
                                 break;
                             default:
-                                if (message.getType() == 23) {
-                                    break;
-                                }
-
                                 if (message.getMessage() != null) {
                                     Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
                                 } else {
@@ -195,21 +188,16 @@ public class Client {
                     output.flush();
                 } else if (isServerClosed) {
                     new UIMessage("Server shutdown.", "The sync server that you were connected to has shutdown.", 0);
-                    System.exit(0);
-                    return;
                 } else {
                     Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
-                    System.exit(0);
-                    return;
                 }
             } catch(IOException e) {
                 Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
-                System.exit(0);
             }
 
             try {
                 Debug.Log("Closing socket...", 4);
-                socket.close();
+                if (socket != null && !socket.isClosed()) socket.close();
                 Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
                 e.printStackTrace();
@@ -217,7 +205,8 @@ public class Client {
 
             Debug.Log("Disconnected from server.", 4);
             Debug.Log("Client stopped.", 1);
-            System.exit(0);
+
+            new Main();
         }
 
         private synchronized void sendUsernameToServer() {

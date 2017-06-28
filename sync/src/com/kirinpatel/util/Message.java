@@ -18,30 +18,30 @@ public class Message implements Serializable {
     /**
      * Main constructor that will create the message with a given type and the
      * provided message.
-     * <p>
+     *
      * Types:
-     * 0: Connection Messages
-     * 0: Disconnecting
-     * 1: Connecting
-     * 2: Connected
-     * 3: Closing
-     * 1#: Username Messages
-     * 0: Sending client name
-     * User
-     * 1: Sending connected clients
-     * ArrayList<User>
-     * 2#: Media Messages
-     * 0: MediaURL
-     * String
-     * 1: Media state
-     * boolean
-     * 2: Seek to point
-     * long
-     * 3#: Messages
-     * 0: Messages
-     * ArrayList<String>
-     * 1: Client messages
-     * ArrayList<String>
+     *  0: Connection Messages
+     *      0: Disconnecting
+     *      1: Connecting
+     *      2: Connected
+     *      3: Closing
+     *  1#: Username Messages
+     *      0: Sending client name
+     *          User
+     *      1: Sending connected clients
+     *          ArrayList<User>
+     *  2#: Media Messages
+     *      0: MediaURL
+     *          String
+     *      1: Media state
+     *          boolean
+     *      2: Seek to point
+     *          long
+     *  3#: Messages
+     *      0: Messages
+     *          ArrayList<String>
+     *      1: Client messages
+     *          ArrayList<String>
      *
      * @param type    Type of message being sent
      * @param message Message to be sent

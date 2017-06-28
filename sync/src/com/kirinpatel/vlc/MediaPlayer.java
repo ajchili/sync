@@ -1,6 +1,7 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.util.Debug;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
@@ -26,11 +27,10 @@ public class MediaPlayer extends JPanel {
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
     private BufferedImage scale;
-    private boolean isPaused = false;
+    private boolean isPaused = true;
     private long time = -1;
     private long length = -1;
     private String mediaURL = "";
-    private boolean hasAutoPaused = false;
     private boolean isScrubbing = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
@@ -74,7 +74,7 @@ public class MediaPlayer extends JPanel {
     private void initControls() {
         Debug.Log("Initializing media player controls...", 3);
         if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
-            playbackPanel.pauseMedia.addActionListener(e -> {
+            PlaybackPanel.pauseMedia.addActionListener(e -> {
                 if (isPaused) mediaPlayer.play();
                 else mediaPlayer.pause();
             });
@@ -113,8 +113,14 @@ public class MediaPlayer extends JPanel {
                 }
             });
         }
+        PlaybackPanel.pauseMedia.setText(">");
         playbackPanel.mediaPosition.setMaximum(1000);
         Debug.Log("Media player controls initialized.", 3);
+        mediaPlayer.setMarqueeSize(60);
+        mediaPlayer.setMarqueeOpacity(50);
+        mediaPlayer.setMarqueeColour(Color.white);
+        mediaPlayer.setMarqueeTimeout(3500);
+        mediaPlayer.setMarqueeLocation(50, 1000);
     }
 
     public void play() {
@@ -158,7 +164,8 @@ public class MediaPlayer extends JPanel {
     public void setMediaURL(String mediaURL) {
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             Debug.Log("Setting media url.", 6);
-            mediaPlayer.playMedia(mediaURL);
+            mediaPlayer.prepareMedia(mediaURL);
+            mediaPlayer.parseMedia();
             initControls();
         }
     }
@@ -205,18 +212,13 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void opening(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-
+            mediaPlayer.setVolume(playbackPanel.mediaVolume.getValue());
         }
 
         @Override
         public void buffering(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
             if (v == 100.0) {
                 Debug.Log("Media buffered.", 1);
-                if (!hasAutoPaused) {
-                    mediaPlayer.pause();
-                    hasAutoPaused = true;
-                    mediaPlayer.setVolume(playbackPanel.mediaVolume.getValue());
-                }
             }
         }
 
@@ -224,14 +226,9 @@ public class MediaPlayer extends JPanel {
         public void playing(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
             isPaused = false;
             length = mediaPlayer.getLength();
-            playbackPanel.pauseMedia.setText("||");
+            PlaybackPanel.pauseMedia.setText("||");
 
             mediaPlayer.setMarqueeText("Playing");
-            mediaPlayer.setMarqueeSize(60);
-            mediaPlayer.setMarqueeOpacity(200);
-            mediaPlayer.setMarqueeColour(Color.white);
-            mediaPlayer.setMarqueeTimeout(5000);
-            mediaPlayer.setMarqueeLocation(50, 400);
             mediaPlayer.enableMarquee(true);
         }
 
@@ -239,14 +236,9 @@ public class MediaPlayer extends JPanel {
         public void paused(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
             isPaused = true;
             length = mediaPlayer.getLength();
-            playbackPanel.pauseMedia.setText(">");
+            PlaybackPanel.pauseMedia.setText(">");
 
             mediaPlayer.setMarqueeText("Paused");
-            mediaPlayer.setMarqueeSize(60);
-            mediaPlayer.setMarqueeOpacity(200);
-            mediaPlayer.setMarqueeColour(Color.white);
-            mediaPlayer.setMarqueeTimeout(5000);
-            mediaPlayer.setMarqueeLocation(50, 400);
             mediaPlayer.enableMarquee(true);
         }
 
@@ -306,7 +298,7 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void lengthChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, long l) {
-
+            length = l;
         }
 
         @Override

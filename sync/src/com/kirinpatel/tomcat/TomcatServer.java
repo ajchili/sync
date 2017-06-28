@@ -39,7 +39,9 @@ public class TomcatServer {
         ctx.addChild(defaultServlet);
         ctx.addServletMappingDecoded("/*", "media");
         ctx.addWelcomeFile("index.html");
+    }
 
+    public void start() {
         try {
             tomcat.start();
             Debug.Log("Tomcat server started.", 4);
@@ -47,5 +49,16 @@ public class TomcatServer {
             Debug.Log("Unable to start tomcat started.", 5);
         }
         tomcat.getServer().await();
+    }
+
+    public void stop() {
+        try {
+            Debug.Log("Stopping Tomcat server...", 4);
+            tomcat.getServer().stop();
+            tomcat.getServer().destroy();
+            Debug.Log("Tomcat server stopped.", 4);
+        } catch(LifecycleException e) {
+            e.printStackTrace();
+        }
     }
 }

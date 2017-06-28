@@ -1,7 +1,9 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.util;
 
+import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Debug;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 

@@ -21,9 +21,10 @@ public class Server {
     private static ServerGUI gui;
     private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
+    private static TomcatServer tomcatServer;
     private static boolean isRunning = false;
     private static boolean closeServer = false;
-    private static boolean isBound = false;
+    private boolean isBound = false;
 
     public Server() {
         Debug.Log("Starting server...", 1);
@@ -34,9 +35,8 @@ public class Server {
 
         server = new ServerThread();
         new Thread(server).start();
-        new Thread(() -> {
-            new TomcatServer();
-        }).start();
+        tomcatServer = new TomcatServer();
+        new Thread(() -> tomcatServer.start()).start();
     }
 
     public static void stop() {
@@ -96,8 +96,6 @@ public class Server {
                 if (isBound) {
                     new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
                 }
-
-                System.exit(0);
             }
         }
 
@@ -119,6 +117,8 @@ public class Server {
                     e.printStackTrace();
                 }
             }
+
+            tomcatServer.stop();
         }
 
         /**
@@ -217,10 +217,6 @@ public class Server {
                                 Debug.Log("Client " + client + " received.", 4);
                                 break;
                             default:
-                                if (message.getType() == 24) {
-                                    break;
-                                }
-
                                 if (message.getMessage() != null) {
                                     Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
                                 } else {
@@ -259,7 +255,8 @@ public class Server {
                 socket.close();
                 Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
-                e.printStackTrace();
+                connectedClients.remove(user);
+                stop();
             }
         }
 
@@ -270,7 +267,7 @@ public class Server {
                 output.flush();
                 Debug.Log("Closing message sent.", 4);
             } catch(IOException e) {
-                e.printStackTrace();
+                Debug.Log("Uncaught error (" + e.getMessage() + ").", 5);
             }
 
             server.stop();
