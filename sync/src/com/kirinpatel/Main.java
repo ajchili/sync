@@ -117,10 +117,24 @@ public class Main extends JFrame {
         JPanel ipPanel = new JPanel(new GridLayout(1, 2));
 
         JTextField ipField = new JTextField();
+        ipField.addActionListener(e -> {
+            if (!ipField.getText().isEmpty()) {
+                saveIPAddress(ipField.getText());
+                new Client(ipField.getText());
+                frame.dispose();
+                main.dispose();
+            } else {
+                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
+            }
+        });
         ipPanel.add(ipField);
         JComboBox ipBox;
         if (getPreviousAddresses() != null) ipBox = new JComboBox(getPreviousAddresses().toArray());
         else ipBox = new JComboBox();
+        ipBox.setSelectedItem(null);
+        ipBox.addItemListener(e -> {
+            ipField.setText(e.getItem().toString());
+        });
         ipPanel.add(ipBox);
 
         frame.add(ipPanel, BorderLayout.CENTER);
@@ -142,6 +156,12 @@ public class Main extends JFrame {
     }
 
     private static void saveIPAddress(String ipAddress) {
+        if (getPreviousAddresses() != null) {
+            for (String ip : getPreviousAddresses()) {
+                if (ip.equals(ipAddress)) return;
+            }
+        }
+
         File file = new File("launcherData.dat");
         BufferedWriter writer;
         if (!file.exists()) {

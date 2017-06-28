@@ -58,7 +58,8 @@ public class TomcatServer {
             tomcat.getServer().destroy();
             Debug.Log("Tomcat server stopped.", 4);
         } catch(LifecycleException e) {
-            e.printStackTrace();
+            Debug.Log("Error stopping Tomcat server...", 2);
+            System.exit(0);
         }
     }
 }

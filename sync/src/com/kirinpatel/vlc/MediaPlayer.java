@@ -117,7 +117,7 @@ public class MediaPlayer extends JPanel {
         playbackPanel.mediaPosition.setMaximum(1000);
         Debug.Log("Media player controls initialized.", 3);
         mediaPlayer.setMarqueeSize(60);
-        mediaPlayer.setMarqueeOpacity(50);
+        mediaPlayer.setMarqueeOpacity(200);
         mediaPlayer.setMarqueeColour(Color.white);
         mediaPlayer.setMarqueeTimeout(3500);
         mediaPlayer.setMarqueeLocation(50, 1000);
