@@ -1,7 +1,6 @@
 package com.kirinpatel.tomcat;
 
 import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.PortValidator;
 import com.kirinpatel.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -50,7 +49,6 @@ public class TomcatServer {
             Debug.Log("Unable to start tomcat started.", 5);
         }
         tomcat.getServer().await();
-        PortValidator.isAvailable(8080);
     }
 
     public void stop() {
