@@ -170,6 +170,10 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setTime(time);
     }
 
+    public void setRate(float rate) {
+        mediaPlayer.setRate(rate);
+    }
+
     public boolean isPaused() {
         return isPaused;
     }
