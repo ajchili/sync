@@ -8,7 +8,6 @@ import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -94,6 +93,7 @@ public class Client {
                                 break;
                             case 20:
                                 PlaybackPanel.mediaPlayer.setMediaURL(message.getMessage().toString());
+                                lastSentTime = 0;
                                 break;
                             case 21:
                                 if ((boolean) message.getMessage()) PlaybackPanel.mediaPlayer.pause();

@@ -2,7 +2,10 @@ package com.kirinpatel.vlc;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.gui.ServerGUI;
+import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
+import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
@@ -62,22 +65,6 @@ public class MediaPlayer extends JPanel {
         Debug.Log("MediaPlayer created.", 6);
     }
 
-    /**
-     * Credit: https://github.com/caprica/vlcj-player/blob/master/src/main/java/uk/co/caprica/vlcjplayer/time/Time.java
-     *
-     * @param value Time
-     * @return Time in displayable string format
-     */
-    public static String formatTime(long value) {
-        value /= 1000;
-        int hours = (int) value / 3600;
-        int remainder = (int) value - hours * 3600;
-        int minutes = remainder / 60;
-        remainder = remainder - minutes * 60;
-        int seconds = remainder;
-        return String.format("%d:%02d:%02d", hours, minutes, seconds);
-    }
-
     private void initControls() {
         Debug.Log("Initializing media player controls...", 3);
         if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
@@ -123,12 +110,21 @@ public class MediaPlayer extends JPanel {
 
         PlaybackPanel.pauseMedia.setText(">");
         playbackPanel.mediaPosition.setMaximum(1000);
-        Debug.Log("Media player controls initialized.", 3);
         mediaPlayer.setMarqueeSize(60);
         mediaPlayer.setMarqueeOpacity(200);
         mediaPlayer.setMarqueeColour(Color.white);
         mediaPlayer.setMarqueeTimeout(3500);
         mediaPlayer.setMarqueeLocation(50, 1000);
+
+        if (playbackPanel.type == 0) {
+            for (User client : Server.connectedClients) {
+                client.setTime(0);
+                ServerGUI.controlPanel.updateConnectedClientsTime(Server.connectedClients);
+            }
+        }
+
+        isPaused = true;
+        Debug.Log("Media player controls initialized.", 3);
     }
 
     public void play() {
@@ -200,6 +196,22 @@ public class MediaPlayer extends JPanel {
 
     public long getMediaLength() {
         return length == -1 ? 0 : length;
+    }
+
+    /**
+     * Credit: https://github.com/caprica/vlcj-player/blob/master/src/main/java/uk/co/caprica/vlcjplayer/time/Time.java
+     *
+     * @param value Time
+     * @return Time in displayable string format
+     */
+    public static String formatTime(long value) {
+        value /= 1000;
+        int hours = (int) value / 3600;
+        int remainder = (int) value - hours * 3600;
+        int minutes = remainder / 60;
+        remainder = remainder - minutes * 60;
+        int seconds = remainder;
+        return String.format("%d:%02d:%02d", hours, minutes, seconds);
     }
 
     protected void paintComponent(Graphics g) {

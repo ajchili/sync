@@ -312,6 +312,7 @@ public class Server {
                 output.writeObject(new Message(20, PlaybackPanel.mediaPlayer.getMediaURL()));
                 output.flush();
                 mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
+                time = 0;
             } catch(IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
             }
