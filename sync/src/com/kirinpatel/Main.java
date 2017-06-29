@@ -125,7 +125,6 @@ public class Main extends JFrame {
         JTextField ipField = new JTextField();
         ipField.addActionListener(e -> {
             if (!ipField.getText().isEmpty()) {
-                saveIPAddress(ipField.getText());
                 new Client(ipField.getText());
                 frame.dispose();
                 main.dispose();
@@ -148,7 +147,6 @@ public class Main extends JFrame {
         JButton connect = new JButton("Connect");
         connect.addActionListener(e -> {
             if (!ipField.getText().isEmpty()) {
-                saveIPAddress(ipField.getText());
                 new Client(ipField.getText());
                 frame.dispose();
                 main.dispose();
@@ -161,7 +159,7 @@ public class Main extends JFrame {
         frame.setVisible(true);
     }
 
-    private static void saveIPAddress(String ipAddress) {
+    public static void saveIPAddress(String ipAddress) {
         if (getPreviousAddresses() != null) {
             for (String ip : getPreviousAddresses()) {
                 if (ip.equals(ipAddress)) return;

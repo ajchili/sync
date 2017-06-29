@@ -341,14 +341,9 @@ public class Server {
         }
 
         private synchronized void sendVideoTime() {
-            if (Math.abs(PlaybackPanel.mediaPlayer.getMediaTime() - time) > 3000)
-                time = PlaybackPanel.mediaPlayer.getMediaTime();
-
             try {
-                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime() + Math.abs(PlaybackPanel.mediaPlayer.getMediaTime() - time)));
+                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
                 output.flush();
-                time = PlaybackPanel.mediaPlayer.getMediaTime();
-                if (user != null) user.setTime(time);
             } catch(IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
             }
@@ -356,10 +351,12 @@ public class Server {
 
         private synchronized void sendVideoRate() {
             long timeDifference = PlaybackPanel.mediaPlayer.getMediaTime() - time;
-            if (Math.abs(timeDifference) > 1250) {
+            if (Math.abs(timeDifference) > 1000) {
+                Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, sending current media time.", 4);
                 sendVideoTime();
-            } else {
+            } else if (Math.abs(timeDifference) > 250) {
                 try {
+                    Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, changing playback rate.", 4);
                     output.writeObject(new Message(23, (timeDifference + 1000) * 1.0f / 1000));
                     output.flush();
                 } catch(IOException e) {

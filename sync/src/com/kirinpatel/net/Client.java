@@ -100,13 +100,20 @@ public class Client {
                                 else PlaybackPanel.mediaPlayer.play();
                                 break;
                             case 22:
-                                lastSentTime = (long) message.getMessage();
-                                PlaybackPanel.mediaPlayer.seekTo(lastSentTime);
+                                PlaybackPanel.mediaPlayer.seekTo((long) message.getMessage());
                                 sendVideoState();
                                 break;
                             case 23:
-                                rate = (float) message.getMessage();
+                                rate = ((float) message.getMessage() > 0.75f ? (float) message.getMessage() : 0.75f);
                                 PlaybackPanel.mediaPlayer.setRate(rate);
+                                new Thread(() -> {
+                                    try {
+                                        Thread.sleep(200);
+                                        PlaybackPanel.mediaPlayer.setRate(1.0f);
+                                    } catch(InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }).start();
                                 break;
                             case 30:
                                 ClientGUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
@@ -124,14 +131,9 @@ public class Client {
                     e.printStackTrace();
                 }
 
-                if (!messages.isEmpty()) {
-                    sendMessages();
-                }
+                if (!messages.isEmpty()) sendMessages();
 
-                if (lastSentTime < (PlaybackPanel.mediaPlayer.getMediaTime() - 250)) {
-                    sendVideoTime();
-                    sendVideoState();
-                }
+                if (lastSentTime < (PlaybackPanel.mediaPlayer.getMediaTime() - 250)) sendVideoTime();
             }
 
             disconnectFromServer();
@@ -174,6 +176,7 @@ public class Client {
 
             gui = new ClientGUI();
             Debug.Log("Client started.", 1);
+            Main.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
         }
@@ -216,26 +219,25 @@ public class Client {
             }
         }
 
-        private synchronized void sendVideoTime() {
-            try {
-                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
-                output.flush();
-                sendVideoState();
-            } catch(SocketException e) {
-
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-
-            lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
-        }
-
         private synchronized void sendVideoState() {
             try {
                 output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
                 output.flush();
             } catch(SocketException e) {
+                Client.stop();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
 
+        private synchronized void sendVideoTime() {
+            try {
+                lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
+                output.writeObject(new Message(22, lastSentTime));
+                output.flush();
+                sendVideoState();
+            } catch(SocketException e) {
+                Client.stop();
             } catch(IOException e) {
                 e.printStackTrace();
             }

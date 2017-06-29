@@ -116,9 +116,7 @@ public class ControlPanel extends JPanel {
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
-        Debug.Log("Updating connected clients in gui...", 3);
         updateConnectedClientsTime(users);
-        Debug.Log("Connected clients updated in gui.", 3);
     }
 
     public void updateConnectedClientsTime(ArrayList<User> users) {
