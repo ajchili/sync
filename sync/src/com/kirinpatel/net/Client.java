@@ -8,6 +8,7 @@ import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -70,6 +71,7 @@ public class Client {
         private ObjectOutputStream output;
         private boolean isConnected = false;
         private long lastSentTime = 0;
+        private float rate = 1.0f;
 
         public void run() {
             connectToServer();
@@ -88,31 +90,33 @@ public class Client {
                                 }
                                 break;
                             case 11:
-                                Debug.Log("Receiving list of connected clients...", 4);
                                 ClientGUI.controlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
-                                Debug.Log("Connected clients list received.", 4);
                                 break;
                             case 20:
-                                Debug.Log("Receiving media URL...", 4);
                                 PlaybackPanel.mediaPlayer.setMediaURL(message.getMessage().toString());
-                                Debug.Log("Media URL received.", 4);
                                 break;
                             case 21:
-                                Debug.Log("Received media state.", 4);
                                 if ((boolean) message.getMessage()) PlaybackPanel.mediaPlayer.pause();
                                 else PlaybackPanel.mediaPlayer.play();
                                 break;
                             case 22:
-                                Debug.Log("Receiving media time...", 4);
-                                lastSentTime = (long) message.getMessage();
-                                PlaybackPanel.mediaPlayer.seekTo(lastSentTime);
+                                PlaybackPanel.mediaPlayer.seekTo((long) message.getMessage());
                                 sendVideoState();
-                                Debug.Log("Media time set.", 4);
+                                break;
+                            case 23:
+                                rate = ((float) message.getMessage() > 0.75f ? (float) message.getMessage() : 0.75f);
+                                PlaybackPanel.mediaPlayer.setRate(rate);
+                                new Thread(() -> {
+                                    try {
+                                        Thread.sleep(200);
+                                        PlaybackPanel.mediaPlayer.setRate(1.0f);
+                                    } catch(InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }).start();
                                 break;
                             case 30:
-                                Debug.Log("Receiving chat messages...", 4);
                                 ClientGUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
-                                Debug.Log("Chat messages received.", 4);
                                 break;
                             default:
                                 if (message.getMessage() != null) {
@@ -127,13 +131,9 @@ public class Client {
                     e.printStackTrace();
                 }
 
-                if (!messages.isEmpty()) {
-                    sendMessages();
-                }
+                if (!messages.isEmpty()) sendMessages();
 
-                if (lastSentTime < (PlaybackPanel.mediaPlayer.getMediaTime() - 250) || lastSentTime > (PlaybackPanel.mediaPlayer.getMediaTime() + 50)) {
-                    sendVideoTime();
-                }
+                if (lastSentTime < (PlaybackPanel.mediaPlayer.getMediaTime() - 250)) sendVideoTime();
             }
 
             disconnectFromServer();
@@ -176,6 +176,7 @@ public class Client {
 
             gui = new ClientGUI();
             Debug.Log("Client started.", 1);
+            Main.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
         }
@@ -211,10 +212,19 @@ public class Client {
 
         private synchronized void sendUsernameToServer() {
             try {
-                Debug.Log("Sending username to server...", 4);
                 output.writeObject(new Message(10, user.getUsername()));
                 output.flush();
-                Debug.Log("Username sent to server.", 4);
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private synchronized void sendVideoState() {
+            try {
+                output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
+                output.flush();
+            } catch(SocketException e) {
+                Client.stop();
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -222,28 +232,12 @@ public class Client {
 
         private synchronized void sendVideoTime() {
             try {
-                Debug.Log("Sending current media time...", 4);
-                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
+                lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
+                output.writeObject(new Message(22, lastSentTime));
                 output.flush();
-                Debug.Log("Current media time sent.", 4);
                 sendVideoState();
             } catch(SocketException e) {
-
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-
-            lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
-        }
-
-        private synchronized void sendVideoState() {
-            try {
-                Debug.Log("Sending current media state...", 4);
-                output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
-                output.flush();
-                Debug.Log("Current media state sent.", 4);
-            } catch(SocketException e) {
-
+                Client.stop();
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -251,12 +245,10 @@ public class Client {
 
         private synchronized void sendMessages() {
             try {
-                Debug.Log("Sending chat messages to server...", 4);
                 output.reset();
                 output.writeObject(new Message(31, messages));
                 output.flush();
                 messages.clear();
-                Debug.Log("Chat messages to server.", 4);
             } catch(IOException e) {
                 e.printStackTrace();
             }

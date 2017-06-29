@@ -18,8 +18,8 @@ public class ServerGUI extends JFrame {
 
         Debug.Log("Starting server gui...", 3);
 
-        setSize(new Dimension(800, 360));
-        setMinimumSize(new Dimension(800, 360));
+        setSize(new Dimension(840, 360));
+        setMinimumSize(new Dimension(840, 360));
         setLayout(new BorderLayout());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);

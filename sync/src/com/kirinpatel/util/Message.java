@@ -35,8 +35,10 @@ public class Message implements Serializable {
      *          String
      *      1: Media state
      *          boolean
-     *      2: Seek to point
+     *      2: Time
      *          long
+     *      3: Playback rate
+     *          float
      *  3#: Messages
      *      0: Messages
      *          ArrayList<String>

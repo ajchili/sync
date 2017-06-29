@@ -37,14 +37,13 @@ public class MediaPlayer extends JPanel {
     public boolean isBuffering = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
-        Debug.Log("Creating MediaPlayer...", 6);
         new NativeDiscovery().discover();
+        Debug.Log("Creating MediaPlayer...", 6);
         setBackground(Color.BLACK);
         setOpaque(true);
 
         WIDTH = (int) (1920 * Main.videoQuality);
         HEIGHT = (int) (1080 * Main.videoQuality);
-
         this.playbackPanel = playbackPanel;
 
         image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
@@ -170,6 +169,10 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setTime(time);
     }
 
+    public void setRate(float rate) {
+        if (!isPaused) mediaPlayer.setRate(rate);
+    }
+
     public boolean isPaused() {
         return isPaused;
     }
@@ -225,8 +228,7 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void buffering(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
-            if (v == 100.0) Debug.Log("Media buffered.", 1);
-            else isBuffering = isPaused;
+          
         }
 
         @Override
