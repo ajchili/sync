@@ -34,6 +34,7 @@ public class MediaPlayer extends JPanel {
     private long length = -1;
     private String mediaURL = "";
     private boolean isScrubbing = false;
+    public boolean isBuffering = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
         new NativeDiscovery().discover();
@@ -227,7 +228,7 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void buffering(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
-
+          
         }
 
         @Override
