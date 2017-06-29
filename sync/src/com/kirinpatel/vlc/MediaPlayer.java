@@ -33,8 +33,9 @@ public class MediaPlayer extends JPanel {
     private long time = -1;
     private long length = -1;
     private String mediaURL = "";
+    private String filePath = "";
     private boolean isScrubbing = false;
-    public boolean isBuffering = false;
+    private boolean isFile = false;
 
     public MediaPlayer(PlaybackPanel playbackPanel) {
         new NativeDiscovery().discover();
@@ -154,7 +155,19 @@ public class MediaPlayer extends JPanel {
     public void setMediaURL(String mediaURL) {
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             Debug.Log("Setting media url.", 6);
+            isFile = false;
             mediaPlayer.prepareMedia(mediaURL);
+            mediaPlayer.parseMedia();
+            initControls();
+        }
+    }
+
+    public void setMediaFile(String filePath, String mediaURL) {
+        if (!filePath.isEmpty() && !mediaURL.isEmpty() && !filePath.equals(this.filePath) && !mediaURL.equals(this.mediaURL)) {
+            Debug.Log("Setting media file.", 6);
+            isFile = true;
+            this.mediaURL = mediaURL;
+            mediaPlayer.prepareMedia(filePath);
             mediaPlayer.parseMedia();
             initControls();
         }
@@ -218,7 +231,7 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void mediaChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t, String s) {
-            mediaURL = s;
+            if (!isFile) mediaURL = s;
         }
 
         @Override

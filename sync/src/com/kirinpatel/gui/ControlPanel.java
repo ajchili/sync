@@ -69,8 +69,9 @@ public class ControlPanel extends JPanel {
                     String url = "http://" + Server.ipAddress + ":8080/";
                     String fileName = mediaSelector.getSelectedFile().getName();
                     String fileExtension = fileName.substring(fileName.lastIndexOf('.'), fileName.length());
-                    if (type == 0) PlaybackPanel.mediaPlayer.setMediaURL(mediaSelector.getSelectedFile().getAbsolutePath());
-                    else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
+                    // if (type == 0) PlaybackPanel.mediaPlayer.setMediaFile(mediaSelector.getSelectedFile().getAbsolutePath(), url + fileName);
+                    // else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
+                    PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
                     if (new File(mediaSelector.getSelectedFile().getAbsolutePath().replace(fileExtension, ".srt")).exists()) Debug.Log("Subtitle file found.", 1);
                 } else if (mediaSelector.getSelectedFile() != null) {
                     new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
