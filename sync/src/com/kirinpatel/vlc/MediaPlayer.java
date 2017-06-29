@@ -429,7 +429,7 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void newMedia(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-
+            time = 0;
         }
 
         @Override

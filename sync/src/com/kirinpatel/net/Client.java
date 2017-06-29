@@ -101,6 +101,7 @@ public class Client {
                                 break;
                             case 22:
                                 PlaybackPanel.mediaPlayer.seekTo((long) message.getMessage());
+                                lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
                                 sendVideoState();
                                 break;
                             case 23:
@@ -233,6 +234,7 @@ public class Client {
         private synchronized void sendVideoTime() {
             try {
                 lastSentTime = PlaybackPanel.mediaPlayer.getMediaTime();
+                output.reset();
                 output.writeObject(new Message(22, lastSentTime));
                 output.flush();
                 sendVideoState();
