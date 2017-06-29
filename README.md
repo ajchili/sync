@@ -10,6 +10,8 @@ a Java based multi-client video and audio syncing application
 3. Download [sync](https://www.github.com/ajchili/sync/releases)
 	* The latest stable version can be found in the link above
 	* The latest development version can be obtained through the repository itself
+	* The latest experimental version can be obtained through the [experimental](https://github.com/ajchili/sync/tree/experimental) branch
+		* _Please note, this branch is most likely broken and will contain unfinished features_
 4. Run sync
 	* Server setup
 		* It is recommended to:
@@ -42,6 +44,8 @@ a Java based multi-client video and audio syncing application
 ## compatibility issues
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
 
+* Version [1.3.0](https://github.com/ajchili/sync/releases/tag/1.3.0)
+	* Incompatible with previous versions of sync as server/client communications have been changed
 * Version [1.1.2](https://github.com/ajchili/sync/releases/tag/1.1.2)
 	* Incompatible with previous versions of sync as server/client communications have been changed
 * Version [0.4.0](https://github.com/ajchili/sync/releases/tag/0.4.0) & [0.5.0](https://github.com/ajchili/sync/releases/tag/0.5.0)
@@ -50,3 +54,6 @@ While some of these issues become irrelevant or are fixed with updates, a server
 	* No longer compatible with future versions as the media player has been changed
 * Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
 	* Messaging feature incompatible with other version
+	
+## what to do if you run into issues
+If you for any reason run into issues while using sync _(it is possible to as the application is ever changing)_, submit an issue [here](https://github.com/ajchili/sync/issues) and provide as much detail as possible as to the issue
