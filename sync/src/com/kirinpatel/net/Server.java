@@ -271,19 +271,6 @@ public class Server {
                 output.writeObject(new Message(0, 2));
                 output.flush();
                 Debug.Log("Established connection to " + client + '.', 4);
-                if (!PlaybackPanel.mediaPlayer.isPaused()) {
-                    PlaybackPanel.mediaPlayer.pause();
-                    PlaybackPanel.pauseMedia.setEnabled(false);
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(2000);
-                            PlaybackPanel.mediaPlayer.play();
-                            PlaybackPanel.pauseMedia.setEnabled(true);
-                        } catch(InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
-                }
                 sendVideoState();
                 sendVideoTime();
             } catch(IOException | ClassNotFoundException e) {
