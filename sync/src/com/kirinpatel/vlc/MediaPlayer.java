@@ -160,10 +160,11 @@ public class MediaPlayer extends JPanel {
     }
 
     public void setMediaURL(String mediaURL) {
+        String[] options = {":sout = #transcode{vcodec=x264,width=" + WIDTH + "height=" + HEIGHT + ",acodec=vorb,ab=128,channels=2,samplerate=44100}:display :no-sout-rtp-sap :no-sout-standard-sap :ttl=1 :sout-keep"};
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             Debug.Log("Setting media url.", 6);
             isFile = false;
-            mediaPlayer.prepareMedia(mediaURL);
+            mediaPlayer.prepareMedia(mediaURL, options);
             mediaPlayer.parseMedia();
             initControls();
         }

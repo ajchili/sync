@@ -341,10 +341,10 @@ public class Server {
 
         private synchronized void sendVideoRate() {
             long timeDifference = PlaybackPanel.mediaPlayer.getMediaTime() - time;
-            if (Math.abs(timeDifference) > 1000) {
+            if (Math.abs(timeDifference) > 2000) {
                 Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, sending current media time.", 4);
                 sendVideoTime();
-            } else if (Math.abs(timeDifference) > 250) {
+            } else if (Math.abs(timeDifference) > 1000) {
                 try {
                     Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, changing playback rate.", 4);
                     output.writeObject(new Message(23, (timeDifference + 1000) * 1.0f / 1000));
