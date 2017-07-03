@@ -10,7 +10,7 @@ public class VersionChecker {
 
     private final static int VERSION = 1;
     private final static int BUILD = 3;
-    private final static int REVISION = 1;
+    private final static int REVISION = 2;
 
     public static boolean isUpdated() {
         try {
