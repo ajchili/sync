@@ -4,6 +4,7 @@ import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.util.VersionChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,17 +71,22 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
+        if (VersionChecker.isUpdated()) {
+            try {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+
             }
-        } catch (Exception e) {
-            // If Nimbus is not available, you can set the GUI to another look and feel.
+            main = new Main();
+        } else {
+            Debug.Log("Outdated version of sync! Please update!", 2);
+            new UIMessage("Outdated version of sync!", "You have an outdated version of sync, please update sync!", 1);
         }
-        main = new Main();
     }
 
     /**

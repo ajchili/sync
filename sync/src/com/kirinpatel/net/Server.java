@@ -37,8 +37,8 @@ public class Server {
         new Thread(() -> {
             try {
                 Thread.sleep(5000);
-                PortValidator.isAvailable(8000);
-                PortValidator.isAvailable(8080);
+                if(isRunning) PortValidator.isAvailable(8000);
+                if(isRunning) PortValidator.isAvailable(8080);
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }

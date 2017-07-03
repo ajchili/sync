@@ -24,6 +24,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+/**
+ * Modified JPanel that will play media for the sync application.
+ */
 public class MediaPlayer extends JPanel {
 
     private final int WIDTH;
@@ -40,6 +43,11 @@ public class MediaPlayer extends JPanel {
     private boolean isScrubbing = false;
     private boolean isFile = false;
 
+    /**
+     * Constructor that will return a MediaPlayer.
+     *
+     * @param playbackPanel Returns MediaPanel
+     */
     public MediaPlayer(PlaybackPanel playbackPanel) {
         new NativeDiscovery().discover();
         Debug.Log("Creating MediaPlayer...", 6);
@@ -65,6 +73,9 @@ public class MediaPlayer extends JPanel {
         Debug.Log("MediaPlayer created.", 6);
     }
 
+    /**
+     * Initialize media controls or reset them after media is changed.
+     */
     private void initControls() {
         Debug.Log("Initializing media player controls...", 3);
         if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
