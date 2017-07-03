@@ -20,6 +20,7 @@ public class PortValidator {
             Debug.Log("Error testing connection on port (" + port + ").", 5);
             if (port == 8000) new UIMessage("A port is not forwarded!", "Clients will be unable to connect to your sync server! Please open port " + port + ".", 1);
             else new UIMessage("A port is not forwarded!", "You will be unable to use offline media! Please open port " + port + " to use offline media.", 1);
+            Server.stop();
         } finally {
             if (s != null) {
                 try {

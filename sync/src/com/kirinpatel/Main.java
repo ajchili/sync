@@ -4,6 +4,7 @@ import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.util.VersionChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,15 +16,13 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Main class that will run the application. This class, as of version 2.0, will
- * also server as the launcher for the application.
+ * Main class that will run the application and also server as the launcher for the application.
  */
 public class Main extends JFrame {
 
     public static boolean hideUI;
     public static double videoQuality = 1.0;
     private static Main main;
-    private static String ipAddress = "";
 
     /**
      * Creates launcher window.
@@ -72,19 +71,27 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
+        if (VersionChecker.isUpdated()) {
+            try {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
                 }
+            } catch (Exception e) {
+
             }
-        } catch (Exception e) {
-            // If Nimbus is not available, you can set the GUI to another look and feel.
+            main = new Main();
+        } else {
+            Debug.Log("Outdated version of sync! Please update!", 2);
+            new UIMessage("Outdated version of sync!", "You have an outdated version of sync, please update sync!", 1);
         }
-        main = new Main();
     }
 
+    /**
+     * Gets desired server IP address that the client would like to connect to.
+     */
     private static void getIPAddress() {
         JFrame frame = new JFrame("sync");
 
@@ -159,6 +166,11 @@ public class Main extends JFrame {
         frame.setVisible(true);
     }
 
+    /**
+     * Saves IP address to file for easier connections to the server in the future.
+     *
+     * @param ipAddress Server IP address
+     */
     public static void saveIPAddress(String ipAddress) {
         if (getPreviousAddresses() != null) {
             for (String ip : getPreviousAddresses()) {
@@ -190,6 +202,11 @@ public class Main extends JFrame {
         }
     }
 
+    /**
+     * Returns previously connected sync server IP addresses.
+     *
+     * @return ArrayList of previous server IP addresses
+     */
     private static ArrayList<String> getPreviousAddresses() {
         File file = new File("launcherData.dat");
         if (file.exists()) {

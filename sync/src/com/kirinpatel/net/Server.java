@@ -37,8 +37,8 @@ public class Server {
         new Thread(() -> {
             try {
                 Thread.sleep(5000);
-                PortValidator.isAvailable(8000);
-                PortValidator.isAvailable(8080);
+                if(isRunning) PortValidator.isAvailable(8000);
+                if(isRunning) PortValidator.isAvailable(8080);
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }
@@ -312,6 +312,8 @@ public class Server {
                 output.writeObject(new Message(20, PlaybackPanel.mediaPlayer.getMediaURL()));
                 output.flush();
                 mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
+                time = 0;
+                connectedClients.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
             } catch(IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
             }
@@ -329,6 +331,7 @@ public class Server {
 
         private synchronized void sendVideoTime() {
             try {
+                output.reset();
                 output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
                 output.flush();
             } catch(IOException e) {
