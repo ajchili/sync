@@ -66,7 +66,7 @@ public class MenuBar extends JMenuBar {
             playbackPanel.initFullscreen();
         });
         ui.add(fullscreen);
-        settings.add(ui);
+        ui.add(new JSeparator());
         JMenu controlPanel = new JMenu("Control Panel");
         ButtonGroup controlPanelButtons = new ButtonGroup();
         JRadioButtonMenuItem showControlPanel = new JRadioButtonMenuItem("Show");
@@ -85,6 +85,24 @@ public class MenuBar extends JMenuBar {
         controlPanelButtons.add(showControlPanel);
         controlPanelButtons.add(hideControlPanel);
         ui.add(controlPanel);
+        JMenu mediaTime = new JMenu("Playback Times");
+        ButtonGroup mediaTimeButtons = new ButtonGroup();
+        JRadioButtonMenuItem showMediaTime = new JRadioButtonMenuItem("Show");
+        showMediaTime.addActionListener(e -> {
+            Main.showUserTimes = true;
+        });
+        showMediaTime.setSelected(playbackPanel.type == 0);
+        mediaTime.add(showMediaTime);
+        JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
+        hideMediaTime.addActionListener(e -> {
+            Main.showUserTimes = false;
+        });
+        hideMediaTime.setSelected(playbackPanel.type == 1);
+        mediaTime.add(hideMediaTime);
+        mediaTimeButtons.add(showMediaTime);
+        mediaTimeButtons.add(hideMediaTime);
+        ui.add(mediaTime);
+        settings.add(ui);
         JMenu video = new JMenu("Video Settings");
         JMenuItem videoSettings = new JMenuItem("Show Video Settings Window");
         video.add(videoSettings);

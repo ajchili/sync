@@ -3,6 +3,7 @@ package com.kirinpatel.vlc;
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.gui.ServerGUI;
+import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
@@ -54,8 +55,8 @@ public class MediaPlayer extends JPanel {
         setBackground(Color.BLACK);
         setOpaque(true);
 
-        WIDTH = (1920 * Main.videoQuality) / 100;
-        HEIGHT = (1080 * Main.videoQuality) / 100;
+        WIDTH = (1280 * Main.videoQuality) / 100;
+        HEIGHT = (720 * Main.videoQuality) / 100;
         this.playbackPanel = playbackPanel;
 
 
@@ -118,6 +119,10 @@ public class MediaPlayer extends JPanel {
                     mediaPlayer.setTime(position * getMediaLength() / 1000);
                 }
             });
+        } else {
+            PlaybackPanel.pauseMedia.addActionListener(e -> {
+                Client.user.setWantsToPause(true);
+            });
         }
 
         PlaybackPanel.pauseMedia.setText(">");
@@ -131,7 +136,7 @@ public class MediaPlayer extends JPanel {
         if (playbackPanel.type == 0) {
             for (User client : Server.connectedClients) {
                 client.setTime(0);
-                ServerGUI.controlPanel.updateConnectedClientsTime(Server.connectedClients);
+                ServerGUI.controlPanel.updateConnectedClients(Server.connectedClients);
             }
         }
 
@@ -248,6 +253,10 @@ public class MediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
+            if (playbackPanel.type == 0) {
+                Server.connectedClients.get(0).setTime(getMediaTime());
+                ServerGUI.controlPanel.updateConnectedClients(Server.connectedClients);
+            }
         }
     }
 

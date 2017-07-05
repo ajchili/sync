@@ -101,6 +101,7 @@ public class Server {
 
                 if (isBound) {
                     new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
+                    Server.stop();
                 }
             }
         }
@@ -164,7 +165,7 @@ public class Server {
         private String mediaURL = "";
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis() - 9000;
+        private long lastClientUpdate = System.currentTimeMillis();
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
@@ -207,7 +208,6 @@ public class Server {
                                 break;
                             case 22:
                                 time = (long) message.getMessage();
-                                ServerGUI.controlPanel.updateConnectedClientsTime(connectedClients);
                                 if (user != null) user.setTime(time);
                                 sendVideoRate();
                                 break;
@@ -229,7 +229,7 @@ public class Server {
                     e.printStackTrace();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 10000) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
 
                 if (messages.size() < Server.messages.size()) sendMessagesToClient();
 

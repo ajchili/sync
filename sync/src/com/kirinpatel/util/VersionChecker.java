@@ -6,12 +6,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+/**
+ * VersionChecker will determine if the current version of sync is outdated or not.
+ */
 public class VersionChecker {
 
     private final static int VERSION = 1;
     private final static int BUILD = 4;
     private final static int REVISION = 0;
 
+    /**
+     * Provides if sync is updated.
+     *
+     * @return Returns if sync is updated
+     */
     public static boolean isUpdated() {
         try {
             Scanner s = new Scanner(new URLReader(new URL("https://github.com/ajchili/sync/releases")));

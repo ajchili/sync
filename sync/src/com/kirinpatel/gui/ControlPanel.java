@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
@@ -30,7 +31,24 @@ public class ControlPanel extends JPanel {
 
         connectedClients = new JList();
         connectedClients.setToolTipText("Connected Clients");
-        connectedClients.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        connectedClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        connectedClients.setCellRenderer(new DefaultListCellRenderer() {
+
+            @Override
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                User host = Server.connectedClients.get(0);
+                User user = Server.connectedClients.get(index);
+
+                if (host != null && !host.equals(user)) {
+                    if (host.getTime() - 2000 > user.getTime()) setBackground(Color.RED);
+                    else if (host.getTime() - 1000 > user.getTime()) setBackground(Color.YELLOW);
+                }
+
+                return c;
+            }
+        });
         connectedClientsScroll = new JScrollPane(connectedClients);
         connectedClientsScroll.setBorder(null);
         add(connectedClientsScroll);
@@ -65,13 +83,9 @@ public class ControlPanel extends JPanel {
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
-        updateConnectedClientsTime(users);
-    }
-
-    public void updateConnectedClientsTime(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            if (type == 0) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
+            if (type == 0 || Main.showUserTimes) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
             else listModel.addElement(user);
         }
         connectedClients.setModel(listModel);

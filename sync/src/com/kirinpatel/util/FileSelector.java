@@ -14,6 +14,8 @@ public class FileSelector {
         mediaSelector.showOpenDialog(parent);
 
         File selectedFile = mediaSelector.getSelectedFile();
+        if (selectedFile == null) return null;
+
         if (selectedFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
             return selectedFile;
         } else {

@@ -89,7 +89,8 @@ public class Client {
                                 }
                                 break;
                             case 11:
-                                ClientGUI.controlPanel.updateConnectedClients((ArrayList<User>) message.getMessage());
+                                Server.connectedClients = (ArrayList<User>) message.getMessage();
+                                ClientGUI.controlPanel.updateConnectedClients(Server.connectedClients);
                                 break;
                             case 20:
                                 PlaybackPanel.mediaPlayer.setMediaURL(message.getMessage().toString());

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class Main extends JFrame {
 
     public static int videoQuality = 100;
+    public static boolean showUserTimes = false;
     private static Main main;
     private static JFrame frame;
     private static JTextField ipField;
@@ -58,6 +59,10 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
+        if (args.length > 0) {
+            Debug.debugLevel = Integer.parseInt(args[0]);
+        }
+
         if (VersionChecker.isUpdated()) {
             try {
                 for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
