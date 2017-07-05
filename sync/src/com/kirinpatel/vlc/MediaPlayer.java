@@ -54,9 +54,10 @@ public class MediaPlayer extends JPanel {
         setBackground(Color.BLACK);
         setOpaque(true);
 
-        WIDTH = (int) (1920 * Main.videoQuality);
-        HEIGHT = (int) (1080 * Main.videoQuality);
+        WIDTH = (1920 * Main.videoQuality) / 100;
+        HEIGHT = (1080 * Main.videoQuality) / 100;
         this.playbackPanel = playbackPanel;
+
 
         image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
         BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(WIDTH, HEIGHT);
@@ -160,11 +161,10 @@ public class MediaPlayer extends JPanel {
     }
 
     public void setMediaURL(String mediaURL) {
-        String[] options = {":sout = #transcode{vcodec=x264,width=" + WIDTH + "height=" + HEIGHT + ",acodec=vorb,ab=128,channels=2,samplerate=44100}:display :no-sout-rtp-sap :no-sout-standard-sap :ttl=1 :sout-keep"};
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             Debug.Log("Setting media url.", 6);
             isFile = false;
-            mediaPlayer.prepareMedia(mediaURL, options);
+            mediaPlayer.prepareMedia(mediaURL);
             mediaPlayer.parseMedia();
             initControls();
         }

@@ -9,8 +9,8 @@ import java.util.Scanner;
 public class VersionChecker {
 
     private final static int VERSION = 1;
-    private final static int BUILD = 3;
-    private final static int REVISION = 2;
+    private final static int BUILD = 4;
+    private final static int REVISION = 0;
 
     public static boolean isUpdated() {
         try {
@@ -26,20 +26,32 @@ public class VersionChecker {
                 }
             }
 
+            int v = 0;
+            int b = 0;
+            int r = 0;
+
             for (int i = 0; i < 5; i += 2) {
                 int parsedInt = Integer.parseInt(version.substring(i, i + 1));
                 switch(i) {
                     case 0:
-                        if (parsedInt != VERSION) return false;
+                        v = parsedInt;
                         break;
                     case 2:
-                        if (parsedInt != BUILD) return false;
+                        b = parsedInt;
                         break;
                     case 4:
-                        if (parsedInt != REVISION) return false;
+                        r = parsedInt;
                         break;
                     default:
                         break;
+                }
+            }
+
+            if (VERSION != v) return false;
+            else {
+                if (BUILD < b) return false;
+                else {
+                    if (REVISION < r && BUILD == b) return false;
                 }
             }
         } catch(MalformedURLException e) {

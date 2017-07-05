@@ -24,16 +24,13 @@ a Java based multi-client video and audio syncing application
 			* Please look at the [Port Forward](https://portforward.com/router.htm) website if you do not know how to port forward or need any help port forwarding
 			* _Please note, port forwarding port `8080` is only required for offline media_
 		2. Obtain your IP Address, this will be in the title of the sync server window
-		3. Obtain your media
-			* Online media
-				1. Obtain the url of the media you would like to play
-				2. Put link _(including `http://` or `https://`)_ into the url field
-			* Offline media
-				1. Copy media into the Tomcat folder _(the location of this folder will be shown to you on launch)_
-				2. Click `Choose file`
-				3. Select the media file you would like to watch
-		4. Load your media into sync and share your IP Address
-		5. Enjoy!
+		3. Load your media into sync and share your IP Address
+            1. Click `sync` in the menu of the server
+            2. Select media type
+                * For online media, click `Set Media URL` and provide the link
+                    * _Should your media link be anything other than `http://`, please provide that_
+                * For offline media, click `Set Media File` and select your file
+		4. Enjoy!
 	* Client setup
 		* It is recommended to:
 			* Add sync to your firewall

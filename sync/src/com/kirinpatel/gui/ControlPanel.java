@@ -3,8 +3,6 @@ package com.kirinpatel.gui;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.UIMessage;
-import com.kirinpatel.util.URLEncoding;
 import com.kirinpatel.util.User;
 import com.kirinpatel.vlc.MediaPlayer;
 
@@ -12,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 
 public class ControlPanel extends JPanel {
@@ -20,16 +17,13 @@ public class ControlPanel extends JPanel {
     private final int type;
     private JList connectedClients;
     private JScrollPane connectedClientsScroll;
-    private JPanel mediaControlPanel;
-    private JTextField urlField;
-    private JButton setURL;
-    private JButton setOfflineURL;
+    private JPanel chatPanel;
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
 
     public ControlPanel(int type) {
-        super(new GridLayout(3, 1));
+        super(new GridLayout(2, 1));
         this.type = type;
 
         Debug.Log("Creating ControlPanel...", 3);
@@ -41,48 +35,7 @@ public class ControlPanel extends JPanel {
         connectedClientsScroll.setBorder(null);
         add(connectedClientsScroll);
 
-        if (type == 0) {
-            mediaControlPanel = new JPanel(new GridLayout(2, 1));
-            urlField = new JTextField();
-            urlField.setToolTipText("Media URL");
-            mediaControlPanel.add(urlField);
-            JPanel mediaControlButtonPanel = new JPanel(new GridLayout(1, 2));
-            setURL = new JButton("Set URL");
-            setURL.setInputMap(0, null);
-            setURL.addActionListener(e -> {
-                if (!urlField.getText().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL(urlField.getText());
-                else {
-                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL("");
-                    else {
-                        Debug.Log("Media URL not specified!", 2);
-                        new UIMessage("Error setting Media URL!", "The Media URL must be specified!", 1);
-                    }
-                }
-            });
-            mediaControlButtonPanel.add(setURL);
-            setOfflineURL = new JButton("Choose file");
-            setOfflineURL.setInputMap(0, null);
-            setOfflineURL.addActionListener(e -> {
-                JFileChooser mediaSelector = new JFileChooser("tomcat/webapps/media");
-                mediaSelector.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                mediaSelector.showOpenDialog(ControlPanel.this);
-                if (mediaSelector.getSelectedFile() != null && mediaSelector.getSelectedFile().getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                    String url = "http://" + Server.ipAddress + ":8080/";
-                    String fileName = mediaSelector.getSelectedFile().getName();
-                    if (type == 0) PlaybackPanel.mediaPlayer.setMediaFile(mediaSelector.getSelectedFile().getAbsolutePath(), url + URLEncoding.encode(fileName));
-                    else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
-                } else if (mediaSelector.getSelectedFile() != null) {
-                    new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
-                }
-            });
-            mediaControlButtonPanel.add(setOfflineURL);
-            mediaControlPanel.add(mediaControlButtonPanel);
-            add(mediaControlPanel);
-        } else {
-            add(new JPanel());
-        }
-
-        JPanel chatPanel = new JPanel(new BorderLayout());
+        chatPanel = new JPanel(new BorderLayout());
         chatWindow = new JTextArea();
         chatWindow.setEditable(false);
         chatWindow.setLineWrap(true);
@@ -107,11 +60,8 @@ public class ControlPanel extends JPanel {
     }
 
     public void resizePanel(int height) {
-        connectedClientsScroll.setPreferredSize(new Dimension(200, height / 3));
-        if (urlField != null) urlField.setPreferredSize(new Dimension(200, height / 6));
-        if (setURL != null) setURL.setPreferredSize(new Dimension(100, height / 6));
-        if (setOfflineURL != null) setOfflineURL.setPreferredSize(new Dimension(100, height / 6));
-        chatWindowScroll.setPreferredSize(new Dimension(200, chatWindowScroll.getHeight()));
+        connectedClientsScroll.setPreferredSize(new Dimension(200, height / 2));
+        chatPanel.setPreferredSize(new Dimension(200, height / 2));
     }
 
     public void updateConnectedClients(ArrayList<User> users) {

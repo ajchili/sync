@@ -19,8 +19,8 @@ public class ClientGUI extends JFrame {
 
         Debug.Log("Starting client gui...", 3);
 
-        setSize(new Dimension(840 - (Main.hideUI ? 200 : 0), 360));
-        setMinimumSize(new Dimension(840 - (Main.hideUI ? 200 : 0), 360));
+        setSize(new Dimension(840, 360));
+        setMinimumSize(new Dimension(840, 360));
         setLayout(new BorderLayout());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -29,10 +29,9 @@ public class ClientGUI extends JFrame {
         playbackPanel = new PlaybackPanel(1);
         add(playbackPanel, BorderLayout.CENTER);
         controlPanel = new ControlPanel(1);
-        if (!Main.hideUI) {
-            controlPanel.resizePanel(getHeight());
-            add(controlPanel, BorderLayout.EAST);
-        }
+        controlPanel.resizePanel(getHeight());
+        add(controlPanel, BorderLayout.EAST);
+        setJMenuBar(new MenuBar(playbackPanel));
 
         setVisible(true);
 
@@ -43,7 +42,7 @@ public class ClientGUI extends JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            if (!Main.hideUI) controlPanel.resizePanel(getHeight());
+            controlPanel.resizePanel(getHeight());
         }
 
         @Override

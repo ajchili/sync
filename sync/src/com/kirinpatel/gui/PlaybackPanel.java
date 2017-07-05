@@ -37,6 +37,11 @@ public class PlaybackPanel extends JPanel {
 
             @Override
             public void mouseMoved(MouseEvent e) {
+                if (mediaPlayer.isPaused()) {
+                    revalidate();
+                    repaint();
+                }
+
                 if (e.getY() >= getHeight() - getHeight() / 12) {
                     showBar = true;
                     controlPanel.setVisible(true);

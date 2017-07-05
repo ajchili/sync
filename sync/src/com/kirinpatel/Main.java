@@ -20,8 +20,7 @@ import java.util.ArrayList;
  */
 public class Main extends JFrame {
 
-    public static boolean hideUI;
-    public static double videoQuality = 1.0;
+    public static int videoQuality = 100;
     private static Main main;
 
     /**
@@ -47,20 +46,6 @@ public class Main extends JFrame {
         buttonPanel.add(joinServer);
         add(buttonPanel, BorderLayout.CENTER);
 
-        JPanel settingsPanel = new JPanel(new GridLayout(1, 3));
-        JCheckBox hideUIBox = new JCheckBox("Hide UI (Client ONLY)");
-        hideUIBox.addActionListener(e -> {
-            hideUI = ((JCheckBox) e.getSource()).isSelected();
-        });
-        settingsPanel.add(hideUIBox);
-        JComboBox qualityBox = new JComboBox();
-        qualityBox.setModel(new DefaultComboBoxModel(new String[]{"Video Quality: 1.0", "Video Quality: 0.8", "Video Quality: 0.6", "Video Quality: 0.4", "Video Quality: 0.2"}));
-        qualityBox.addActionListener(e -> {
-            videoQuality = Double.parseDouble((((JComboBox) e.getSource()).getSelectedItem().toString()).replace("Video Quality: ", ""));
-        });
-        settingsPanel.add(qualityBox);
-        add(settingsPanel, BorderLayout.SOUTH);
-
         setVisible(true);
         Debug.Log("Sync launcher displayed.", 3);
     }
@@ -85,7 +70,7 @@ public class Main extends JFrame {
             main = new Main();
         } else {
             Debug.Log("Outdated version of sync! Please update!", 2);
-            new UIMessage("Outdated version of sync!", "You have an outdated version of sync, please update sync!", 1);
+            new UIMessage("Outdated version of sync", "You have an outdated version of sync, please update sync!", 1);
         }
     }
 

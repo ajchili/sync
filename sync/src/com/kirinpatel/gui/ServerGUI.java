@@ -1,5 +1,6 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Main;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 
@@ -30,6 +31,7 @@ public class ServerGUI extends JFrame {
         controlPanel = new ControlPanel(0);
         controlPanel.resizePanel(getHeight());
         add(controlPanel, BorderLayout.EAST);
+        setJMenuBar(new MenuBar(playbackPanel));
 
         setVisible(true);
 
