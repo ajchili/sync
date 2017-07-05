@@ -1,5 +1,7 @@
 package com.kirinpatel.util;
 
+import com.kirinpatel.gui.ProgressView;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -28,25 +30,35 @@ public class FileSelector {
     private static File moveFile(File selectedFile) {
         File newFile = new File("tomcat/webapps/media/" + selectedFile.getName());
 
-        try {
-            InputStream inStream = new FileInputStream(selectedFile);
-            OutputStream outStream = new FileOutputStream(newFile);
+        ProgressView progressView = new ProgressView("Moving media", "Please wait while your media is moved to the proper folder.");
+        new Thread(() -> {
+            try {
+                InputStream inStream = new FileInputStream(selectedFile);
+                OutputStream outStream = new FileOutputStream(newFile);
 
-            byte[] buffer = new byte[1024];
-            int length;
+                byte[] buffer = new byte[1024];
+                int length;
 
-            new UIMessage("Copied media", "Your media is being copied to the Tomcat folder.\nDuring this time, the application will be unresponsive, however,\nit should not take long.", 0);
-            while ((length = inStream.read(buffer)) > 0) {
-                outStream.write(buffer, 0, length);
+                while ((length = inStream.read(buffer)) > 0) {
+                    outStream.write(buffer, 0, length);
+                }
+
+                inStream.close();
+                outStream.close();
+
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        new Thread(() -> {
+            while(newFile.length() < selectedFile.length()) {
+                progressView.setProgress(newFile.length(), selectedFile.length());
             }
 
-            inStream.close();
-            outStream.close();
-
-            new UIMessage("Media copied successfully", "Your media has been copied to the Tomcat folder.", 0);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+            progressView.dispose();
+            new UIMessage("Your media is ready", "Your media has been moved to the\nTomcat folder and is ready for playback.", 0);
+        }).start();
 
         return newFile;
     }

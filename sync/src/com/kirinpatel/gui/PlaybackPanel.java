@@ -193,12 +193,14 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-
+            mediaPlayer.revalidate();
+            mediaPlayer.repaint();
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-
+            mediaPlayer.revalidate();
+            mediaPlayer.repaint();
         }
     }
 }

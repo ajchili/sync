@@ -22,6 +22,8 @@ public class Main extends JFrame {
 
     public static int videoQuality = 100;
     private static Main main;
+    private static JFrame frame;
+    private static JTextField ipField;
 
     /**
      * Creates launcher window.
@@ -65,7 +67,7 @@ public class Main extends JFrame {
                     }
                 }
             } catch (Exception e) {
-
+                Debug.Log("Unable to load \"Numbus\" UIManager!", 2);
             }
             main = new Main();
         } else {
@@ -78,7 +80,7 @@ public class Main extends JFrame {
      * Gets desired server IP address that the client would like to connect to.
      */
     private static void getIPAddress() {
-        JFrame frame = new JFrame("sync");
+        frame = new JFrame("sync");
 
         frame.setSize(new Dimension(350, 100));
         frame.setResizable(false);
@@ -114,16 +116,8 @@ public class Main extends JFrame {
 
         JPanel ipPanel = new JPanel(new GridLayout(1, 2));
 
-        JTextField ipField = new JTextField();
-        ipField.addActionListener(e -> {
-            if (!ipField.getText().isEmpty()) {
-                new Client(ipField.getText());
-                frame.dispose();
-                main.dispose();
-            } else {
-                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
-            }
-        });
+        ipField = new JTextField();
+        ipField.addActionListener(new IPAddressListener());
         ipPanel.add(ipField);
         JComboBox ipBox;
         if (getPreviousAddresses() != null) ipBox = new JComboBox(getPreviousAddresses().toArray());
@@ -137,15 +131,7 @@ public class Main extends JFrame {
         frame.add(ipPanel, BorderLayout.CENTER);
 
         JButton connect = new JButton("Connect");
-        connect.addActionListener(e -> {
-            if (!ipField.getText().isEmpty()) {
-                new Client(ipField.getText());
-                frame.dispose();
-                main.dispose();
-            } else {
-                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
-            }
-        });
+        connect.addActionListener(new IPAddressListener());
         frame.add(connect, BorderLayout.SOUTH);
 
         frame.setVisible(true);
@@ -248,6 +234,23 @@ public class Main extends JFrame {
                 case 1:
                     getIPAddress();
                     break;
+            }
+        }
+    }
+
+    /**
+     * Custom ActionListener that will serve to enable usability of the IP address field during Client connections.
+     */
+    static class IPAddressListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!ipField.getText().isEmpty()) {
+                new Client(ipField.getText());
+                frame.dispose();
+                main.dispose();
+            } else {
+                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
             }
         }
     }
