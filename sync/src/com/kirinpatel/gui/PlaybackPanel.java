@@ -5,10 +5,7 @@ import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 
 public class PlaybackPanel extends JPanel {
 
@@ -23,48 +20,15 @@ public class PlaybackPanel extends JPanel {
     private JFrame fullscreen;
     private JPanel fullscreenPanel;
     private boolean showBar = false;
+    private long lastClick = 0;
+    private FullscreenListener fullscreenListener;
 
     PlaybackPanel(int type) {
         super(new BorderLayout());
         setBackground(Color.BLACK);
         this.type = type;
 
-        addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                if (mediaPlayer.isPaused()) {
-                    revalidate();
-                    repaint();
-                }
-
-                if (e.getY() >= getHeight() - getHeight() / 12) {
-                    showBar = true;
-                    controlPanel.setVisible(true);
-                    revalidate();
-                    repaint();
-                } else {
-                    new Thread(() -> {
-                        try {
-                            showBar = false;
-                            Thread.sleep(2000);
-
-                            if (!showBar) {
-                                controlPanel.setVisible(false);
-                                revalidate();
-                                repaint();
-                            }
-                        } catch(InterruptedException e1) {
-                            e1.printStackTrace();
-                        }
-                    }).start();
-                }
-            }
-        });
+        fullscreenListener = new FullscreenListener();
 
         initMediaPlayer();
     }
@@ -72,6 +36,7 @@ public class PlaybackPanel extends JPanel {
     private void initMediaPlayer() {
         mediaPlayer = new MediaPlayer(this);
         add(mediaPlayer, BorderLayout.CENTER);
+        mediaPlayer.addMouseListener(fullscreenListener);
 
         initControls();
     }
@@ -101,7 +66,7 @@ public class PlaybackPanel extends JPanel {
                             showBar = false;
                             Thread.sleep(2000);
 
-                            if (!showBar) {
+                            if (!showBar && isFullscreen) {
                                 controlPanel.setVisible(false);
                                 repaint();
                             }
@@ -112,6 +77,7 @@ public class PlaybackPanel extends JPanel {
                 }
             }
         });
+        fullscreen.addMouseListener(new FullscreenListener());
         fullscreen.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -137,6 +103,7 @@ public class PlaybackPanel extends JPanel {
         fullscreenPanel.add(mediaPlayer, BorderLayout.CENTER);
         fullscreenPanel.add(controlPanel, BorderLayout.SOUTH);
         fullscreen.add(fullscreenPanel);
+        mediaPlayer.removeMouseListener(fullscreenListener);
         fullscreen.setVisible(true);
     }
 
@@ -144,8 +111,10 @@ public class PlaybackPanel extends JPanel {
         isFullscreen = false;
         fullscreenPanel.removeAll();
         fullscreen.dispose();
+        mediaPlayer.addMouseListener(fullscreenListener);
         add(mediaPlayer, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
+        controlPanel.setVisible(true);
         mediaPlayer.repaint();
         controlPanel.repaint();
         repaint();
@@ -198,5 +167,38 @@ public class PlaybackPanel extends JPanel {
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyDispatcher(this));
+    }
+
+    class FullscreenListener implements MouseListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (lastClick > System.currentTimeMillis() - 200) {
+                if (isFullscreen) closeFullscreen();
+                else initFullscreen();
+            }
+
+            lastClick = System.currentTimeMillis();
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
     }
 }

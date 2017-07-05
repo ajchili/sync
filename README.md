@@ -30,19 +30,24 @@ a Java based multi-client video and audio syncing application
                 * For online media, click `Set Media URL` and provide the link
                     * _Should your media link be anything other than `http://`, please provide that_
                 * For offline media, click `Set Media File` and select your file
-		4. Enjoy!
+		4. Enjoy
 	* Client setup
 		* It is recommended to:
 			* Add sync to your firewall
 		1. Obtain the IP Address of the server you would like to connect to
 		2. Connect to the server
-		3. Enjoy!
+		3. Enjoy
 
 ## compatibility issues
 While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
 
+* Version [1.3.2](https://github.com/ajchili/sync/releases/tag/1.3.2)
+	* Offline media not accessible to clients if URL encoding is required
 * Version [1.3.0](https://github.com/ajchili/sync/releases/tag/1.3.0)
 	* Incompatible with previous versions of sync as server/client communications have been changed
+    * Offline media not accessible to clients
+* Version [1.2.0](https://github.com/ajchili/sync/releases/tag/1.2.0)
+    * Offline media not accessible to clients
 * Version [1.1.2](https://github.com/ajchili/sync/releases/tag/1.1.2)
 	* Incompatible with previous versions of sync as server/client communications have been changed
 * Version [0.4.0](https://github.com/ajchili/sync/releases/tag/0.4.0) & [0.5.0](https://github.com/ajchili/sync/releases/tag/0.5.0)
