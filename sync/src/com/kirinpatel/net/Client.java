@@ -1,7 +1,7 @@
 package com.kirinpatel.net;
 
 import com.kirinpatel.Main;
-import com.kirinpatel.gui.ClientGUI;
+import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
@@ -26,7 +26,7 @@ public class Client {
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
     private Socket socket;
-    private ClientGUI gui;
+    private GUI gui;
 
     public Client(String ipAddress) {
         Debug.Log("Starting client...", 1);
@@ -89,8 +89,8 @@ public class Client {
                                 }
                                 break;
                             case 11:
-                                Server.connectedClients = (ArrayList<User>) message.getMessage();
-                                ClientGUI.controlPanel.updateConnectedClients(Server.connectedClients);
+                                Main.connectedUsers = (ArrayList<User>) message.getMessage();
+                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 break;
                             case 20:
                                 PlaybackPanel.mediaPlayer.setMediaURL(message.getMessage().toString());
@@ -118,7 +118,7 @@ public class Client {
                                 }).start();
                                 break;
                             case 30:
-                                ClientGUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
+                                GUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
                                 break;
                             default:
                                 if (message.getMessage() != null) {
@@ -176,7 +176,7 @@ public class Client {
                 e.printStackTrace();
             }
 
-            gui = new ClientGUI();
+            gui = new GUI(1);
             Debug.Log("Client started.", 1);
             Main.saveIPAddress(ipAddress);
 

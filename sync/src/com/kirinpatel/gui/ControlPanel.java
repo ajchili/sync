@@ -38,10 +38,10 @@ public class ControlPanel extends JPanel {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                User host = Server.connectedClients.get(0);
-                User user = Server.connectedClients.get(index);
+                User host = Main.connectedUsers.get(0);
+                User user = Main.connectedUsers.get(index);
 
-                if (host != null && !host.equals(user)) {
+                if (host != null && !host.equals(user) && Main.showUserTimes) {
                     if (host.getTime() - 2000 > user.getTime()) setBackground(Color.RED);
                     else if (host.getTime() - 1000 > user.getTime()) setBackground(Color.YELLOW);
                 }
@@ -85,7 +85,7 @@ public class ControlPanel extends JPanel {
     public void updateConnectedClients(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            if (type == 0 || Main.showUserTimes) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
+            if (Main.showUserTimes) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
             else listModel.addElement(user);
         }
         connectedClients.setModel(listModel);
@@ -126,7 +126,7 @@ public class ControlPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
                 if (type == 0) {
-                    Server.sendMessage(Server.connectedClients.get(0) + ": " + chatField.getText());
+                    Server.sendMessage(Main.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {
                     Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());

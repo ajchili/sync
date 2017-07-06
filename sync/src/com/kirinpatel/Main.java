@@ -4,6 +4,7 @@ import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.util.User;
 import com.kirinpatel.util.VersionChecker;
 
 import javax.swing.*;
@@ -16,12 +17,16 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Main class that will run the application and also server as the launcher for the application.
+ * Main class that will run the application and also server as the launcher for the application and primary object for
+ * global variables.
  */
 public class Main extends JFrame {
 
+    // Global variables
     public static int videoQuality = 100;
     public static boolean showUserTimes = false;
+    public static ArrayList<User> connectedUsers = new ArrayList<>();
+
     private static Main main;
     private static JFrame frame;
     private static JTextField ipField;
@@ -31,6 +36,9 @@ public class Main extends JFrame {
      */
     public Main() {
         super("sync");
+
+        connectedUsers.clear();
+        showUserTimes = false;
 
         Debug.Log("Starting sync launcher...", 3);
         setSize(new Dimension(300, 150));

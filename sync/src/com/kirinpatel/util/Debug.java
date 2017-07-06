@@ -2,10 +2,6 @@ package com.kirinpatel.util;
 
 import java.text.DecimalFormat;
 
-/**
- * @author Kirin Patel
- * @date 6/17/17
- */
 public class Debug {
 
     public static int debugLevel = 0;
@@ -31,7 +27,7 @@ public class Debug {
                 header += "(NETWORK ERROR) - ";
                 break;
             case 6:
-                header += "(vlcj) - ";
+                header += "(VLCJ) - ";
                 break;
             default:
                 break;

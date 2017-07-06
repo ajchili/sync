@@ -1,10 +1,8 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.Main;
+import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.gui.ServerGUI;
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -119,10 +117,6 @@ public class MediaPlayer extends JPanel {
                     mediaPlayer.setTime(position * getMediaLength() / 1000);
                 }
             });
-        } else {
-            PlaybackPanel.pauseMedia.addActionListener(e -> {
-                Client.user.setWantsToPause(true);
-            });
         }
 
         PlaybackPanel.pauseMedia.setText(">");
@@ -134,9 +128,9 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setMarqueeLocation(50, 1000);
 
         if (playbackPanel.type == 0) {
-            for (User client : Server.connectedClients) {
+            for (User client : Main.connectedUsers) {
                 client.setTime(0);
-                ServerGUI.controlPanel.updateConnectedClients(Server.connectedClients);
+                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }
 
@@ -254,8 +248,8 @@ public class MediaPlayer extends JPanel {
             scale = scaleOp.filter(image, after);
             repaint();
             if (playbackPanel.type == 0) {
-                Server.connectedClients.get(0).setTime(getMediaTime());
-                ServerGUI.controlPanel.updateConnectedClients(Server.connectedClients);
+                Main.connectedUsers.get(0).setTime(getMediaTime());
+                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }
     }
@@ -314,9 +308,9 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void finished(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            isPaused = true;
-            PlaybackPanel.pauseMedia.setText(">");
             playbackPanel.mediaPosition.setValue(0);
+            PlaybackPanel.pauseMedia.setText(">");
+            isPaused = true;
         }
 
         @Override

@@ -71,14 +71,14 @@ public class MenuBar extends JMenuBar {
         ButtonGroup controlPanelButtons = new ButtonGroup();
         JRadioButtonMenuItem showControlPanel = new JRadioButtonMenuItem("Show");
         showControlPanel.addActionListener(e -> {
-            playbackPanel.getParent().add(playbackPanel.type == 0 ? ServerGUI.controlPanel : ClientGUI.controlPanel, BorderLayout.EAST);
+            playbackPanel.getParent().add(GUI.controlPanel, BorderLayout.EAST);
             playbackPanel.getParent().repaint();
         });
         showControlPanel.setSelected(true);
         controlPanel.add(showControlPanel);
         JRadioButtonMenuItem hideControlPanel = new JRadioButtonMenuItem("Hide");
         hideControlPanel.addActionListener(e -> {
-            playbackPanel.getParent().remove(playbackPanel.type == 0 ? ServerGUI.controlPanel : ClientGUI.controlPanel);
+            playbackPanel.getParent().remove(GUI.controlPanel);
             playbackPanel.getParent().repaint();
         });
         controlPanel.add(hideControlPanel);
@@ -91,13 +91,12 @@ public class MenuBar extends JMenuBar {
         showMediaTime.addActionListener(e -> {
             Main.showUserTimes = true;
         });
-        showMediaTime.setSelected(playbackPanel.type == 0);
         mediaTime.add(showMediaTime);
         JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
         hideMediaTime.addActionListener(e -> {
             Main.showUserTimes = false;
         });
-        hideMediaTime.setSelected(playbackPanel.type == 1);
+        hideMediaTime.setSelected(true);
         mediaTime.add(hideMediaTime);
         mediaTimeButtons.add(showMediaTime);
         mediaTimeButtons.add(hideMediaTime);

@@ -1,7 +1,8 @@
 package com.kirinpatel.net;
 
+import com.kirinpatel.Main;
+import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.gui.ServerGUI;
 import com.kirinpatel.tomcat.TomcatServer;
 import com.kirinpatel.util.*;
 
@@ -13,9 +14,8 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    public static ArrayList<User> connectedClients = new ArrayList<>();
     public static String ipAddress = "";
-    private static ServerGUI gui;
+    private static GUI gui;
     private static ArrayList<String> messages = new ArrayList<>();
     private static ServerThread server;
     private static TomcatServer tomcatServer;
@@ -25,18 +25,20 @@ public class Server {
 
     public Server() {
         Debug.Log("Starting server...", 1);
-        gui = new ServerGUI();
+        gui = new GUI(0);
 
-        connectedClients.add(new User(System.getProperty("user.name") + " (host)"));
-        ServerGUI.controlPanel.updateConnectedClients(connectedClients);
+        Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
+        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
 
         server = new ServerThread();
         new Thread(server).start();
-        tomcatServer = new TomcatServer();
-        new Thread(() -> tomcatServer.start()).start();
+        new Thread(() -> {
+            tomcatServer = new TomcatServer();
+            tomcatServer.start();
+        }).start();
         new Thread(() -> {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(2500);
                 if(isRunning) PortValidator.isAvailable(8000);
                 if(isRunning) PortValidator.isAvailable(8080);
             } catch(InterruptedException e) {
@@ -47,7 +49,7 @@ public class Server {
 
     public static void stop() {
         Debug.Log("Stopping server...", 1);
-        if (connectedClients.size() == 1) {
+        if (Main.connectedUsers.size() == 1) {
             server.stop();
         } else {
             closeServer = true;
@@ -56,7 +58,11 @@ public class Server {
 
     public static void sendMessage(String message) {
         messages.add(message);
-        ServerGUI.controlPanel.setMessages(messages);
+        GUI.controlPanel.setMessages(messages);
+    }
+
+    public static void setEnabled(boolean enabled) {
+        gui.setEnabled(enabled);
     }
 
     class ServerThread implements Runnable {
@@ -165,7 +171,7 @@ public class Server {
         private String mediaURL = "";
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis();
+        private long lastClientUpdate = System.currentTimeMillis() - 4000;
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
@@ -183,7 +189,7 @@ public class Server {
                     break;
                 }
 
-                connectedClients.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
+                Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
 
                 try {
                     if (socket.getInputStream().available() > 0) {
@@ -191,17 +197,17 @@ public class Server {
                         switch(message.getType()) {
                             case 0:
                                 if ((int) message.getMessage() == 0) {
-                                    connectedClients.remove(user);
-                                    ServerGUI.controlPanel.updateConnectedClients(connectedClients);
+                                    Main.connectedUsers.remove(user);
+                                    GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                     isClientConnected = false;
                                     Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
                                 }
                                 break;
                             case 10:
                                 user = new User(message.getMessage().toString());
-                                connectedClients.add(user);
+                                Main.connectedUsers.add(user);
                                 client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
-                                ServerGUI.controlPanel.updateConnectedClients(connectedClients);
+                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 break;
                             case 21:
                                 if ((boolean) message.getMessage() != isPaused) sendVideoState();
@@ -229,7 +235,7 @@ public class Server {
                     e.printStackTrace();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastClientUpdate + 5000) sendConnectedUsersToClient();
 
                 if (messages.size() < Server.messages.size()) sendMessagesToClient();
 
@@ -243,7 +249,7 @@ public class Server {
                 socket.close();
                 Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
-                connectedClients.remove(user);
+                Main.connectedUsers.remove(user);
                 stop();
             }
         }
@@ -283,7 +289,7 @@ public class Server {
             try {
                 lastClientUpdate = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(11, connectedClients));
+                output.writeObject(new Message(11, Main.connectedUsers));
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send connected clients list to " + client + '.', 5);
@@ -313,7 +319,7 @@ public class Server {
                 output.flush();
                 mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
                 time = 0;
-                connectedClients.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
+                Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
             } catch(IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
             }
