@@ -25,7 +25,6 @@ public class PlaybackPanel extends JPanel {
 
     PlaybackPanel(int type) {
         super(new BorderLayout());
-        setBackground(Color.BLACK);
         this.type = type;
 
         fullscreenListener = new FullscreenListener();
@@ -59,7 +58,7 @@ public class PlaybackPanel extends JPanel {
                 if (e.getY() >= Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 50) {
                     showBar = true;
                     controlPanel.setVisible(true);
-                    repaint();
+                    if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
                 } else {
                     new Thread(() -> {
                         try {
@@ -68,7 +67,7 @@ public class PlaybackPanel extends JPanel {
 
                             if (!showBar && isFullscreen) {
                                 controlPanel.setVisible(false);
-                                repaint();
+                                if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
                             }
                         } catch(InterruptedException e1) {
                             e1.printStackTrace();
@@ -115,9 +114,11 @@ public class PlaybackPanel extends JPanel {
         add(mediaPlayer, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
         controlPanel.setVisible(true);
-        mediaPlayer.repaint();
-        controlPanel.repaint();
-        repaint();
+        if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+            mediaPlayer.repaint();
+            controlPanel.repaint();
+            repaint();
+        }
     }
 
     private void initControls() {
@@ -193,14 +194,18 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            mediaPlayer.revalidate();
-            mediaPlayer.repaint();
+            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+                mediaPlayer.revalidate();
+                mediaPlayer.repaint();
+            }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            mediaPlayer.revalidate();
-            mediaPlayer.repaint();
+            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+                mediaPlayer.revalidate();
+                mediaPlayer.repaint();
+            }
         }
     }
 }
