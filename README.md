@@ -37,25 +37,6 @@ a Java based multi-client video and audio syncing application
 		1. Obtain the IP Address of the server you would like to connect to
 		2. Connect to the server
 		3. Enjoy
-
-## compatibility issues
-While some of these issues become irrelevant or are fixed with updates, a server or client may not have the latest stable version
-
-* Version [1.3.2](https://github.com/ajchili/sync/releases/tag/1.3.2)
-	* Offline media not accessible to clients if URL encoding is required
-* Version [1.3.0](https://github.com/ajchili/sync/releases/tag/1.3.0)
-	* Incompatible with previous versions of sync as server/client communications have been changed
-    * Offline media not accessible to clients
-* Version [1.2.0](https://github.com/ajchili/sync/releases/tag/1.2.0)
-    * Offline media not accessible to clients
-* Version [1.1.2](https://github.com/ajchili/sync/releases/tag/1.1.2)
-	* Incompatible with previous versions of sync as server/client communications have been changed
-* Version [0.4.0](https://github.com/ajchili/sync/releases/tag/0.4.0) & [0.5.0](https://github.com/ajchili/sync/releases/tag/0.5.0)
-	* No OS X support
-* Version [0.3.2](https://github.com/ajchili/sync/releases/tag/0.3.2)
-	* No longer compatible with future versions as the media player has been changed
-* Version [0.2.0](https://github.com/ajchili/sync/releases/tag/0.2.0)
-	* Messaging feature incompatible with other version
 	
 ## what to do if you run into issues
 If you for any reason run into issues while using sync _(it is possible to as the application is ever changing)_, submit an issue [here](https://github.com/ajchili/sync/issues) and provide as much detail as possible as to the issue
