@@ -1,9 +1,8 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.Main;
+import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.gui.ServerGUI;
-import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -54,9 +53,10 @@ public class MediaPlayer extends JPanel {
         setBackground(Color.BLACK);
         setOpaque(true);
 
-        WIDTH = (int) (1920 * Main.videoQuality);
-        HEIGHT = (int) (1080 * Main.videoQuality);
+        WIDTH = (1280 * Main.videoQuality) / 100;
+        HEIGHT = (720 * Main.videoQuality) / 100;
         this.playbackPanel = playbackPanel;
+
 
         image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
         BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(WIDTH, HEIGHT);
@@ -128,9 +128,9 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setMarqueeLocation(50, 1000);
 
         if (playbackPanel.type == 0) {
-            for (User client : Server.connectedClients) {
+            for (User client : Main.connectedUsers) {
                 client.setTime(0);
-                ServerGUI.controlPanel.updateConnectedClientsTime(Server.connectedClients);
+                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }
 
@@ -247,6 +247,10 @@ public class MediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
+            if (playbackPanel.type == 0) {
+                Main.connectedUsers.get(0).setTime(getMediaTime());
+                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+            }
         }
     }
 
@@ -304,9 +308,9 @@ public class MediaPlayer extends JPanel {
 
         @Override
         public void finished(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
-            isPaused = true;
-            PlaybackPanel.pauseMedia.setText(">");
             playbackPanel.mediaPosition.setValue(0);
+            PlaybackPanel.pauseMedia.setText(">");
+            isPaused = true;
         }
 
         @Override

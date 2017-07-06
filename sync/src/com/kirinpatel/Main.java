@@ -4,6 +4,7 @@ import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.util.User;
 import com.kirinpatel.util.VersionChecker;
 
 import javax.swing.*;
@@ -16,19 +17,28 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Main class that will run the application and also server as the launcher for the application.
+ * Main class that will run the application and also server as the launcher for the application and primary object for
+ * global variables.
  */
 public class Main extends JFrame {
 
-    public static boolean hideUI;
-    public static double videoQuality = 1.0;
+    // Global variables
+    public static int videoQuality = 100;
+    public static boolean showUserTimes = false;
+    public static ArrayList<User> connectedUsers = new ArrayList<>();
+
     private static Main main;
+    private static JFrame frame;
+    private static JTextField ipField;
 
     /**
      * Creates launcher window.
      */
     public Main() {
         super("sync");
+
+        connectedUsers.clear();
+        showUserTimes = false;
 
         Debug.Log("Starting sync launcher...", 3);
         setSize(new Dimension(300, 150));
@@ -47,20 +57,6 @@ public class Main extends JFrame {
         buttonPanel.add(joinServer);
         add(buttonPanel, BorderLayout.CENTER);
 
-        JPanel settingsPanel = new JPanel(new GridLayout(1, 3));
-        JCheckBox hideUIBox = new JCheckBox("Hide UI (Client ONLY)");
-        hideUIBox.addActionListener(e -> {
-            hideUI = ((JCheckBox) e.getSource()).isSelected();
-        });
-        settingsPanel.add(hideUIBox);
-        JComboBox qualityBox = new JComboBox();
-        qualityBox.setModel(new DefaultComboBoxModel(new String[]{"Video Quality: 1.0", "Video Quality: 0.8", "Video Quality: 0.6", "Video Quality: 0.4", "Video Quality: 0.2"}));
-        qualityBox.addActionListener(e -> {
-            videoQuality = Double.parseDouble((((JComboBox) e.getSource()).getSelectedItem().toString()).replace("Video Quality: ", ""));
-        });
-        settingsPanel.add(qualityBox);
-        add(settingsPanel, BorderLayout.SOUTH);
-
         setVisible(true);
         Debug.Log("Sync launcher displayed.", 3);
     }
@@ -71,6 +67,10 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
+        if (args.length > 0) {
+            Debug.debugLevel = Integer.parseInt(args[0]);
+        }
+
         if (VersionChecker.isUpdated()) {
             try {
                 for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -80,12 +80,12 @@ public class Main extends JFrame {
                     }
                 }
             } catch (Exception e) {
-
+                Debug.Log("Unable to load \"Numbus\" UIManager!", 2);
             }
             main = new Main();
         } else {
             Debug.Log("Outdated version of sync! Please update!", 2);
-            new UIMessage("Outdated version of sync!", "You have an outdated version of sync, please update sync!", 1);
+            new UIMessage("Outdated version of sync", "You have an outdated version of sync, please update sync!", 1);
         }
     }
 
@@ -93,7 +93,7 @@ public class Main extends JFrame {
      * Gets desired server IP address that the client would like to connect to.
      */
     private static void getIPAddress() {
-        JFrame frame = new JFrame("sync");
+        frame = new JFrame("sync");
 
         frame.setSize(new Dimension(350, 100));
         frame.setResizable(false);
@@ -129,16 +129,8 @@ public class Main extends JFrame {
 
         JPanel ipPanel = new JPanel(new GridLayout(1, 2));
 
-        JTextField ipField = new JTextField();
-        ipField.addActionListener(e -> {
-            if (!ipField.getText().isEmpty()) {
-                new Client(ipField.getText());
-                frame.dispose();
-                main.dispose();
-            } else {
-                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
-            }
-        });
+        ipField = new JTextField();
+        ipField.addActionListener(new IPAddressListener());
         ipPanel.add(ipField);
         JComboBox ipBox;
         if (getPreviousAddresses() != null) ipBox = new JComboBox(getPreviousAddresses().toArray());
@@ -152,15 +144,7 @@ public class Main extends JFrame {
         frame.add(ipPanel, BorderLayout.CENTER);
 
         JButton connect = new JButton("Connect");
-        connect.addActionListener(e -> {
-            if (!ipField.getText().isEmpty()) {
-                new Client(ipField.getText());
-                frame.dispose();
-                main.dispose();
-            } else {
-                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
-            }
-        });
+        connect.addActionListener(new IPAddressListener());
         frame.add(connect, BorderLayout.SOUTH);
 
         frame.setVisible(true);
@@ -263,6 +247,23 @@ public class Main extends JFrame {
                 case 1:
                     getIPAddress();
                     break;
+            }
+        }
+    }
+
+    /**
+     * Custom ActionListener that will serve to enable usability of the IP address field during Client connections.
+     */
+    static class IPAddressListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (!ipField.getText().isEmpty()) {
+                new Client(ipField.getText());
+                frame.dispose();
+                main.dispose();
+            } else {
+                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
             }
         }
     }

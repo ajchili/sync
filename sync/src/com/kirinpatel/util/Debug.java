@@ -2,12 +2,9 @@ package com.kirinpatel.util;
 
 import java.text.DecimalFormat;
 
-/**
- * @author Kirin Patel
- * @date 6/17/17
- */
 public class Debug {
 
+    public static int debugLevel = 0;
     private static final long START_TIME = System.currentTimeMillis();
 
     public static void Log(String message, int type) {
@@ -30,11 +27,14 @@ public class Debug {
                 header += "(NETWORK ERROR) - ";
                 break;
             case 6:
-                header += "(vlcj) - ";
+                header += "(VLCJ) - ";
                 break;
             default:
                 break;
         }
-        System.out.println(header + message);
+
+        if (debugLevel == 0 && (type == 2 || type == 5)) System.out.println(header + message);
+        else if (debugLevel == 1 && (type == 2 ||type== 4 || type == 5)) System.out.println(header + message);
+        else if (debugLevel == 2) System.out.println(header + message);
     }
 }

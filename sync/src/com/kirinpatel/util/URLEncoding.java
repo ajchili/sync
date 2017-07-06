@@ -6,12 +6,12 @@ public class URLEncoding {
      * Credit: https://www.urlencoder.org/
      *
      * @param url Un-encoded URL
-     * @return Encoded URL
+     * @return Returns encoded URL
      */
     public static String encode(String url) {
+        url = url.replace("%", "%25");
         url = url.replace(" ", "%20");
         url = url.replace("\"", "%22");
-        url = url.replace("%", "%25");
         url = url.replace("-", "%2D");
         url = url.replace(".", "%2E");
         url = url.replace("<", "%3C");

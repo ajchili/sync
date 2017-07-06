@@ -11,17 +11,31 @@ public class User implements Serializable {
     private String username;
     private long userID;
     private long time = -1;
+    private boolean wantsToPause = false;
 
+    /**
+     *
+     * @param username
+     */
     public User(String username) {
         this.username = username;
         this.userID = Math.abs(new Random().nextLong());
     }
 
+    /**
+     *
+     * @return Returns user in printable string
+     */
     @Override
     public String toString() {
         return username;
     }
 
+    /**
+     *
+     * @param o Object
+     * @return Returns if object is equal to user
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof User)) {
@@ -32,23 +46,51 @@ public class User implements Serializable {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
+    /**
+     *
+     * @return
+     */
     public long getUserID() {
         return userID;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getTime() {
         return time;
     }
 
+    public boolean doesWantToPuase() {
+        return wantsToPause;
+    }
+
+    /**
+     *
+     * @param time
+     */
     public void setTime(long time) {
         this.time = time;
+    }
+
+    public void setWantsToPause(boolean wantsToPause) {
+        this.wantsToPause = wantsToPause;
+        new Thread(() -> {
+            try {
+                Thread.sleep(2500);
+                setWantsToPause(false);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }
