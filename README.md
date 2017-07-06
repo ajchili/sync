@@ -18,8 +18,9 @@ a Java based multi-client video and audio syncing application
 			* Add sync to your firewall _(to ensure that Tomcat will run flawlessly, allow all Java entries to be permitted)_
 			* Specify the amount of ram that the application can use _(2 gigabytes of ram minimum)_
 			* Use a multi-core cpu
-			* Have an unresricted and a beefy internet connection _(the beefy internet connection is only required when using offline media)_
-			* Use 720p content to prevent excessive bandwidth usage this can be done by looking at [this](https://github.com/ajchili/sync/issues/8) issue
+			* Have an unresricted and a beefy internet connection
+			* Use 720p content to prevent excessive bandwidth usage and smooth playback
+				* Should your media be in a higher resolution, look at [this](https://github.com/ajchili/sync/issues/8) issue for more information
 		1. Port forward if you will be using sync past a local network, sync uses ports `8000` and `8080`
 			* Please look at the [Port Forward](https://portforward.com/router.htm) website if you do not know how to port forward or need any help port forwarding
 			* _Please note, port forwarding port `8080` is only required for offline media_
