@@ -13,7 +13,7 @@ public class VersionChecker {
 
     private final static int VERSION = 1;
     private final static int BUILD = 4;
-    private final static int REVISION = 0;
+    private final static int REVISION = 1;
 
     /**
      * Provides if sync is updated.
