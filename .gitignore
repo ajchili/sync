@@ -20,3 +20,7 @@ hs_err_pid*
 launcherData\.dat
 
 tomcat/webapps/media/*
+
+sync/\.idea/misc\.xml
+
+sync/\.idea/workspace\.xml

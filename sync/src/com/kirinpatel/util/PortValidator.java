@@ -15,6 +15,7 @@ public class PortValidator {
         Socket s = null;
         try {
             s = new Socket(Server.ipAddress, port);
+            s.setSoTimeout(5000);
             Debug.Log("Port (" + port + ") is opened and awaiting connections...", 4);
         } catch(IOException e) {
             Debug.Log("Error testing connection on port (" + port + ").", 5);

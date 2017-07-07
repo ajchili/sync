@@ -50,7 +50,7 @@ public class MenuBar extends JMenuBar {
                 } else new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
             }
         });
-        file.add(setFile);
+        if (!Main.IS_MAC) file.add(setFile);
         if (playbackPanel.type == 0) {
             sync.add(file);
             sync.add(new JSeparator());

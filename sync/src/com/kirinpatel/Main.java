@@ -26,6 +26,11 @@ public class Main extends JFrame {
     public static int videoQuality = 100;
     public static boolean showUserTimes = false;
     public static ArrayList<User> connectedUsers = new ArrayList<>();
+    
+    /**
+     * Credit: http://alvinalexander.com/blog/post/java/how-determine-application-running-mac-os-x-osx-version
+     */
+    public static final boolean IS_MAC = System.getProperty("mrj.version") == null;
 
     private static Main main;
     private static JFrame frame;
