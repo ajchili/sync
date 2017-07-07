@@ -73,12 +73,7 @@ public class Main extends JFrame {
 
         if (VersionChecker.isUpdated()) {
             try {
-                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                }
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 Debug.Log("Unable to load \"Numbus\" UIManager!", 2);
             }
