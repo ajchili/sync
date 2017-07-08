@@ -1,18 +1,11 @@
 package com.kirinpatel;
 
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
-import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.UIMessage;
-import com.kirinpatel.util.User;
-import com.kirinpatel.util.VersionChecker;
+import com.kirinpatel.net.*;
+import com.kirinpatel.util.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -30,7 +23,7 @@ public class Main extends JFrame {
     /**
      * Credit: http://alvinalexander.com/blog/post/java/how-determine-application-running-mac-os-x-osx-version
      */
-    public static final boolean IS_MAC = System.getProperty("mrj.version") == null;
+    public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 
     private static Main main;
     private static JFrame frame;
