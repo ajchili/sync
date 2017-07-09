@@ -42,7 +42,6 @@ public class MediaPlayer extends JPanel {
     private String filePath = "";
     private boolean isScrubbing = false;
     private boolean isFile = false;
-    private final String[] options;
 
     /**
      * Constructor that will return a MediaPlayer.
@@ -58,8 +57,6 @@ public class MediaPlayer extends JPanel {
         WIDTH = (1280 * Main.videoQuality) / 100;
         HEIGHT = (720 * Main.videoQuality) / 100;
         this.playbackPanel = playbackPanel;
-        // Options have yet to be implemented but will be added to allow for better syncing when using offline media
-        options = new String[]{"--sout=#transcode{vcodec=x264,width=" + WIDTH + "height=" + HEIGHT + ",acodec=vorb,ab=128,channels=2,samplerate=44100}:display:rtp{mux=ts,dst=localhost,port=8080,sap}"};
 
 
         image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
