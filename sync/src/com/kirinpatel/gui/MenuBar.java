@@ -68,10 +68,36 @@ public class MenuBar extends JMenuBar {
         ui.add(fullscreen);
         ui.add(new JSeparator());
         JMenu controlPanel = new JMenu("Control Panel");
-        ButtonGroup controlPanelButtons = new ButtonGroup();
+        ButtonGroup locationControlPanelButtons = new ButtonGroup();
+        JRadioButtonMenuItem rightControlPanel = new JRadioButtonMenuItem("Show on Right");
+        rightControlPanel.addActionListener(e -> {
+            if (playbackPanel.getParent().getComponents().length == 2) {
+                playbackPanel.getParent().remove(GUI.controlPanel);
+                playbackPanel.getParent().add(GUI.controlPanel, BorderLayout.EAST);
+                playbackPanel.getParent().revalidate();
+                playbackPanel.getParent().repaint();
+            }
+        });
+        rightControlPanel.setSelected(true);
+        controlPanel.add(rightControlPanel);
+        JRadioButtonMenuItem leftControlPanel = new JRadioButtonMenuItem("Shown on Left");
+        leftControlPanel.addActionListener(e -> {
+            if (playbackPanel.getParent().getComponents().length == 2) {
+                playbackPanel.getParent().remove(GUI.controlPanel);
+                playbackPanel.getParent().add(GUI.controlPanel, BorderLayout.WEST);
+                playbackPanel.getParent().revalidate();
+                playbackPanel.getParent().repaint();
+            }
+        });
+        controlPanel.add(leftControlPanel);
+        locationControlPanelButtons.add(rightControlPanel);
+        locationControlPanelButtons.add(leftControlPanel);
+        controlPanel.add(new JSeparator());
+        ButtonGroup showControlPanelButtons = new ButtonGroup();
         JRadioButtonMenuItem showControlPanel = new JRadioButtonMenuItem("Show");
         showControlPanel.addActionListener(e -> {
-            playbackPanel.getParent().add(GUI.controlPanel, BorderLayout.EAST);
+            playbackPanel.getParent().add(GUI.controlPanel, rightControlPanel.isSelected() ? BorderLayout.EAST : BorderLayout.WEST);
+            playbackPanel.getParent().revalidate();
             playbackPanel.getParent().repaint();
         });
         showControlPanel.setSelected(true);
@@ -79,11 +105,12 @@ public class MenuBar extends JMenuBar {
         JRadioButtonMenuItem hideControlPanel = new JRadioButtonMenuItem("Hide");
         hideControlPanel.addActionListener(e -> {
             playbackPanel.getParent().remove(GUI.controlPanel);
+            playbackPanel.getParent().revalidate();
             playbackPanel.getParent().repaint();
         });
         controlPanel.add(hideControlPanel);
-        controlPanelButtons.add(showControlPanel);
-        controlPanelButtons.add(hideControlPanel);
+        showControlPanelButtons.add(showControlPanel);
+        showControlPanelButtons.add(hideControlPanel);
         ui.add(controlPanel);
         JMenu mediaTime = new JMenu("Playback Times");
         ButtonGroup mediaTimeButtons = new ButtonGroup();
