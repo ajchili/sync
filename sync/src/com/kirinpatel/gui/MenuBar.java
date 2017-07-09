@@ -24,7 +24,7 @@ public class MenuBar extends JMenuBar {
         JMenuItem setURL = new JMenuItem("Set Media URL");
         setURL.addActionListener(e -> {
             String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
-            if (!mediaURL.isEmpty()) {
+            if (mediaURL != null && !mediaURL.isEmpty()) {
                 if (mediaURL.startsWith("http")) PlaybackPanel.mediaPlayer.setMediaURL(mediaURL);
                 else PlaybackPanel.mediaPlayer.setMediaURL("http://" + mediaURL);
             } else {
