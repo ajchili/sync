@@ -61,6 +61,11 @@ public class Server {
         GUI.controlPanel.setMessages(messages);
     }
 
+    public static void kickUser(int user) {
+        Main.connectedUsers.remove(user);
+        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+    }
+
     public static void setEnabled(boolean enabled) {
         gui.setEnabled(enabled);
     }
@@ -168,6 +173,7 @@ public class Server {
         private User user;
         private String client = "client";
         private boolean isClientConnected = false;
+        private boolean hasConnected = false;
         private String mediaURL = "";
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
@@ -189,7 +195,7 @@ public class Server {
                     break;
                 }
 
-                Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
+                if (hasConnected && !Main.connectedUsers.contains(user)) disconnectClientFromServer();
 
                 try {
                     if (socket.getInputStream().available() > 0) {
@@ -208,6 +214,7 @@ public class Server {
                                 Main.connectedUsers.add(user);
                                 client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                hasConnected = true;
                                 break;
                             case 21:
                                 if ((boolean) message.getMessage() != isPaused) sendVideoState();
@@ -232,7 +239,7 @@ public class Server {
                         }
                     }
                 } catch(IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    disconnectClientFromServer();
                 }
 
                 if (System.currentTimeMillis() > lastClientUpdate + 1250) sendConnectedUsersToClient();
@@ -280,13 +287,13 @@ public class Server {
 
         private synchronized void disconnectClientFromServer() {
             try {
-                Debug.Log("Sending closing message to " + client + "...", 4);
+                Debug.Log("Sending disconnect message to " + client + "...", 4);
                 output.writeObject(new Message(0, 3));
                 output.flush();
-                Debug.Log("Closing message sent.", 4);
-                Main.connectedUsers.remove(user);
+                Debug.Log("Disconnect message sent.", 4);
             } catch(IOException e) {
-                Debug.Log("Uncaught error (" + e.getMessage() + ").", 5);
+                Debug.Log("Unable to properly disconnect with client.", 5);
+                isClientConnected = false;
             }
         }
 

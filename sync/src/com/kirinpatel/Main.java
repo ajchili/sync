@@ -39,7 +39,7 @@ public class Main extends JFrame {
         showUserTimes = false;
 
         Debug.Log("Starting sync launcher...", 3);
-        setSize(new Dimension(300, 150));
+        setSize(new Dimension(200, 100));
 
         setResizable(false);
         setLayout(new BorderLayout());
@@ -88,7 +88,7 @@ public class Main extends JFrame {
     private static void getIPAddress() {
         frame = new JFrame("sync");
 
-        frame.setSize(new Dimension(350, 100));
+        frame.setSize(new Dimension(300, 100));
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.setDefaultCloseOperation(HIDE_ON_CLOSE);

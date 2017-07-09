@@ -9,7 +9,10 @@ import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.URLEncoding;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -55,7 +58,18 @@ public class MenuBar extends JMenuBar {
             sync.add(file);
             sync.add(new JSeparator());
         }
+        JMenuItem share = new JMenuItem("Share Server Address");
+        share.addActionListener(e -> {
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(playbackPanel.type == 0 ? Server.ipAddress : Client.ipAddress), null);
+            new UIMessage("Server Address Copied", "The server address has been copied to your clipboard.", 0);
+        });
+        sync.add(share);
+        sync.add(new JSeparator());
         JMenuItem close = new JMenuItem("Close sync");
+        close.addActionListener(e -> {
+            if (playbackPanel.type == 0) Server.stop();
+            else Client.stop();
+        });
         sync.add(close);
         add(sync);
 
@@ -68,8 +82,9 @@ public class MenuBar extends JMenuBar {
         ui.add(fullscreen);
         ui.add(new JSeparator());
         JMenu controlPanel = new JMenu("Control Panel");
+        JMenu controlPanelLocation = new JMenu("Location");
         ButtonGroup locationControlPanelButtons = new ButtonGroup();
-        JRadioButtonMenuItem rightControlPanel = new JRadioButtonMenuItem("Show on Right");
+        JRadioButtonMenuItem rightControlPanel = new JRadioButtonMenuItem("Display on Right");
         rightControlPanel.addActionListener(e -> {
             if (playbackPanel.getParent().getComponents().length == 2) {
                 playbackPanel.getParent().remove(GUI.controlPanel);
@@ -79,8 +94,8 @@ public class MenuBar extends JMenuBar {
             }
         });
         rightControlPanel.setSelected(true);
-        controlPanel.add(rightControlPanel);
-        JRadioButtonMenuItem leftControlPanel = new JRadioButtonMenuItem("Shown on Left");
+        controlPanelLocation.add(rightControlPanel);
+        JRadioButtonMenuItem leftControlPanel = new JRadioButtonMenuItem("Display on Left");
         leftControlPanel.addActionListener(e -> {
             if (playbackPanel.getParent().getComponents().length == 2) {
                 playbackPanel.getParent().remove(GUI.controlPanel);
@@ -89,9 +104,55 @@ public class MenuBar extends JMenuBar {
                 playbackPanel.getParent().repaint();
             }
         });
-        controlPanel.add(leftControlPanel);
+        controlPanelLocation.add(leftControlPanel);
         locationControlPanelButtons.add(rightControlPanel);
         locationControlPanelButtons.add(leftControlPanel);
+        controlPanel.add(controlPanelLocation);
+        JMenu mediaTime = new JMenu("Playback Times");
+        JMenu mediaTimeIndicators = new JMenu("Playback Time Indicator");
+        JPanel warningTimePanel = new JPanel(new BorderLayout());
+        warningTimePanel.add(new JLabel("Warning Time: ", JLabel.LEFT), BorderLayout.WEST);
+        JSlider warningSlider = new JSlider(250, 1999, 1000);
+        warningSlider.setPaintTicks(true);
+        warningSlider.setMajorTickSpacing(100);
+        warningSlider.setMinorTickSpacing(50);
+        warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
+        warningSlider.addChangeListener(e -> {
+            Debug.deSyncWarningTime = warningSlider.getValue();
+            warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
+        });
+        warningTimePanel.add(warningSlider, BorderLayout.CENTER);
+        mediaTimeIndicators.add(warningTimePanel);
+        JPanel desyncTimePanel = new JPanel(new BorderLayout());
+        desyncTimePanel.add(new JLabel("DeSync Time: ", JLabel.LEFT), BorderLayout.WEST);
+        JSlider desyncSlider = new JSlider(2000, 10000, 2000);
+        desyncSlider.setPaintTicks(true);
+        desyncSlider.setMajorTickSpacing(500);
+        desyncSlider.setMinorTickSpacing(250);
+        desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
+        desyncSlider.addChangeListener(e -> {
+            Debug.deSyncWarningTime = desyncSlider.getValue();
+            desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
+        });
+        desyncTimePanel.add(desyncSlider, BorderLayout.CENTER);
+        mediaTimeIndicators.add(desyncTimePanel);
+        mediaTime.add(mediaTimeIndicators);
+        mediaTime.add(new JSeparator());
+        ButtonGroup mediaTimeButtons = new ButtonGroup();
+        JRadioButtonMenuItem showMediaTime = new JRadioButtonMenuItem("Show");
+        showMediaTime.addActionListener(e -> {
+            Main.showUserTimes = true;
+        });
+        mediaTime.add(showMediaTime);
+        JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
+        hideMediaTime.addActionListener(e -> {
+            Main.showUserTimes = false;
+        });
+        hideMediaTime.setSelected(true);
+        mediaTime.add(hideMediaTime);
+        mediaTimeButtons.add(showMediaTime);
+        mediaTimeButtons.add(hideMediaTime);
+        controlPanel.add(mediaTime);
         controlPanel.add(new JSeparator());
         ButtonGroup showControlPanelButtons = new ButtonGroup();
         JRadioButtonMenuItem showControlPanel = new JRadioButtonMenuItem("Show");
@@ -112,22 +173,6 @@ public class MenuBar extends JMenuBar {
         showControlPanelButtons.add(showControlPanel);
         showControlPanelButtons.add(hideControlPanel);
         ui.add(controlPanel);
-        JMenu mediaTime = new JMenu("Playback Times");
-        ButtonGroup mediaTimeButtons = new ButtonGroup();
-        JRadioButtonMenuItem showMediaTime = new JRadioButtonMenuItem("Show");
-        showMediaTime.addActionListener(e -> {
-            Main.showUserTimes = true;
-        });
-        mediaTime.add(showMediaTime);
-        JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
-        hideMediaTime.addActionListener(e -> {
-            Main.showUserTimes = false;
-        });
-        hideMediaTime.setSelected(true);
-        mediaTime.add(hideMediaTime);
-        mediaTimeButtons.add(showMediaTime);
-        mediaTimeButtons.add(hideMediaTime);
-        ui.add(mediaTime);
         settings.add(ui);
         JMenu video = new JMenu("Video Settings");
         JMenuItem videoSettings = new JMenuItem("Show Video Settings Window");

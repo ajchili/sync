@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 public class Debug {
 
     public static int debugLevel = 0;
+    public static long deSyncWarningTime = 1000;
+    public static long deSyncTime = 2000;
     private static final long START_TIME = System.currentTimeMillis();
 
     public static void Log(String message, int type) {

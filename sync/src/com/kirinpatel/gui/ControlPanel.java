@@ -15,17 +15,16 @@ import java.util.ArrayList;
 
 public class ControlPanel extends JPanel {
 
-    private final int type;
     private JList connectedClients;
     private JScrollPane connectedClientsScroll;
     private JPanel chatPanel;
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
+    public static boolean isUserDisplayShown = false;
 
     public ControlPanel(int type) {
         super(new GridLayout(2, 1));
-        this.type = type;
 
         Debug.Log("Creating ControlPanel...", 3);
 
@@ -42,8 +41,14 @@ public class ControlPanel extends JPanel {
                 User user = Main.connectedUsers.get(index);
 
                 if (host != null && !host.equals(user) && Main.showUserTimes) {
-                    if (host.getTime() - 2000 > user.getTime()) setBackground(Color.RED);
-                    else if (host.getTime() - 1000 > user.getTime()) setBackground(Color.YELLOW);
+                    if (host.getTime() - Debug.deSyncTime > user.getTime()) setBackground(Color.RED);
+                    else if (host.getTime() - Debug.deSyncWarningTime > user.getTime()) setBackground(Color.YELLOW);
+                }
+
+                if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
+                    isUserDisplayShown = true;
+                    chatWindow.requestFocus();
+                    new ClientInfoGUI(index);
                 }
 
                 return c;
