@@ -171,7 +171,7 @@ public class Server {
         private String mediaURL = "";
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis() - 4000;
+        private long lastClientUpdate = System.currentTimeMillis() - 1000;
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
@@ -235,7 +235,7 @@ public class Server {
                     e.printStackTrace();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 5000) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastClientUpdate + 1250) sendConnectedUsersToClient();
 
                 if (messages.size() < Server.messages.size()) sendMessagesToClient();
 
@@ -255,14 +255,7 @@ public class Server {
         }
 
         public void stop() {
-            try {
-                Debug.Log("Sending closing message to " + client + "...", 4);
-                output.writeObject(new Message(0, 3));
-                output.flush();
-                Debug.Log("Closing message sent.", 4);
-            } catch(IOException e) {
-                Debug.Log("Uncaught error (" + e.getMessage() + ").", 5);
-            }
+            disconnectClientFromServer();
 
             server.stop();
         }
@@ -279,9 +272,21 @@ public class Server {
                 Debug.Log("Established connection to " + client + '.', 4);
                 sendVideoState();
                 sendVideoTime();
+                sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
                 Debug.Log("Unable to establish connection to " + client + '.', 5);
-                System.out.println(socket.getInetAddress());
+            }
+        }
+
+        private synchronized void disconnectClientFromServer() {
+            try {
+                Debug.Log("Sending closing message to " + client + "...", 4);
+                output.writeObject(new Message(0, 3));
+                output.flush();
+                Debug.Log("Closing message sent.", 4);
+                Main.connectedUsers.remove(user);
+            } catch(IOException e) {
+                Debug.Log("Uncaught error (" + e.getMessage() + ").", 5);
             }
         }
 
@@ -293,6 +298,7 @@ public class Server {
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send connected clients list to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -310,6 +316,7 @@ public class Server {
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send message log to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -322,6 +329,7 @@ public class Server {
                 Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
             } catch(IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -332,6 +340,7 @@ public class Server {
                 isPaused = PlaybackPanel.mediaPlayer.isPaused();
             } catch(IOException e) {
                 Debug.Log("Unable to send media state to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -342,6 +351,7 @@ public class Server {
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -357,6 +367,7 @@ public class Server {
                     output.flush();
                 } catch(IOException e) {
                     Debug.Log("Unable to send rate to " + client + '.', 5);
+                    disconnectClientFromServer();
                 }
             }
         }
