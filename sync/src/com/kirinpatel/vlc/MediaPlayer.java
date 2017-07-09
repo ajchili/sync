@@ -3,6 +3,7 @@ package com.kirinpatel.vlc;
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.net.Client;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -41,6 +42,7 @@ public class MediaPlayer extends JPanel {
     private String filePath = "";
     private boolean isScrubbing = false;
     private boolean isFile = false;
+    private final String[] options;
 
     /**
      * Constructor that will return a MediaPlayer.
@@ -56,6 +58,8 @@ public class MediaPlayer extends JPanel {
         WIDTH = (1280 * Main.videoQuality) / 100;
         HEIGHT = (720 * Main.videoQuality) / 100;
         this.playbackPanel = playbackPanel;
+        // Options have yet to be implemented but will be added to allow for better syncing when using offline media
+        options = new String[]{"--sout=#transcode{vcodec=x264,width=" + WIDTH + "height=" + HEIGHT + ",acodec=vorb,ab=128,channels=2,samplerate=44100}:display:rtp{mux=ts,dst=localhost,port=8080,sap}"};
 
 
         image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
@@ -249,6 +253,9 @@ public class MediaPlayer extends JPanel {
             repaint();
             if (playbackPanel.type == 0) {
                 Main.connectedUsers.get(0).setTime(getMediaTime());
+                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+            } else {
+                Client.user.setTime(getMediaTime());
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }
