@@ -2,7 +2,6 @@ package com.kirinpatel.gui;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.util.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +10,14 @@ import java.awt.event.ComponentListener;
 
 public class ClientInfoGUI extends JFrame {
 
-    private User client;
+    private int index;
+    private JLabel ping;
+    private UpdateUIThread updateUIThread;
 
     public ClientInfoGUI(int index) {
         super("Client info");
 
-        client = Main.connectedUsers.get(index);
+        this.index = index;
 
         setResizable(false);
         setLayout(new GridLayout(4, 1));
@@ -24,17 +25,21 @@ public class ClientInfoGUI extends JFrame {
         addComponentListener(new ClientInfoComponentListener());
         setLocationRelativeTo(null);
 
-        add(new JLabel("Username: " + client.getUsername()));
-        add(new JLabel("UserID: " + client.getUserID()));
+        add(new JLabel("Username: " + Main.connectedUsers.get(index).getUsername()));
+        add(new JLabel("UserID: " + Main.connectedUsers.get(index).getUserID()));
+        ping = new JLabel("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
+        add(ping);
         JButton disconnectUser = new JButton("Kick Client");
         disconnectUser.addActionListener(e -> {
             Server.kickUser(index);
             ControlPanel.isUserDisplayShown = false;
             dispose();
         });
-        add(new JSlider());
         add(disconnectUser);
         pack();
+
+        updateUIThread = new UpdateUIThread();
+        new Thread(updateUIThread).start();
 
         setVisible(true);
     }
@@ -59,7 +64,29 @@ public class ClientInfoGUI extends JFrame {
         @Override
         public void componentHidden(ComponentEvent e) {
             ControlPanel.isUserDisplayShown = false;
+            updateUIThread.stop();
             dispose();
+        }
+    }
+
+    class UpdateUIThread implements Runnable {
+
+        private boolean isRunning = true;
+
+        @Override
+        public void run() {
+            while(isRunning) {
+                try {
+                    Thread.sleep(500);
+                    ping.setText("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
+                } catch(InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        public void stop() {
+            isRunning = false;
         }
     }
 }

@@ -178,6 +178,7 @@ public class Server {
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
         private long lastClientUpdate = System.currentTimeMillis() - 1000;
+        private long lastPingCheck = System.currentTimeMillis() - 1000;
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
@@ -202,11 +203,18 @@ public class Server {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
                             case 0:
-                                if ((int) message.getMessage() == 0) {
-                                    Main.connectedUsers.remove(user);
-                                    GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
-                                    isClientConnected = false;
-                                    Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
+                                switch((int) message.getMessage()) {
+                                    case 0:
+                                        Main.connectedUsers.remove(user);
+                                        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                        isClientConnected = false;
+                                        Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
+                                        break;
+                                    case 4:
+                                        user.setPing(System.currentTimeMillis() - lastPingCheck);
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 break;
                             case 10:
@@ -242,7 +250,9 @@ public class Server {
                     disconnectClientFromServer();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 1250) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastPingCheck + 1000) sendPing();
+
+                if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
 
                 if (messages.size() < Server.messages.size()) sendMessagesToClient();
 
@@ -294,6 +304,17 @@ public class Server {
             } catch(IOException e) {
                 Debug.Log("Unable to properly disconnect with client.", 5);
                 isClientConnected = false;
+            }
+        }
+
+        private synchronized void sendPing() {
+            try {
+                lastPingCheck = System.currentTimeMillis();
+                output.writeObject(new Message(0, 4));
+                output.flush();
+            } catch(IOException e) {
+                Debug.Log("Unable to properly ping " + client + ".", 5);
+                disconnectClientFromServer();
             }
         }
 

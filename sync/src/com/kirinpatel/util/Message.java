@@ -20,6 +20,7 @@ public class Message implements Serializable {
      *      1: Connecting
      *      2: Connected
      *      3: Closing
+     *      4: Ping testing
      *  1#: Username Messages
      *      0: Sending client name
      *          User
