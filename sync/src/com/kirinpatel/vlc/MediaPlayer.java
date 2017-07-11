@@ -1,6 +1,7 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.Main;
+import com.kirinpatel.gui.AudioSettingsGUI;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.net.Client;
@@ -35,7 +36,7 @@ public class MediaPlayer extends JPanel {
     private final PlaybackPanel playbackPanel;
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
-    public final Equalizer equalizer;
+    public static Equalizer equalizer;
     private BufferedImage scale;
     private boolean isPaused = true;
     private long time = -1;
@@ -74,7 +75,8 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setPlaySubItems(true);
         mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
         equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
-        System.out.println(equalizer.getBandCount());
+        for (int i = 0; i < 10; i++) equalizer.setAmp(i, AudioSettingsGUI.loadSettings(i));
+        mediaPlayer.setEqualizer(equalizer);
         Debug.Log("MediaPlayer created.", 6);
     }
 
