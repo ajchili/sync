@@ -9,6 +9,7 @@ import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.player.Equalizer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
 import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
@@ -34,6 +35,7 @@ public class MediaPlayer extends JPanel {
     private final PlaybackPanel playbackPanel;
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
+    public final Equalizer equalizer;
     private BufferedImage scale;
     private boolean isPaused = true;
     private long time = -1;
@@ -71,6 +73,8 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setStandardMediaOptions();
         mediaPlayer.setPlaySubItems(true);
         mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
+        equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
+        System.out.println(equalizer.getBandCount());
         Debug.Log("MediaPlayer created.", 6);
     }
 

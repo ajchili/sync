@@ -256,8 +256,11 @@ public class MenuBar extends JMenuBar {
              */
             JMenu audio = new JMenu("Audio Settings");
             JMenuItem audioSettings = new JMenuItem("Show Audio Settings Window");
+            audioSettings.addActionListener(e -> {
+                new AudioSettingsGUI();
+            });
             audio.add(audioSettings);
-            // settings.add(audio);
+            settings.add(audio);
 
         add(settings);
     }

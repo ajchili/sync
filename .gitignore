@@ -24,3 +24,5 @@ tomcat/webapps/media/*
 sync/\.idea/misc\.xml
 
 sync/\.idea/workspace\.xml
+
+equalizer\.dat
