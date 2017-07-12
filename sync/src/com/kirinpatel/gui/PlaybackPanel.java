@@ -133,6 +133,8 @@ public class PlaybackPanel extends JPanel {
         pauseMedia.setEnabled(type == 0);
         pauseMedia.setBackground(background);
         pauseMedia.setForeground(foreground);
+        pauseMedia.setOpaque(true);
+        pauseMedia.setBorderPainted(false);
         pauseMedia.setFocusable(false);
         controlPanel.add(pauseMedia);
 
@@ -152,9 +154,9 @@ public class PlaybackPanel extends JPanel {
         JPanel volumePanel = new JPanel(new BorderLayout());
         volumePanel.setBackground(background);
         JLabel mediaVolumeLabel = new JLabel("Volume: ");
-        mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setBackground(background);
         mediaVolumeLabel.setForeground(foreground);
+        mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setFocusable(false);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
         mediaVolume = new JSlider(0, 100, 25);

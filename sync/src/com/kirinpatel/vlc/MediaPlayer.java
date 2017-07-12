@@ -170,7 +170,7 @@ public class MediaPlayer extends JPanel {
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             Debug.Log("Setting media url.", 6);
             isFile = false;
-            mediaPlayer.prepareMedia(mediaURL);
+            mediaPlayer.prepareMedia(mediaURL.startsWith("_") ? "http://" + Client.ipAddress + ":8080/" + mediaURL.substring(1) : mediaURL);
             mediaPlayer.parseMedia();
             initControls();
         }

@@ -50,7 +50,7 @@ public class MenuBar extends JMenuBar {
                 if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
                     String url = "http://" + Server.ipAddress + ":8080/";
                     String fileName = mediaFile.getName();
-                    if (playbackPanel.type == 0) PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), url + URLEncoding.encode(fileName));
+                    if (playbackPanel.type == 0) PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), "_" + URLEncoding.encode(fileName));
                     else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
                 } else {
                     if (!mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
@@ -58,7 +58,7 @@ public class MenuBar extends JMenuBar {
                     } else new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
                 }
             });
-            if (!Main.IS_MAC) file.add(setFile);
+            file.add(setFile);
             if (playbackPanel.type == 0) {
                 sync.add(file);
                 sync.add(new JSeparator());

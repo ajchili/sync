@@ -34,13 +34,15 @@ public class Server {
         new Thread(server).start();
         new Thread(() -> {
             tomcatServer = new TomcatServer();
-            if (!Main.IS_MAC) tomcatServer.start();
+            tomcatServer.start();
         }).start();
         new Thread(() -> {
             try {
                 Thread.sleep(2500);
-                if(isRunning) PortValidator.isAvailable(8000);
-                if(isRunning && !Main.IS_MAC) PortValidator.isAvailable(8080);
+                if(isRunning) {
+                    PortValidator.isAvailable(8000);
+                    PortValidator.isAvailable(8080);
+                }
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }
@@ -136,7 +138,7 @@ public class Server {
                 }
             }
 
-            if (!Main.IS_MAC) tomcatServer.stop();
+            tomcatServer.stop();
         }
 
         /**
