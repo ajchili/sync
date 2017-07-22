@@ -21,3 +21,4 @@ META-INF/*
 \.idea/
 sync/build\.xml
 sync/sync\.iml
+sync/manifest\.mf
