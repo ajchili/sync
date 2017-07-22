@@ -1,18 +1,11 @@
 package com.kirinpatel;
 
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
-import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.UIMessage;
-import com.kirinpatel.util.User;
-import com.kirinpatel.util.VersionChecker;
+import com.kirinpatel.net.*;
+import com.kirinpatel.util.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -26,6 +19,11 @@ public class Main extends JFrame {
     public static int videoQuality = 100;
     public static boolean showUserTimes = false;
     public static ArrayList<User> connectedUsers = new ArrayList<>();
+    
+    /**
+     * Credit: http://alvinalexander.com/blog/post/java/how-determine-application-running-mac-os-x-osx-version
+     */
+    public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 
     private static Main main;
     private static JFrame frame;
@@ -41,7 +39,7 @@ public class Main extends JFrame {
         showUserTimes = false;
 
         Debug.Log("Starting sync launcher...", 3);
-        setSize(new Dimension(300, 150));
+        setSize(new Dimension(200, 100));
 
         setResizable(false);
         setLayout(new BorderLayout());
@@ -73,12 +71,7 @@ public class Main extends JFrame {
 
         if (VersionChecker.isUpdated()) {
             try {
-                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                }
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
                 Debug.Log("Unable to load \"Numbus\" UIManager!", 2);
             }
@@ -95,7 +88,7 @@ public class Main extends JFrame {
     private static void getIPAddress() {
         frame = new JFrame("sync");
 
-        frame.setSize(new Dimension(350, 100));
+        frame.setSize(new Dimension(300, 100));
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.setDefaultCloseOperation(HIDE_ON_CLOSE);

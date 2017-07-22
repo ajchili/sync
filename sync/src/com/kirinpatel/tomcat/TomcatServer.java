@@ -27,7 +27,7 @@ public class TomcatServer {
         tomcat.setPort(8080);
         tomcat.setBaseDir("./tomcat");
 
-        Context ctx = tomcat.addContext("", "/media");
+        Context ctx = tomcat.addContext("","./media");
 
         Wrapper defaultServlet = ctx.createWrapper();
         defaultServlet.setName("media");
@@ -47,6 +47,7 @@ public class TomcatServer {
             Debug.Log("Tomcat server started.", 4);
         } catch(LifecycleException e) {
             Debug.Log("Unable to start tomcat started.", 5);
+            System.exit(0);
         }
         tomcat.getServer().await();
     }
@@ -59,6 +60,7 @@ public class TomcatServer {
             Debug.Log("Tomcat server stopped.", 4);
         } catch(LifecycleException e) {
             Debug.Log("Error stopping Tomcat server...", 2);
+        } finally {
             System.exit(0);
         }
     }

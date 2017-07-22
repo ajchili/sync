@@ -25,7 +25,6 @@ public class PlaybackPanel extends JPanel {
 
     PlaybackPanel(int type) {
         super(new BorderLayout());
-        setBackground(Color.BLACK);
         this.type = type;
 
         fullscreenListener = new FullscreenListener();
@@ -59,7 +58,7 @@ public class PlaybackPanel extends JPanel {
                 if (e.getY() >= Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 50) {
                     showBar = true;
                     controlPanel.setVisible(true);
-                    repaint();
+                    if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
                 } else {
                     new Thread(() -> {
                         try {
@@ -68,7 +67,7 @@ public class PlaybackPanel extends JPanel {
 
                             if (!showBar && isFullscreen) {
                                 controlPanel.setVisible(false);
-                                repaint();
+                                if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
                             }
                         } catch(InterruptedException e1) {
                             e1.printStackTrace();
@@ -115,9 +114,11 @@ public class PlaybackPanel extends JPanel {
         add(mediaPlayer, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
         controlPanel.setVisible(true);
-        mediaPlayer.repaint();
-        controlPanel.repaint();
-        repaint();
+        if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+            mediaPlayer.repaint();
+            controlPanel.repaint();
+            repaint();
+        }
     }
 
     private void initControls() {
@@ -132,6 +133,8 @@ public class PlaybackPanel extends JPanel {
         pauseMedia.setEnabled(type == 0);
         pauseMedia.setBackground(background);
         pauseMedia.setForeground(foreground);
+        pauseMedia.setOpaque(true);
+        pauseMedia.setBorderPainted(false);
         pauseMedia.setFocusable(false);
         controlPanel.add(pauseMedia);
 
@@ -151,9 +154,9 @@ public class PlaybackPanel extends JPanel {
         JPanel volumePanel = new JPanel(new BorderLayout());
         volumePanel.setBackground(background);
         JLabel mediaVolumeLabel = new JLabel("Volume: ");
-        mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setBackground(background);
         mediaVolumeLabel.setForeground(foreground);
+        mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setFocusable(false);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
         mediaVolume = new JSlider(0, 100, 25);
@@ -193,14 +196,18 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            mediaPlayer.revalidate();
-            mediaPlayer.repaint();
+            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+                mediaPlayer.revalidate();
+                mediaPlayer.repaint();
+            }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            mediaPlayer.revalidate();
-            mediaPlayer.repaint();
+            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+                mediaPlayer.revalidate();
+                mediaPlayer.repaint();
+            }
         }
     }
 }

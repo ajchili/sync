@@ -63,7 +63,8 @@ public class GUI extends JFrame {
             PlaybackPanel.mediaPlayer.release();
             dispose();
             Debug.Log(type == 0 ? "Server gui closed." : "Client gui closed.", 3);
-            Server.stop();
+            if (type == 0) Server.stop();
+            else Client.stop();
         }
     }
 }

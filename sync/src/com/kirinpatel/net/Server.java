@@ -39,8 +39,10 @@ public class Server {
         new Thread(() -> {
             try {
                 Thread.sleep(2500);
-                if(isRunning) PortValidator.isAvailable(8000);
-                if(isRunning) PortValidator.isAvailable(8080);
+                if(isRunning) {
+                    PortValidator.isAvailable(8000);
+                    PortValidator.isAvailable(8080);
+                }
             } catch(InterruptedException e) {
                 e.printStackTrace();
             }
@@ -59,6 +61,11 @@ public class Server {
     public static void sendMessage(String message) {
         messages.add(message);
         GUI.controlPanel.setMessages(messages);
+    }
+
+    public static void kickUser(int user) {
+        Main.connectedUsers.remove(user);
+        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
     }
 
     public static void setEnabled(boolean enabled) {
@@ -168,10 +175,12 @@ public class Server {
         private User user;
         private String client = "client";
         private boolean isClientConnected = false;
+        private boolean hasConnected = false;
         private String mediaURL = "";
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis() - 4000;
+        private long lastClientUpdate = System.currentTimeMillis() - 1000;
+        private long lastPingCheck = System.currentTimeMillis() - 1000;
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
@@ -189,18 +198,25 @@ public class Server {
                     break;
                 }
 
-                Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
+                if (hasConnected && !Main.connectedUsers.contains(user)) disconnectClientFromServer();
 
                 try {
                     if (socket.getInputStream().available() > 0) {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
                             case 0:
-                                if ((int) message.getMessage() == 0) {
-                                    Main.connectedUsers.remove(user);
-                                    GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
-                                    isClientConnected = false;
-                                    Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
+                                switch((int) message.getMessage()) {
+                                    case 0:
+                                        Main.connectedUsers.remove(user);
+                                        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                        isClientConnected = false;
+                                        Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
+                                        break;
+                                    case 4:
+                                        user.setPing(System.currentTimeMillis() - lastPingCheck);
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 break;
                             case 10:
@@ -208,6 +224,7 @@ public class Server {
                                 Main.connectedUsers.add(user);
                                 client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                hasConnected = true;
                                 break;
                             case 21:
                                 if ((boolean) message.getMessage() != isPaused) sendVideoState();
@@ -232,10 +249,12 @@ public class Server {
                         }
                     }
                 } catch(IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+                    disconnectClientFromServer();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 5000) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastPingCheck + 1000) sendPing();
+
+                if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
 
                 if (messages.size() < Server.messages.size()) sendMessagesToClient();
 
@@ -255,14 +274,7 @@ public class Server {
         }
 
         public void stop() {
-            try {
-                Debug.Log("Sending closing message to " + client + "...", 4);
-                output.writeObject(new Message(0, 3));
-                output.flush();
-                Debug.Log("Closing message sent.", 4);
-            } catch(IOException e) {
-                Debug.Log("Uncaught error (" + e.getMessage() + ").", 5);
-            }
+            disconnectClientFromServer();
 
             server.stop();
         }
@@ -279,9 +291,32 @@ public class Server {
                 Debug.Log("Established connection to " + client + '.', 4);
                 sendVideoState();
                 sendVideoTime();
+                sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
                 Debug.Log("Unable to establish connection to " + client + '.', 5);
-                System.out.println(socket.getInetAddress());
+            }
+        }
+
+        private synchronized void disconnectClientFromServer() {
+            try {
+                Debug.Log("Sending disconnect message to " + client + "...", 4);
+                output.writeObject(new Message(0, 3));
+                output.flush();
+                Debug.Log("Disconnect message sent.", 4);
+            } catch(IOException e) {
+                Debug.Log("Unable to properly disconnect with client.", 5);
+                isClientConnected = false;
+            }
+        }
+
+        private synchronized void sendPing() {
+            try {
+                lastPingCheck = System.currentTimeMillis();
+                output.writeObject(new Message(0, 4));
+                output.flush();
+            } catch(IOException e) {
+                Debug.Log("Unable to properly ping " + client + ".", 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -293,6 +328,7 @@ public class Server {
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send connected clients list to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -310,6 +346,7 @@ public class Server {
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send message log to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -322,6 +359,7 @@ public class Server {
                 Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
             } catch(IOException e) {
                 Debug.Log("Unable to send media URL to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -332,6 +370,7 @@ public class Server {
                 isPaused = PlaybackPanel.mediaPlayer.isPaused();
             } catch(IOException e) {
                 Debug.Log("Unable to send media state to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -342,6 +381,7 @@ public class Server {
                 output.flush();
             } catch(IOException e) {
                 Debug.Log("Unable to send current media time to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
@@ -357,6 +397,7 @@ public class Server {
                     output.flush();
                 } catch(IOException e) {
                     Debug.Log("Unable to send rate to " + client + '.', 5);
+                    disconnectClientFromServer();
                 }
             }
         }

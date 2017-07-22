@@ -81,11 +81,19 @@ public class Client {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
                             case 0:
-                                if ((int) message.getMessage() == 3) {
-                                    Debug.Log("Server closing...", 4);
-                                    isServerClosed = true;
-                                    gui.hide();
-                                    Client.stop();
+                                switch((int) message.getMessage()) {
+                                    case 3:
+                                        Debug.Log("Server closing...", 4);
+                                        isServerClosed = true;
+                                        gui.hide();
+                                        Client.stop();
+                                        stop();
+                                        break;
+                                    case 4:
+                                        sendPing();
+                                        break;
+                                    default:
+                                        break;
                                 }
                                 break;
                             case 11:
@@ -210,6 +218,15 @@ public class Client {
             Debug.Log("Client stopped.", 1);
 
             new Main();
+        }
+
+        private synchronized void sendPing() {
+            try {
+                output.writeObject(new Message(0, 4));
+                output.flush();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
         }
 
         private synchronized void sendUsernameToServer() {

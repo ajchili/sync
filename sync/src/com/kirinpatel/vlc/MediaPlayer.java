@@ -1,13 +1,16 @@
 package com.kirinpatel.vlc;
 
 import com.kirinpatel.Main;
+import com.kirinpatel.gui.AudioSettingsGUI;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.net.Client;
 import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.player.Equalizer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
 import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
@@ -33,6 +36,7 @@ public class MediaPlayer extends JPanel {
     private final PlaybackPanel playbackPanel;
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
+    public static Equalizer equalizer;
     private BufferedImage scale;
     private boolean isPaused = true;
     private long time = -1;
@@ -70,6 +74,9 @@ public class MediaPlayer extends JPanel {
         mediaPlayer.setStandardMediaOptions();
         mediaPlayer.setPlaySubItems(true);
         mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
+        equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
+        for (int i = 0; i < 10; i++) equalizer.setAmp(i, AudioSettingsGUI.loadSettings(i));
+        mediaPlayer.setEqualizer(equalizer);
         Debug.Log("MediaPlayer created.", 6);
     }
 
@@ -163,7 +170,7 @@ public class MediaPlayer extends JPanel {
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             Debug.Log("Setting media url.", 6);
             isFile = false;
-            mediaPlayer.prepareMedia(mediaURL);
+            mediaPlayer.prepareMedia(mediaURL.startsWith("_") ? "http://" + Client.ipAddress + ":8080/" + mediaURL.substring(1) : mediaURL);
             mediaPlayer.parseMedia();
             initControls();
         }
@@ -249,6 +256,9 @@ public class MediaPlayer extends JPanel {
             repaint();
             if (playbackPanel.type == 0) {
                 Main.connectedUsers.get(0).setTime(getMediaTime());
+                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+            } else {
+                Client.user.setTime(getMediaTime());
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }

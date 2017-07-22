@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class VersionChecker {
 
     private final static int VERSION = 1;
-    private final static int BUILD = 4;
+    private final static int BUILD = 5;
     private final static int REVISION = 0;
 
     /**

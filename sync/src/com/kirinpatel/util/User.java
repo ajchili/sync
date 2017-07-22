@@ -11,6 +11,7 @@ public class User implements Serializable {
     private String username;
     private long userID;
     private long time = -1;
+    private long ping = 0;
     private boolean wantsToPause = false;
 
     /**
@@ -74,6 +75,11 @@ public class User implements Serializable {
         return wantsToPause;
     }
 
+    public long getPing() {
+        return ping;
+    }
+
+
     /**
      *
      * @param time
@@ -92,5 +98,9 @@ public class User implements Serializable {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    public void setPing(long ping) {
+        this.ping = ping;
     }
 }
