@@ -6,12 +6,19 @@ a Java based multi-client video and audio syncing application
 	1. The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version
 	2. After downloading the latest version, run the installer
 	3. This will either install, update, or notify you that Java is installed
-2. Download and install [vlc](http://www.videolan.org/vlc/index.html)
+2. Download and install [VLC](http://www.videolan.org/vlc/index.html)
 3. Download [sync](https://www.github.com/ajchili/sync/releases)
 	* The latest stable version can be found in the link above
-	* The latest development version can be obtained through the repository itself
-	* The latest experimental version can be obtained through the [experimental](https://github.com/ajchili/sync/tree/experimental) branch
-		* _Please note, this branch is most likely broken and will contain unfinished features_
+	* For development builds please either download the master branch or the experimental branch
+		* _Please note, you must add the jars or Maven dependencies for Tomcat Embedded, VLCJ, and slfj4_
+			* These specific jars are required when developing for sync
+				* tomcat-embed-core-8.5.15.jar
+				* jna-4.1.0.jar
+				* jna-platform-4.1.0.jar
+				* vlcj-3.10.1.jar
+				* slf4j-api-1.7.10.jar
+				* sl4j-nop-1.7.10.jar
+		* _Please note, the experimental branch is most likely broken and will contain unfinished features_
 4. Run sync
 	* Server setup
 		* It is recommended to:
