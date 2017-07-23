@@ -4,12 +4,21 @@ import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 
+/**
+ * AudioSettingsGUI class will be used to show the Audio Equalizer to allow a user to set the db boost of each audio
+ * frequency band.
+ */
 public class AudioSettingsGUI extends JFrame {
 
     private int[] frequencies = new int[10];
 
+    /**
+     * Main constructor that will create the AudioSettingsGUI.
+     */
     public AudioSettingsGUI() {
         super("Audio Equalizer");
 
@@ -20,6 +29,9 @@ public class AudioSettingsGUI extends JFrame {
         setLocationRelativeTo(null);
 
         for (int i = 32; i <= 16384; i *= 2) {
+            final long[] lastClick = {0};
+            final int index = i;
+
             JPanel panel = new JPanel(new BorderLayout());
             JLabel label = new JLabel(i < 1000 ? i + "" : "" + (i / 1000) + 'K', SwingConstants.CENTER);
             panel.add(label, BorderLayout.NORTH);
@@ -29,13 +41,35 @@ public class AudioSettingsGUI extends JFrame {
             slider.setPaintLabels(true);
             slider.setMajorTickSpacing(4);
             slider.setMinorTickSpacing(1);
-            final int j = i;
+            slider.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (lastClick[0] > System.currentTimeMillis() - 200) setBandValue(index, ((JSlider) e.getSource()).getValue());
+                    lastClick[0] = System.currentTimeMillis();
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+
+                }
+            });
             slider.addChangeListener(e -> {
-                int band = 0;
-                for (int k = j; k > 32; k /= 2) band++;
-                frequencies[band] = ((JSlider) e.getSource()).getValue();
-                MediaPlayer.equalizer.setAmp(band, frequencies[band]);
-                saveSettings();
+                setBandValue(index, ((JSlider) e.getSource()).getValue());
             });
             panel.add(slider, BorderLayout.CENTER);
             add(panel);
@@ -44,6 +78,26 @@ public class AudioSettingsGUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Saves provided band db boost value.
+     *
+     * @param index Band index
+     * @param value Value of band
+     */
+    private void setBandValue(int index, int value) {
+        int band = 0;
+        for (int i = index; i > 32; i /= 2) band++;
+        frequencies[band] = value;
+        MediaPlayer.equalizer.setAmp(band, frequencies[band]);
+        saveSettings();
+    }
+
+    /**
+     * Provides db boost of a provided frequency band.
+     *
+     * @param band Frequency band number
+     * @return Returns db boost of provided frequency band
+     */
     public static int loadSettings(int band) {
         int location = 0;
         for (int i = band; i > 32; i /= 2) location++;
@@ -65,6 +119,9 @@ public class AudioSettingsGUI extends JFrame {
         return 0;
     }
 
+    /**
+     * Saves user equalization settings.
+     */
     private void saveSettings() {
         BufferedWriter writer;
         try {
