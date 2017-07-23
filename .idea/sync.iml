@@ -12,5 +12,6 @@
     <orderEntry type="library" name="vlcj" level="project" />
     <orderEntry type="library" name="slf4j" level="project" />
     <orderEntry type="library" name="Tomcat" level="project" />
+    <orderEntry type="library" name="weupnp" level="project" />
   </component>
 </module>

@@ -14,7 +14,7 @@ public class PortValidator {
     public static void isAvailable(int port) {
         Socket s = new Socket();
         try {
-            s.connect(new InetSocketAddress(Server.ipAddress, port), 4000);
+            s.connect(new InetSocketAddress(Server.ipAddress, port), 5000);
         } catch(IOException e) {
             if (port == 8000) new UIMessage("A port is not forwarded!", "Clients will be unable to connect to your sync server! Please open port " + port + ".", 1);
             else if (port == 8080) new UIMessage("A port is not forwarded!", "You will be unable to use offline media! Please open port " + port + " to use offline media.", 1);
