@@ -5,9 +5,15 @@ import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.tomcat.TomcatServer;
 import com.kirinpatel.util.*;
+import org.bitlet.weupnp.GatewayDevice;
+import org.bitlet.weupnp.GatewayDiscover;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.*;
+import java.net.BindException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,9 +22,11 @@ public class Server {
 
     public static String ipAddress = "";
     private static GUI gui;
-    private static ArrayList<String> messages = new ArrayList<>();
+    private static GatewayDiscover discover;
+    private static GatewayDevice device;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
+    private static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean closeServer = false;
     private boolean isBound = false;
@@ -31,26 +39,15 @@ public class Server {
 
         server = new ServerThread();
         new Thread(server).start();
-        new Thread(() -> {
-            tomcatServer = new TomcatServer();
-            tomcatServer.start();
-        }).start();
-        new Thread(() -> {
-            try {
-                Thread.sleep(2500);
-                if(isRunning) {
-                    PortValidator.isAvailable(8000);
-                    PortValidator.isAvailable(8080);
-                }
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
     }
 
     public static void stop() {
-        if (Main.connectedUsers.size() == 1) server.stop();
-        else closeServer = true;
+        if (Main.connectedUsers.size() == 1) {
+            server.stop();
+        }
+        else {
+            closeServer = true;
+        }
     }
 
     public static void sendMessage(String message) {
@@ -63,6 +60,11 @@ public class Server {
         GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
     }
 
+    /**
+     * Sets whether the server GUI will be usable or not.
+     *
+     * @param enabled Is usable
+     */
     public static void setEnabled(boolean enabled) {
         gui.setEnabled(enabled);
     }
@@ -76,13 +78,48 @@ public class Server {
         public void run() {
             isRunning = true;
 
+            discover = new GatewayDiscover();
+            try {
+                discover.discover();
+                device = discover.getValidGateway();
+
+                if (device != null) {
+                    if (!device.addPortMapping(8000, 8000, device.getLocalAddress().getHostAddress(),"TCP","sync")) {
+                        new UIMessage("A port is not forwarded!"
+                                ,"Clients will be unable to connect to your sync server! Please open port 8000."
+                                ,1);
+                    }
+
+                    if (!device.addPortMapping(8080, 8080, device.getLocalAddress().getHostAddress(),"TCP","tomcat")) {
+                        new UIMessage("A port is not forwarded!"
+                                ,"You will be unable to use offline media! Please open port 8080 to use offline"
+                                + " media."
+                                , 1);
+                    } else {
+                        tomcatServer = new TomcatServer();
+                        new Thread(() -> tomcatServer.start()).start();
+                    }
+                }
+            } catch(IOException e) {
+                e.printStackTrace();
+            } catch(SAXException e) {
+                e.printStackTrace();
+            } catch(ParserConfigurationException e) {
+                e.printStackTrace();
+            }
+
             connectionExecutor = Executors.newFixedThreadPool(10);
 
             try {
                 service = new ServerSocket(8000);
 
-                gui.setTitle(gui.getTitle() + getIPAddress());
-                while(isRunning) {
+                try {
+                    gui.setTitle(gui.getTitle() + " (" + device.getExternalIPAddress() + ":8000)");
+                } catch(SAXException e) {
+                    e.printStackTrace();
+                }
+
+                while (isRunning) {
                     socket = service.accept();
 
                     connectionExecutor.execute(new ServerSocketTask(socket));
@@ -90,15 +127,17 @@ public class Server {
             } catch(BindException e) {
                 gui.dispose();
                 isBound = true;
-            } catch(SocketException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
             } catch(IOException e) {
                 e.printStackTrace();
             } finally {
                 connectionExecutor.shutdown();
-
                 while(!connectionExecutor.isTerminated()) {
-
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        e.printStackTrace();
+                    }
                 }
 
                 if (isBound) {
@@ -113,46 +152,31 @@ public class Server {
         public void stop() {
             isRunning = false;
 
-            if (socket != null && !socket.isClosed()) {
+            if (device != null) {
                 try {
-                    socket.close();
+                    device.deletePortMapping(8000,"TCP");
+                    device.deletePortMapping(8080,"TCP");
                 } catch(IOException e) {
+                    e.printStackTrace();
+                } catch(SAXException e) {
                     e.printStackTrace();
                 }
             }
 
-            if (service != null && !service.isClosed()) {
-                try {
-                    service.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            tomcatServer.stop();
-        }
-
-        /**
-         * Provides the public IP address of the server.
-         * Credit: https://stackoverflow.com/a/2939223
-         *
-         * @return Returns string value of public IP address
-         */
-        private String getIPAddress() {
-            String ip = "";
             try {
-                URL whatismyip = new URL("http://checkip.amazonaws.com");
-                BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-
-                ipAddress = in.readLine();
-                ip = " (" + ipAddress + ":8000)";
-            } catch(MalformedURLException e) {
+                if (socket != null) {
+                    socket.close();
+                }
+                if (service != null) {
+                    service.close();
+                }
+            } catch (IOException e) {
                 e.printStackTrace();
-            } catch(IOException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
             }
 
-            return ip;
+            if (tomcatServer != null) {
+                tomcatServer.stop();
+            }
         }
     }
 
@@ -228,7 +252,7 @@ public class Server {
                                 }
                                 break;
                             default:
-                                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                                // TODO(ajchili): catch this better
                                 break;
                         }
                     }
@@ -240,7 +264,7 @@ public class Server {
 
                 if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
 
-                if (messages.size() < Server.messages.size()) sendMessagesToClient();
+                if (messages.size() < messages.size()) sendMessagesToClient();
 
                 if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) sendMediaURL();
 
@@ -273,7 +297,7 @@ public class Server {
                 sendVideoTime();
                 sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                // TODO(ajchili): catch this better
             }
         }
 
@@ -282,7 +306,7 @@ public class Server {
                 output.writeObject(new Message(0, 3));
                 output.flush();
             } catch(IOException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                // TODO(ajchili): catch this better
             } finally {
                 isClientConnected = false;
             }
@@ -312,7 +336,7 @@ public class Server {
         private synchronized void sendMessagesToClient() {
             try {
                 ArrayList<String> newMessages = new ArrayList<>();
-                ArrayList<String> messageCache = Server.messages;
+                ArrayList<String> messageCache = messages;
                 for (int i = messages.size(); i < messageCache.size(); i++) {
                     newMessages.add(messageCache.get(i));
                 }
