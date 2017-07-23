@@ -21,11 +21,6 @@ public class Main extends JFrame {
     public static ArrayList<User> connectedUsers = new ArrayList<>();
     public static long deSyncWarningTime = 1000;
     public static long deSyncTime = 2000;
-    
-    /**
-     * Credit: http://alvinalexander.com/blog/post/java/how-determine-application-running-mac-os-x-osx-version
-     */
-    public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
 
     private static Main main;
     private static JFrame frame;
@@ -124,7 +119,9 @@ public class Main extends JFrame {
         else ipBox = new JComboBox();
         ipBox.setSelectedItem(null);
         ipBox.addItemListener(e -> {
-            ipField.setText(e.getItem().toString());
+            new Client(e.getItem().toString());
+            frame.dispose();
+            main.dispose();
         });
         ipPanel.add(ipBox);
 

@@ -115,8 +115,12 @@ public class Server {
 
                 try {
                     gui.setTitle(gui.getTitle() + " (" + device.getExternalIPAddress() + ":8000)");
+                    gui.setVisible(true);
                 } catch(SAXException e) {
-                    e.printStackTrace();
+                    server.stop();
+                    new UIMessage("Unable to start server!"
+                            ,"Please ensure that UPnP is enabled in your router."
+                            , 1);
                 }
 
                 while (isRunning) {
@@ -175,7 +179,14 @@ public class Server {
             }
 
             if (tomcatServer != null) {
-                tomcatServer.stop();
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(5000);
+                        tomcatServer.stop();
+                    } catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         }
     }
@@ -186,7 +197,6 @@ public class Server {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private User user;
-        private String client = "client";
         private boolean isClientConnected = false;
         private boolean hasConnected = false;
         private String mediaURL = "";
@@ -234,7 +244,6 @@ public class Server {
                             case 10:
                                 user = new User(message.getMessage().toString());
                                 Main.connectedUsers.add(user);
-                                client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 hasConnected = true;
                                 break;

@@ -32,7 +32,7 @@ public class GUI extends JFrame {
         add(controlPanel, BorderLayout.EAST);
         setJMenuBar(new MenuBar(playbackPanel));
 
-        setVisible(true);
+        setVisible(type == 1);
     }
 
     class ResizeListener implements ComponentListener {
