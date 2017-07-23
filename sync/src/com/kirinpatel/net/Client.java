@@ -125,7 +125,7 @@ public class Client {
                                 GUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
                                 break;
                             default:
-                                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                                // TODO(ajchili): catch this better
                                 break;
                         }
                     }
@@ -157,8 +157,6 @@ public class Client {
                 new UIMessage("Error joining server!", "Server is either full or not running!", 1);
                 Client.stop();
                 return;
-            } catch(SocketException e) {
-                e.printStackTrace();
             } catch(IOException e) {
                 e.printStackTrace();
             }
@@ -189,11 +187,13 @@ public class Client {
                     new UIMessage("Server shutdown.", "The sync server that you were connected to has shutdown.", 0);
                 }
             } catch(IOException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                // TODO(ajchili): catch this better
             }
 
             try {
-                if (socket != null && !socket.isClosed()) socket.close();
+                if (socket != null) {
+                    socket.close();
+                }
             } catch(IOException e) {
                 e.printStackTrace();
             }

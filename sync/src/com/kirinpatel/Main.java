@@ -43,7 +43,7 @@ public class Main extends JFrame {
         setSize(new Dimension(200, 100));
         setResizable(false);
         setLayout(new BorderLayout());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
@@ -68,7 +68,7 @@ public class Main extends JFrame {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                // TODO(ajchili): catch this better
             }
             main = new Main();
         } else {
@@ -181,9 +181,7 @@ public class Main extends JFrame {
     private static ArrayList<String> getPreviousAddresses() {
         File file = new File("launcherData.dat");
         if (file.exists()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 String ipAddress;
                 ArrayList<String> ipAddresses = new ArrayList<>();
 
@@ -192,7 +190,7 @@ public class Main extends JFrame {
                 }
 
                 return ipAddresses;
-            }catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

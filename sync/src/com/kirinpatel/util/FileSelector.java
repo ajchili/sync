@@ -37,9 +37,8 @@ public class FileSelector {
                 new ProgressView("Moving media"
                         ,"Please wait while your media is moved to the proper folder.");
         new Thread(() -> {
-            try {
-                InputStream inStream = new FileInputStream(selectedFile);
-                OutputStream outStream = new FileOutputStream(newFile);
+            try (InputStream inStream = new FileInputStream(selectedFile);
+                OutputStream outStream = new FileOutputStream(newFile)) {
 
                 byte[] buffer = new byte[1024];
                 int length;
@@ -47,9 +46,6 @@ public class FileSelector {
                 while ((length = inStream.read(buffer)) > 0) {
                     outStream.write(buffer, 0, length);
                 }
-
-                inStream.close();
-                outStream.close();
 
             } catch(IOException e) {
                 e.printStackTrace();

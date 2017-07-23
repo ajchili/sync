@@ -38,19 +38,24 @@ public class Server {
         new Thread(() -> {
             try {
                 Thread.sleep(2500);
-                if(isRunning) {
+                if (isRunning) {
                     PortValidator.isAvailable(8000);
                     PortValidator.isAvailable(8080);
                 }
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 e.printStackTrace();
             }
         }).start();
     }
 
     public static void stop() {
-        if (Main.connectedUsers.size() == 1) server.stop();
-        else closeServer = true;
+        if (Main.connectedUsers.size() == 1) {
+            server.stop();
+        }
+        else {
+            closeServer = true;
+        }
     }
 
     public static void sendMessage(String message) {
@@ -90,15 +95,17 @@ public class Server {
             } catch(BindException e) {
                 gui.dispose();
                 isBound = true;
-            } catch(SocketException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
             } catch(IOException e) {
                 e.printStackTrace();
             } finally {
                 connectionExecutor.shutdown();
-
                 while(!connectionExecutor.isTerminated()) {
-
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        e.printStackTrace();
+                    }
                 }
 
                 if (isBound) {
@@ -113,20 +120,15 @@ public class Server {
         public void stop() {
             isRunning = false;
 
-            if (socket != null && !socket.isClosed()) {
-                try {
+            try {
+                if (socket != null) {
                     socket.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
                 }
-            }
-
-            if (service != null && !service.isClosed()) {
-                try {
+                if (service != null) {
                     service.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             tomcatServer.stop();
@@ -146,12 +148,9 @@ public class Server {
 
                 ipAddress = in.readLine();
                 ip = " (" + ipAddress + ":8000)";
-            } catch(MalformedURLException e) {
-                e.printStackTrace();
             } catch(IOException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                e.printStackTrace();
             }
-
             return ip;
         }
     }
@@ -228,7 +227,7 @@ public class Server {
                                 }
                                 break;
                             default:
-                                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                                // TODO(ajchili): catch this better
                                 break;
                         }
                     }
@@ -273,7 +272,7 @@ public class Server {
                 sendVideoTime();
                 sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                // TODO(ajchili): catch this better
             }
         }
 
@@ -282,7 +281,7 @@ public class Server {
                 output.writeObject(new Message(0, 3));
                 output.flush();
             } catch(IOException e) {
-                System.out.println("Catch this exception better, smh. What is wrong with you????");
+                // TODO(ajchili): catch this better
             } finally {
                 isClientConnected = false;
             }

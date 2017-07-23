@@ -67,9 +67,12 @@ public class PlaybackPanel extends JPanel {
 
                             if (!showBar && isFullscreen) {
                                 controlPanel.setVisible(false);
-                                if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
+                                if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+                                    repaint();
+                                }
                             }
                         } catch(InterruptedException e1) {
+                            Thread.currentThread().interrupt();
                             e1.printStackTrace();
                         }
                     }).start();

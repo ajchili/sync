@@ -14,8 +14,7 @@ public class TomcatServer {
 
     public TomcatServer() {
         File mediaPath = new File("tomcat/webapps/media");
-        if (!mediaPath.getAbsoluteFile().exists()) {
-            mediaPath.mkdirs();
+        if (!mediaPath.getAbsoluteFile().exists() && mediaPath.mkdirs()) {
             new UIMessage("Tomcat directory created!",
                     "A new folder has been added for offline media.\nPlease open \""
                             + mediaPath.getAbsolutePath()
@@ -55,7 +54,7 @@ public class TomcatServer {
             tomcat.getServer().stop();
             tomcat.getServer().destroy();
         } catch(LifecycleException e) {
-            System.out.println("Catch this exception better, smh. What is wrong with you????");
+            // TODO(ajchili): catch this better
         } finally {
             System.exit(0);
         }

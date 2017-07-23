@@ -19,13 +19,13 @@ public class MenuBar extends JMenuBar {
     public MenuBar(PlaybackPanel playbackPanel) {
         super();
 
-        /**
-         * Application section
+        /*
+          Application section
          */
         JMenu sync = new JMenu("sync");
 
-            /**
-             * Media section
+            /*
+              Media section
              */
             JMenu file = new JMenu("Set Media");
             JMenuItem setURL = new JMenuItem("Set Media URL");
@@ -51,9 +51,12 @@ public class MenuBar extends JMenuBar {
                     if (playbackPanel.type == 0) PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), "_" + URLEncoding.encode(fileName));
                     else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
                 } else {
-                    if (!mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-
-                    } else new UIMessage("Error selecting media!", "The media file that you selected could not be used.\nPlease make sure that it is inside of the media directory.", 1);
+                    if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
+                        new UIMessage("Error selecting media!",
+                                "The media file that you selected could not be used.\n" +
+                                        "Please make sure that it is inside of the media directory."
+                                ,1);
+                    }
                 }
             });
             file.add(setFile);
@@ -62,19 +65,28 @@ public class MenuBar extends JMenuBar {
                 sync.add(new JSeparator());
             }
 
-            /**
-             * Share section
+            /*
+              Share section
              */
             JMenuItem share = new JMenuItem("Share Server Address");
             share.addActionListener(e -> {
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(playbackPanel.type == 0 ? Server.ipAddress : Client.ipAddress), null);
-                new UIMessage("Server Address Copied", "The server address has been copied to your clipboard.", 0);
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(
+                                new StringSelection(playbackPanel.type == 0
+                                        ? Server.ipAddress
+                                        : Client.ipAddress),
+                                null);
+                new UIMessage(
+                        "Server Address Copied",
+                        "The server address has been copied to your clipboard.",
+                        0);
             });
             sync.add(share);
             sync.add(new JSeparator());
 
-            /**
-             * Close section
+            /*
+              Close section
              */
             JMenuItem close = new JMenuItem("Close sync");
             close.addActionListener(e -> {
@@ -85,17 +97,17 @@ public class MenuBar extends JMenuBar {
 
         add(sync);
 
-        /**
-         * Settings section
+        /*
+          Settings section
          */
         JMenu settings = new JMenu("Settings");
 
-            /**
+            /*
              * Interface settings section
              */
             JMenu ui = new JMenu("Interface Settings");
 
-                /**
+                /*
                  * Fullscreen
                  */
                 JMenuItem fullscreen = new JMenuItem("Launch Fullscreen");
@@ -105,7 +117,7 @@ public class MenuBar extends JMenuBar {
                 ui.add(fullscreen);
                 ui.add(new JSeparator());
 
-                /**
+                /*
                  * Control Panel
                  */
                 JMenu controlPanel = new JMenu("Control Panel");
@@ -203,7 +215,7 @@ public class MenuBar extends JMenuBar {
 
             settings.add(ui);
 
-            /**
+            /*
              * Video settings
              */
             JMenu video = new JMenu("Video Settings");
@@ -249,14 +261,12 @@ public class MenuBar extends JMenuBar {
             }
             // settings.add(video);
 
-            /**
+            /*
              * Audio settings
              */
             JMenu audio = new JMenu("Audio Settings");
             JMenuItem audioEqualizer = new JMenuItem("Audio Equalizer");
-            audioEqualizer.addActionListener(e -> {
-                new AudioSettingsGUI();
-            });
+            audioEqualizer.addActionListener(e -> new AudioSettingsGUI());
             audio.add(audioEqualizer);
             settings.add(audio);
 

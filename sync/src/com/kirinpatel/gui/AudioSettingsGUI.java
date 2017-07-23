@@ -72,15 +72,12 @@ public class AudioSettingsGUI extends JFrame {
 
         File file = new File("equalizer.dat");
         if (file.exists()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
                 for (int i = 0; i < location; i++) {
                     reader.readLine();
                 }
-
                 return Integer.parseInt(reader.readLine());
-            }catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
@@ -91,14 +88,10 @@ public class AudioSettingsGUI extends JFrame {
      * Saves user equalization settings.
      */
     private void saveSettings() {
-        BufferedWriter writer;
-        try {
-            writer = new BufferedWriter(new FileWriter(new File("equalizer.dat")));
+        try ( BufferedWriter writer = new BufferedWriter(new FileWriter(new File("equalizer.dat")))) {
             for (int i = 0; i < 10; i++) {
                 writer.write(frequencies[i] + "\n");
             }
-
-            writer.close();
         } catch(IOException e) {
             e.printStackTrace();
         }

@@ -82,6 +82,7 @@ public class ClientInfoGUI extends JFrame {
                         ping.setText("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
                     }
                 } catch(InterruptedException e) {
+                    Thread.currentThread().interrupt();
                     e.printStackTrace();
                 }
             }
