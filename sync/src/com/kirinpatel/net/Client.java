@@ -3,7 +3,6 @@ package com.kirinpatel.net;
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.User;
@@ -29,7 +28,6 @@ public class Client {
     private GUI gui;
 
     public Client(String ipAddress) {
-        Debug.Log("Starting client...", 1);
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
 
@@ -38,7 +36,6 @@ public class Client {
     }
 
     public static void stop() {
-        Debug.Log("Stopping Client...", 1);
         clientThread.stop();
     }
 
@@ -83,7 +80,6 @@ public class Client {
                             case 0:
                                 switch((int) message.getMessage()) {
                                     case 3:
-                                        Debug.Log("Server closing...", 4);
                                         isServerClosed = true;
                                         gui.hide();
                                         Client.stop();
@@ -129,11 +125,7 @@ public class Client {
                                 GUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
                                 break;
                             default:
-                                if (message.getMessage() != null) {
-                                    Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
-                                } else {
-                                    Debug.Log("Unregistered message - (" + message.getType() + ").", 2);
-                                }
+                                System.out.println("Catch this exception better, smh. What is wrong with you????");
                                 break;
                         }
                     }
@@ -155,7 +147,6 @@ public class Client {
 
         private synchronized void connectToServer() {
             try {
-                Debug.Log("Connecting to server...", 4);
                 socket = new Socket(Client.ipAddress, 8000);
                 socket.setKeepAlive(true);
             } catch(UnknownHostException e) {
@@ -179,13 +170,11 @@ public class Client {
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
                 isConnected = message.getType() == 0 && (int) message.getMessage() == 2;
-                Debug.Log("Connected to server.", 4);
             } catch(IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
             gui = new GUI(1);
-            Debug.Log("Client started.", 1);
             Main.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
@@ -193,29 +182,21 @@ public class Client {
 
         private synchronized void disconnectFromServer() {
             try {
-                Debug.Log("Disconnecting from server...", 4);
                 if (output != null && !isServerClosed) {
                     output.writeObject(new Message(0, 0));
                     output.flush();
                 } else if (isServerClosed) {
                     new UIMessage("Server shutdown.", "The sync server that you were connected to has shutdown.", 0);
-                } else {
-                    Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
                 }
             } catch(IOException e) {
-                Debug.Log("Unable to send disconnect signal to server, forcefully disconnecting!", 5);
+                System.out.println("Catch this exception better, smh. What is wrong with you????");
             }
 
             try {
-                Debug.Log("Closing socket...", 4);
                 if (socket != null && !socket.isClosed()) socket.close();
-                Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
                 e.printStackTrace();
             }
-
-            Debug.Log("Disconnected from server.", 4);
-            Debug.Log("Client stopped.", 1);
 
             new Main();
         }

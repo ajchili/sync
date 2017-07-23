@@ -24,7 +24,6 @@ public class Server {
     private boolean isBound = false;
 
     public Server() {
-        Debug.Log("Starting server...", 1);
         gui = new GUI(0);
 
         Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
@@ -50,12 +49,8 @@ public class Server {
     }
 
     public static void stop() {
-        Debug.Log("Stopping server...", 1);
-        if (Main.connectedUsers.size() == 1) {
-            server.stop();
-        } else {
-            closeServer = true;
-        }
+        if (Main.connectedUsers.size() == 1) server.stop();
+        else closeServer = true;
     }
 
     public static void sendMessage(String message) {
@@ -86,21 +81,17 @@ public class Server {
             try {
                 service = new ServerSocket(8000);
 
-                Debug.Log("Server started.", 1);
                 gui.setTitle(gui.getTitle() + getIPAddress());
                 while(isRunning) {
-                    Debug.Log("Awaiting connection...", 4);
                     socket = service.accept();
 
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
             } catch(BindException e) {
-                Debug.Log("Unable to start server, address already in use!", 5);
                 gui.dispose();
                 isBound = true;
             } catch(SocketException e) {
-                Debug.Log("Closing unused socket...", 4);
-                Debug.Log("Socket closed.", 4);
+                System.out.println("Catch this exception better, smh. What is wrong with you????");
             } catch(IOException e) {
                 e.printStackTrace();
             } finally {
@@ -109,8 +100,6 @@ public class Server {
                 while(!connectionExecutor.isTerminated()) {
 
                 }
-
-                Debug.Log("Server stopped.", 1);
 
                 if (isBound) {
                     new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
@@ -148,19 +137,17 @@ public class Server {
          * @return Returns string value of public IP address
          */
         private String getIPAddress() {
-            Debug.Log("Obtaining server IP address...", 4);
             String ip = "";
             try {
                 URL whatismyip = new URL("http://checkip.amazonaws.com");
                 BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 
-                Debug.Log("Server IP address obtained.", 4);
                 ipAddress = in.readLine();
                 ip = " (" + ipAddress + ":8000)";
             } catch(MalformedURLException e) {
                 e.printStackTrace();
             } catch(IOException e) {
-                Debug.Log("Unable to obtain server IP address.", 5);
+                System.out.println("Catch this exception better, smh. What is wrong with you????");
             }
 
             return ip;
@@ -210,7 +197,6 @@ public class Server {
                                         Main.connectedUsers.remove(user);
                                         GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                         isClientConnected = false;
-                                        Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
                                         break;
                                     case 4:
                                         user.setPing(System.currentTimeMillis() - lastPingCheck);
@@ -240,11 +226,7 @@ public class Server {
                                 }
                                 break;
                             default:
-                                if (message.getMessage() != null) {
-                                    Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
-                                } else {
-                                    Debug.Log("Unregistered message - (" + message.getType() + ").", 2);
-                                }
+                                System.out.println("Catch this exception better, smh. What is wrong with you????");
                                 break;
                         }
                     }
@@ -264,9 +246,7 @@ public class Server {
             }
 
             try {
-                Debug.Log("Closing socket...", 4);
                 socket.close();
-                Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
                 Main.connectedUsers.remove(user);
                 stop();
@@ -281,30 +261,27 @@ public class Server {
 
         private synchronized void connectClientToServer() {
             try {
-                Debug.Log("Establishing connection to " + client + "...", 4);
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
                 isClientConnected = message.getType() == 0 && (int) message.getMessage() == 1;
                 output = new ObjectOutputStream(socket.getOutputStream());
                 output.writeObject(new Message(0, 2));
                 output.flush();
-                Debug.Log("Established connection to " + client + '.', 4);
                 sendVideoState();
                 sendVideoTime();
                 sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
-                Debug.Log("Unable to establish connection to " + client + '.', 5);
+                System.out.println("Catch this exception better, smh. What is wrong with you????");
             }
         }
 
         private synchronized void disconnectClientFromServer() {
             try {
-                Debug.Log("Sending disconnect message to " + client + "...", 4);
                 output.writeObject(new Message(0, 3));
                 output.flush();
-                Debug.Log("Disconnect message sent.", 4);
             } catch(IOException e) {
-                Debug.Log("Unable to properly disconnect with client.", 5);
+                System.out.println("Catch this exception better, smh. What is wrong with you????");
+            } finally {
                 isClientConnected = false;
             }
         }
@@ -315,7 +292,6 @@ public class Server {
                 output.writeObject(new Message(0, 4));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to properly ping " + client + ".", 5);
                 disconnectClientFromServer();
             }
         }
@@ -327,7 +303,6 @@ public class Server {
                 output.writeObject(new Message(11, Main.connectedUsers));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to send connected clients list to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
@@ -345,7 +320,6 @@ public class Server {
                 output.writeObject(new Message(30, newMessages));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to send message log to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
@@ -358,7 +332,6 @@ public class Server {
                 time = 0;
                 Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
             } catch(IOException e) {
-                Debug.Log("Unable to send media URL to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
@@ -369,7 +342,6 @@ public class Server {
                 output.flush();
                 isPaused = PlaybackPanel.mediaPlayer.isPaused();
             } catch(IOException e) {
-                Debug.Log("Unable to send media state to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
@@ -380,7 +352,6 @@ public class Server {
                 output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to send current media time to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
@@ -388,15 +359,12 @@ public class Server {
         private synchronized void sendVideoRate() {
             long timeDifference = PlaybackPanel.mediaPlayer.getMediaTime() - time;
             if (Math.abs(timeDifference) > 2000) {
-                Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, sending current media time.", 4);
                 sendVideoTime();
             } else if (Math.abs(timeDifference) > 1000) {
                 try {
-                    Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, changing playback rate.", 4);
                     output.writeObject(new Message(23, (timeDifference + 1000) * 1.0f / 1000));
                     output.flush();
                 } catch(IOException e) {
-                    Debug.Log("Unable to send rate to " + client + '.', 5);
                     disconnectClientFromServer();
                 }
             }

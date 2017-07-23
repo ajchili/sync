@@ -1,6 +1,5 @@
 package com.kirinpatel.tomcat;
 
-import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -16,13 +15,10 @@ public class TomcatServer {
     public TomcatServer() {
         File mediaPath = new File("tomcat/webapps/media");
         if (!mediaPath.getAbsoluteFile().exists()) {
-            Debug.Log("Creating Tomcat file structure...", 1);
             mediaPath.mkdirs();
-            Debug.Log("Tomcat file structure created.", 1);
             new UIMessage("Tomcat directory created!", "A new folder has been added for offline media.\nPlease open \"" + mediaPath.getAbsolutePath() + "\"\nand add any media files that you would like to use for sync.", 0);
         }
 
-        Debug.Log("Starting Tomcat server...", 4);
         tomcat = new Tomcat();
         tomcat.setPort(8080);
         tomcat.setBaseDir("./tomcat");
@@ -44,9 +40,7 @@ public class TomcatServer {
     public void start() {
         try {
             tomcat.start();
-            Debug.Log("Tomcat server started.", 4);
         } catch(LifecycleException e) {
-            Debug.Log("Unable to start tomcat started.", 5);
             System.exit(0);
         }
         tomcat.getServer().await();
@@ -54,12 +48,10 @@ public class TomcatServer {
 
     public void stop() {
         try {
-            Debug.Log("Stopping Tomcat server...", 4);
             tomcat.getServer().stop();
             tomcat.getServer().destroy();
-            Debug.Log("Tomcat server stopped.", 4);
         } catch(LifecycleException e) {
-            Debug.Log("Error stopping Tomcat server...", 2);
+            System.out.println("Catch this exception better, smh. What is wrong with you????");
         } finally {
             System.exit(0);
         }

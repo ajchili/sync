@@ -10,9 +10,7 @@ public class KeyDispatcher implements KeyEventDispatcher {
     private final PlaybackPanel playbackPanel;
 
     public KeyDispatcher(PlaybackPanel playbackPanel) {
-        Debug.Log("Creating KeyDispatcher...", 1);
         this.playbackPanel = playbackPanel;
-        Debug.Log("KeyDispatcher created.", 1);
     }
 
     @Override
@@ -22,7 +20,6 @@ public class KeyDispatcher implements KeyEventDispatcher {
                 switch(e.getKeyCode()) {
                     case 27:
                         if (playbackPanel.isFullscreen) {
-                            Debug.Log("Closing fullscreen...", 3);
                             playbackPanel.closeFullscreen();
                         }
                         break;
@@ -33,13 +30,8 @@ public class KeyDispatcher implements KeyEventDispatcher {
                         }
                         break;
                     case 122:
-                        if (playbackPanel.isFullscreen) {
-                            Debug.Log("Closing fullscreen...", 3);
-                            playbackPanel.closeFullscreen();
-                        } else {
-                            Debug.Log("Opening fullscreen...", 3);
-                            playbackPanel.initFullscreen();
-                        }
+                        if (playbackPanel.isFullscreen) playbackPanel.closeFullscreen();
+                        else  playbackPanel.initFullscreen();
                         break;
                     default:
                         break;

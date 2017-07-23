@@ -3,7 +3,6 @@ package com.kirinpatel.gui;
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.FileSelector;
 import com.kirinpatel.util.UIMessage;
 import com.kirinpatel.util.URLEncoding;
@@ -38,7 +37,6 @@ public class MenuBar extends JMenuBar {
                 } else {
                     if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL("");
                     else {
-                        Debug.Log("Media URL not specified!", 2);
                         new UIMessage("Error setting Media URL!", "The Media URL must be specified!", 1);
                     }
                 }
@@ -147,7 +145,7 @@ public class MenuBar extends JMenuBar {
                 warningSlider.setMinorTickSpacing(50);
                 warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
                 warningSlider.addChangeListener(e -> {
-                    Debug.deSyncWarningTime = warningSlider.getValue();
+                    Main.deSyncWarningTime = warningSlider.getValue();
                     warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
                 });
                 warningTimePanel.add(warningSlider, BorderLayout.CENTER);
@@ -160,7 +158,7 @@ public class MenuBar extends JMenuBar {
                 desyncSlider.setMinorTickSpacing(250);
                 desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
                 desyncSlider.addChangeListener(e -> {
-                    Debug.deSyncWarningTime = desyncSlider.getValue();
+                    Main.deSyncWarningTime = desyncSlider.getValue();
                     desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
                 });
                 desyncTimePanel.add(desyncSlider, BorderLayout.CENTER);

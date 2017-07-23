@@ -19,6 +19,8 @@ public class Main extends JFrame {
     public static int videoQuality = 100;
     public static boolean showUserTimes = false;
     public static ArrayList<User> connectedUsers = new ArrayList<>();
+    public static long deSyncWarningTime = 1000;
+    public static long deSyncTime = 2000;
     
     /**
      * Credit: http://alvinalexander.com/blog/post/java/how-determine-application-running-mac-os-x-osx-version
@@ -38,9 +40,7 @@ public class Main extends JFrame {
         connectedUsers.clear();
         showUserTimes = false;
 
-        Debug.Log("Starting sync launcher...", 3);
         setSize(new Dimension(200, 100));
-
         setResizable(false);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -56,7 +56,6 @@ public class Main extends JFrame {
         add(buttonPanel, BorderLayout.CENTER);
 
         setVisible(true);
-        Debug.Log("Sync launcher displayed.", 3);
     }
 
     /**
@@ -65,19 +64,14 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        if (args.length > 0) {
-            Debug.debugLevel = Integer.parseInt(args[0]);
-        }
-
         if (VersionChecker.isUpdated()) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
-                Debug.Log("Unable to load \"Numbus\" UIManager!", 2);
+                System.out.println("Catch this exception better, smh. What is wrong with you????");
             }
             main = new Main();
         } else {
-            Debug.Log("Outdated version of sync! Please update!", 2);
             new UIMessage("Outdated version of sync", "You have an outdated version of sync, please update sync!", 1);
         }
     }

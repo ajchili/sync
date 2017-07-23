@@ -71,7 +71,7 @@ public class User implements Serializable {
         return time;
     }
 
-    public boolean doesWantToPuase() {
+    public boolean doesWantToPause() {
         return wantsToPause;
     }
 

@@ -5,7 +5,6 @@ import com.kirinpatel.gui.AudioSettingsGUI;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.net.Client;
-import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
@@ -53,12 +52,12 @@ public class MediaPlayer extends JPanel {
      */
     public MediaPlayer(PlaybackPanel playbackPanel) {
         new NativeDiscovery().discover();
-        Debug.Log("Creating MediaPlayer...", 6);
         setBackground(Color.BLACK);
         setOpaque(true);
 
-        WIDTH = (1280 * Main.videoQuality) / 100;
-        HEIGHT = (720 * Main.videoQuality) / 100;
+        // Width and height values are not scalable because VLCJ does not support real-time scaling of mediaplayer.
+        WIDTH = 1280; // (1280 * Main.videoQuality) / 100;
+        HEIGHT = 720; //(720 * Main.videoQuality) / 100;
         this.playbackPanel = playbackPanel;
 
 
@@ -77,14 +76,12 @@ public class MediaPlayer extends JPanel {
         equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
         for (int i = 0; i < 10; i++) equalizer.setAmp(i, AudioSettingsGUI.loadSettings(i));
         mediaPlayer.setEqualizer(equalizer);
-        Debug.Log("MediaPlayer created.", 6);
     }
 
     /**
      * Initialize media controls or reset them after media is changed.
      */
     private void initControls() {
-        Debug.Log("Initializing media player controls...", 3);
         if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
             PlaybackPanel.pauseMedia.addActionListener(e -> {
                 if (isPaused) mediaPlayer.play();
@@ -142,33 +139,27 @@ public class MediaPlayer extends JPanel {
         }
 
         isPaused = true;
-        Debug.Log("Media player controls initialized.", 3);
     }
 
     public void play() {
         if (!mediaURL.isEmpty() && isPaused) {
-            Debug.Log("Playing media.", 6);
             mediaPlayer.play();
         }
     }
 
     public void pause() {
         if (!mediaURL.isEmpty() && !isPaused) {
-            Debug.Log("Pausing media.", 6);
             mediaPlayer.pause();
         }
     }
 
     public void release() {
-        Debug.Log("Releasing media player...", 6);
         mediaPlayer.stop();
         mediaPlayer.release();
-        Debug.Log("Media player released.", 6);
     }
 
     public void setMediaURL(String mediaURL) {
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
-            Debug.Log("Setting media url.", 6);
             isFile = false;
             mediaPlayer.prepareMedia(mediaURL.startsWith("_") ? "http://" + Client.ipAddress + ":8080/" + mediaURL.substring(1) : mediaURL);
             mediaPlayer.parseMedia();
@@ -178,7 +169,6 @@ public class MediaPlayer extends JPanel {
 
     public void setMediaFile(String filePath, String mediaURL) {
         if (!filePath.isEmpty() && !mediaURL.isEmpty() && !filePath.equals(this.filePath) && !mediaURL.equals(this.mediaURL)) {
-            Debug.Log("Setting media file.", 6);
             isFile = true;
             this.mediaURL = mediaURL;
             mediaPlayer.prepareMedia(filePath);
@@ -192,7 +182,6 @@ public class MediaPlayer extends JPanel {
     }
 
     public void seekTo(long time) {
-        Debug.Log("Seeking media player (" + time + ").", 6);
         mediaPlayer.setTime(time);
     }
 

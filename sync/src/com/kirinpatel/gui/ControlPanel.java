@@ -3,7 +3,6 @@ package com.kirinpatel.gui;
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.User;
 import com.kirinpatel.vlc.MediaPlayer;
 
@@ -26,8 +25,6 @@ public class ControlPanel extends JPanel {
     public ControlPanel(int type) {
         super(new GridLayout(2, 1));
 
-        Debug.Log("Creating ControlPanel...", 3);
-
         connectedClients = new JList();
         connectedClients.setToolTipText("Connected Clients");
         connectedClients.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -41,8 +38,8 @@ public class ControlPanel extends JPanel {
                 User user = Main.connectedUsers.get(index);
 
                 if (host != null && !host.equals(user) && Main.showUserTimes) {
-                    if (host.getTime() - Debug.deSyncTime > user.getTime()) setBackground(Color.RED);
-                    else if (host.getTime() - Debug.deSyncWarningTime > user.getTime()) setBackground(Color.YELLOW);
+                    if (host.getTime() - Main.deSyncTime > user.getTime()) setBackground(Color.RED);
+                    else if (host.getTime() - Main.deSyncWarningTime > user.getTime()) setBackground(Color.YELLOW);
                 }
 
                 if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
@@ -78,8 +75,6 @@ public class ControlPanel extends JPanel {
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
         add(chatPanel);
-
-        Debug.Log("ControlPanel created.", 3);
     }
 
     public void resizePanel(int height) {
