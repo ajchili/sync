@@ -1,7 +1,7 @@
 package com.kirinpatel.gui;
 
 import com.kirinpatel.util.KeyDispatcher;
-import com.kirinpatel.vlc.MediaPlayer;
+import com.kirinpatel.vlc.VLCJMediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +9,7 @@ import java.awt.event.*;
 
 public class PlaybackPanel extends JPanel {
 
-    public static MediaPlayer mediaPlayer;
+    public static VLCJMediaPlayer mediaPlayer;
     public static JButton pauseMedia;
     public final int type;
     public JLabel mediaPositionLabel;
@@ -33,7 +33,7 @@ public class PlaybackPanel extends JPanel {
     }
 
     private void initMediaPlayer() {
-        mediaPlayer = new MediaPlayer(this);
+        mediaPlayer = new VLCJMediaPlayer(this);
         add(mediaPlayer, BorderLayout.CENTER);
         mediaPlayer.addMouseListener(fullscreenListener);
 

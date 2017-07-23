@@ -28,7 +28,7 @@ import java.awt.image.BufferedImage;
 /**
  * Modified JPanel that will play media for the sync application.
  */
-public class MediaPlayer extends JPanel {
+public class VLCJMediaPlayer extends JPanel {
 
     private final int WIDTH;
     private final int HEIGHT;
@@ -50,7 +50,7 @@ public class MediaPlayer extends JPanel {
      *
      * @param playbackPanel Returns MediaPanel
      */
-    public MediaPlayer(PlaybackPanel playbackPanel) {
+    public VLCJMediaPlayer(PlaybackPanel playbackPanel) {
         new NativeDiscovery().discover();
         setBackground(Color.BLACK);
         setOpaque(true);

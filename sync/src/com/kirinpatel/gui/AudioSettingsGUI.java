@@ -1,6 +1,6 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.vlc.MediaPlayer;
+import com.kirinpatel.vlc.VLCJMediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class AudioSettingsGUI extends JFrame {
         int band = 0;
         for (int i = index; i > 32; i /= 2) band++;
         frequencies[band] = value;
-        MediaPlayer.equalizer.setAmp(band, frequencies[band]);
+        VLCJMediaPlayer.equalizer.setAmp(band, frequencies[band]);
         saveSettings();
     }
 

@@ -4,7 +4,7 @@ import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.User;
-import com.kirinpatel.vlc.MediaPlayer;
+import com.kirinpatel.vlc.VLCJMediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,7 +85,7 @@ public class ControlPanel extends JPanel {
     public void updateConnectedClients(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            if (Main.showUserTimes) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
+            if (Main.showUserTimes) listModel.addElement(user + " (" + VLCJMediaPlayer.formatTime(user.getTime()) + ')');
             else listModel.addElement(user);
         }
         connectedClients.setModel(listModel);
