@@ -10,14 +10,6 @@ a Java based multi-client video and audio syncing application
 3. Download [sync](https://www.github.com/ajchili/sync/releases)
 	* The latest stable version can be found in the link above
 	* For development builds please either download the master branch or the experimental branch
-		* _Please note, you must add the jars or Maven dependencies for Tomcat Embedded, VLCJ, and slfj4_
-			* These specific jars are required when developing for sync
-				* tomcat-embed-core-8.5.15.jar
-				* jna-4.1.0.jar
-				* jna-platform-4.1.0.jar
-				* vlcj-3.10.1.jar
-				* slf4j-api-1.7.10.jar
-				* sl4j-nop-1.7.10.jar
 		* _Please note, the experimental branch is most likely broken and will contain unfinished features_
 4. Run sync
 	* Server setup
