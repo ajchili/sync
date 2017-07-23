@@ -4,8 +4,6 @@ import com.kirinpatel.vlc.MediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.*;
 
 /**
@@ -29,7 +27,6 @@ public class AudioSettingsGUI extends JFrame {
         setLocationRelativeTo(null);
 
         for (int i = 32; i <= 16384; i *= 2) {
-            final long[] lastClick = {0};
             final int index = i;
 
             JPanel panel = new JPanel(new BorderLayout());
@@ -41,36 +38,7 @@ public class AudioSettingsGUI extends JFrame {
             slider.setPaintLabels(true);
             slider.setMajorTickSpacing(4);
             slider.setMinorTickSpacing(1);
-            slider.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (lastClick[0] > System.currentTimeMillis() - 200) setBandValue(index, ((JSlider) e.getSource()).getValue());
-                    lastClick[0] = System.currentTimeMillis();
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-
-                }
-            });
-            slider.addChangeListener(e -> {
-                setBandValue(index, ((JSlider) e.getSource()).getValue());
-            });
+            slider.addChangeListener(e -> setBandValue(index, ((JSlider) e.getSource()).getValue()));
             panel.add(slider, BorderLayout.CENTER);
             add(panel);
         }
