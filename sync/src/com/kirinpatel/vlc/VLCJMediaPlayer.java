@@ -10,6 +10,7 @@ import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.Equalizer;
+import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.direct.BufferFormatCallback;
 import uk.co.caprica.vlcj.player.direct.DirectMediaPlayer;
@@ -61,7 +62,11 @@ public class VLCJMediaPlayer extends JPanel {
         this.playbackPanel = playbackPanel;
 
 
-        image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleImage(WIDTH, HEIGHT);
+        image = GraphicsEnvironment
+                        .getLocalGraphicsEnvironment()
+                        .getDefaultScreenDevice()
+                        .getDefaultConfiguration()
+                        .createCompatibleImage(WIDTH, HEIGHT);
         BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(WIDTH, HEIGHT);
         DirectMediaPlayerComponent mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
             @Override
@@ -161,14 +166,19 @@ public class VLCJMediaPlayer extends JPanel {
     public void setMediaURL(String mediaURL) {
         if (!mediaURL.isEmpty() && !mediaURL.equals(this.mediaURL)) {
             isFile = false;
-            mediaPlayer.prepareMedia(mediaURL.startsWith("_") ? "http://" + Client.ipAddress + ":8080/" + mediaURL.substring(1) : mediaURL);
+            mediaPlayer.prepareMedia(mediaURL.startsWith("_")
+                    ? "http://" + Client.ipAddress + ":8080/" + mediaURL.substring(1)
+                    : mediaURL);
             mediaPlayer.parseMedia();
             initControls();
         }
     }
 
     public void setMediaFile(String filePath, String mediaURL) {
-        if (!filePath.isEmpty() && !mediaURL.isEmpty() && !filePath.equals(this.filePath) && !mediaURL.equals(this.mediaURL)) {
+        if (!filePath.isEmpty()
+                && !mediaURL.isEmpty()
+                && !filePath.equals(this.filePath)
+                && !mediaURL.equals(this.mediaURL)) {
             isFile = true;
             this.mediaURL = mediaURL;
             mediaPlayer.prepareMedia(filePath);
@@ -256,22 +266,24 @@ public class VLCJMediaPlayer extends JPanel {
     class MediaEventListener implements MediaPlayerEventListener {
 
         @Override
-        public void mediaChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t, String s) {
+        public void mediaChanged(MediaPlayer mediaPlayer,
+                                 libvlc_media_t libvlc_media_t,
+                                 String s) {
             if (!isFile) mediaURL = s;
         }
 
         @Override
-        public void opening(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void opening(MediaPlayer mediaPlayer) {
             mediaPlayer.setVolume(playbackPanel.mediaVolume.getValue());
         }
 
         @Override
-        public void buffering(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
+        public void buffering(MediaPlayer mediaPlayer, float v) {
           
         }
 
         @Override
-        public void playing(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void playing(MediaPlayer mediaPlayer) {
             isPaused = false;
             length = mediaPlayer.getLength();
             PlaybackPanel.pauseMedia.setText("||");
@@ -281,7 +293,7 @@ public class VLCJMediaPlayer extends JPanel {
         }
 
         @Override
-        public void paused(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void paused(MediaPlayer mediaPlayer) {
             isPaused = true;
             length = mediaPlayer.getLength();
             PlaybackPanel.pauseMedia.setText(">");
@@ -291,29 +303,29 @@ public class VLCJMediaPlayer extends JPanel {
         }
 
         @Override
-        public void stopped(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void stopped(MediaPlayer mediaPlayer) {
 
         }
 
         @Override
-        public void forward(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void forward(MediaPlayer mediaPlayer) {
 
         }
 
         @Override
-        public void backward(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void backward(MediaPlayer mediaPlayer) {
 
         }
 
         @Override
-        public void finished(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void finished(MediaPlayer mediaPlayer) {
             playbackPanel.mediaPosition.setValue(0);
             PlaybackPanel.pauseMedia.setText(">");
             isPaused = true;
         }
 
         @Override
-        public void timeChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, long l) {
+        public void timeChanged(MediaPlayer mediaPlayer, long l) {
             if (!isScrubbing) {
                 time = l;
                 playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(length));
@@ -322,142 +334,142 @@ public class VLCJMediaPlayer extends JPanel {
         }
 
         @Override
-        public void positionChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
+        public void positionChanged(MediaPlayer mediaPlayer, float v) {
 
         }
 
         @Override
-        public void seekableChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void seekableChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void pausableChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void pausableChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void titleChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void titleChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void snapshotTaken(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, String s) {
+        public void snapshotTaken(MediaPlayer mediaPlayer, String s) {
 
         }
 
         @Override
-        public void lengthChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, long l) {
+        public void lengthChanged(MediaPlayer mediaPlayer, long l) {
             length = l;
         }
 
         @Override
-        public void videoOutput(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void videoOutput(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void scrambledChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void scrambledChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void elementaryStreamAdded(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i, int i1) {
+        public void elementaryStreamAdded(MediaPlayer mediaPlayer, int i, int i1) {
 
         }
 
         @Override
-        public void elementaryStreamDeleted(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i, int i1) {
+        public void elementaryStreamDeleted(MediaPlayer mediaPlayer, int i, int i1) {
 
         }
 
         @Override
-        public void elementaryStreamSelected(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i, int i1) {
+        public void elementaryStreamSelected(MediaPlayer mediaPlayer, int i, int i1) {
 
         }
 
         @Override
-        public void corked(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, boolean b) {
+        public void corked(MediaPlayer mediaPlayer, boolean b) {
 
         }
 
         @Override
-        public void muted(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, boolean b) {
+        public void muted(MediaPlayer mediaPlayer, boolean b) {
 
         }
 
         @Override
-        public void volumeChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, float v) {
+        public void volumeChanged(MediaPlayer mediaPlayer, float v) {
 
         }
 
         @Override
-        public void audioDeviceChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, String s) {
+        public void audioDeviceChanged(MediaPlayer mediaPlayer, String s) {
 
         }
 
         @Override
-        public void chapterChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void chapterChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void error(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void error(MediaPlayer mediaPlayer) {
 
         }
 
         @Override
-        public void mediaMetaChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void mediaMetaChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void mediaSubItemAdded(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t) {
+        public void mediaSubItemAdded(MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t) {
 
         }
 
         @Override
-        public void mediaDurationChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, long l) {
+        public void mediaDurationChanged(MediaPlayer mediaPlayer, long l) {
 
         }
 
         @Override
-        public void mediaParsedChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void mediaParsedChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void mediaFreed(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void mediaFreed(MediaPlayer mediaPlayer) {
 
         }
 
         @Override
-        public void mediaStateChanged(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void mediaStateChanged(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void mediaSubItemTreeAdded(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t) {
+        public void mediaSubItemTreeAdded(MediaPlayer mediaPlayer, libvlc_media_t libvlc_media_t) {
 
         }
 
         @Override
-        public void newMedia(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void newMedia(MediaPlayer mediaPlayer) {
             time = 0;
         }
 
         @Override
-        public void subItemPlayed(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void subItemPlayed(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void subItemFinished(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer, int i) {
+        public void subItemFinished(MediaPlayer mediaPlayer, int i) {
 
         }
 
         @Override
-        public void endOfSubItems(uk.co.caprica.vlcj.player.MediaPlayer mediaPlayer) {
+        public void endOfSubItems(MediaPlayer mediaPlayer) {
 
         }
     }

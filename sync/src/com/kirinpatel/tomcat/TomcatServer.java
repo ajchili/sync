@@ -16,7 +16,11 @@ public class TomcatServer {
         File mediaPath = new File("tomcat/webapps/media");
         if (!mediaPath.getAbsoluteFile().exists()) {
             mediaPath.mkdirs();
-            new UIMessage("Tomcat directory created!", "A new folder has been added for offline media.\nPlease open \"" + mediaPath.getAbsolutePath() + "\"\nand add any media files that you would like to use for sync.", 0);
+            new UIMessage("Tomcat directory created!",
+                    "A new folder has been added for offline media.\nPlease open \""
+                            + mediaPath.getAbsolutePath()
+                            + "\"\nand add any media files that you would like to use for sync.",
+                    0);
         }
 
         tomcat = new Tomcat();

@@ -102,7 +102,9 @@ public class Server {
                 }
 
                 if (isBound) {
-                    new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
+                    new UIMessage("Unable to start server!",
+                            "The address is in use by another application!",
+                            1);
                     Server.stop();
                 }
             }
