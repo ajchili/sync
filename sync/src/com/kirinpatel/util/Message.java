@@ -7,44 +7,36 @@ import java.io.Serializable;
  */
 public class Message implements Serializable {
 
-    private int type;
+    private MESSAGE_TYPE type;
     private Object message;
 
-    /**
-     * Main constructor that will create the message with a given type and the
-     * provided message.
-     *
-     * Types:
-     *  0: Connection Messages
-     *      0: Disconnecting
-     *      1: Connecting
-     *      2: Connected
-     *      3: Closing
-     *      4: Ping testing
-     *  1#: Username Messages
-     *      0: Sending client name
-     *          User
-     *      1: Sending connected clients
-     *          ArrayList<User>
-     *  2#: Media Messages
-     *      0: MediaURL
-     *          String
-     *      1: Media state
-     *          boolean
-     *      2: Time
-     *          long
-     *      3: Playback rate
-     *          float
-     *  3#: Messages
-     *      0: Messages
-     *          ArrayList<String>
-     *      1: Client messages
-     *          ArrayList<String>
-     *
-     * @param type    Type of message being sent
-     * @param message Message to be sent
-     */
-    public Message(int type, Object message) {
+    public enum MESSAGE_TYPE {
+        DISCONNECTING(0),
+        CONNECTING(1),
+        CONNECTED(2),
+        CLOSING(3),
+        PING_TESTING(4),
+        CLIENT_NAME(10),
+        CONNECTED_CLIENTS(11),
+        MEDIA_URL(20),
+        MEDIA_STATE(21),
+        TIME(22),
+        PLAYBACK_RATE(23),
+        MESSAGES(30),
+        CLIENT_MESSAGES(31);
+
+        private int messageId;
+
+        MESSAGE_TYPE(int messageId) {
+            this.messageId = messageId;
+        }
+
+        public int getMessageId() {
+            return messageId;
+        }
+    }
+
+    public Message(MESSAGE_TYPE type, Object message) {
         this.type = type;
         this.message = message;
     }
@@ -80,7 +72,7 @@ public class Message implements Serializable {
      *
      * @return Returns message type
      */
-    public int getType() {
+    public MESSAGE_TYPE getType() {
         return type;
     }
 
