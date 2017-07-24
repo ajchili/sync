@@ -12,6 +12,7 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/uk/co/caprica/vlcj/3.10.1/vlcj-3.10.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/java/dev/jna/jna/4.1.0/jna-4.1.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/net/java/dev/jna/jna-platform/4.1.0/jna-platform-4.1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/bitlet/weupnp/0.1.2/weupnp-0.1.2.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>
