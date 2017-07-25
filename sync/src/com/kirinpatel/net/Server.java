@@ -117,6 +117,7 @@ public class Server {
 
                 try {
                     gui.setTitle(gui.getTitle() + " (" + device.getExternalIPAddress() + ":8000)");
+                    Server.ipAddress = device.getExternalIPAddress();
                     gui.setVisible(true);
                 } catch(SAXException e) {
                     server.stop();
