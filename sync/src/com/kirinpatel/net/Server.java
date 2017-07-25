@@ -86,16 +86,17 @@ public class Server {
 
                 if (device != null) {
                     if (!device.addPortMapping(8000, 8000, device.getLocalAddress().getHostAddress(),"TCP","sync")) {
-                        new UIMessage("A port is not forwarded!"
-                                ,"Clients will be unable to connect to your sync server! Please open port 8000."
+                        new UIMessage("UPnP not enabled!"
+                                ,"Please enable UPnP in your router's settings to allow clients to connect" +
+                                "to your sync server."
                                 ,1);
                     }
 
                     if (!device.addPortMapping(8080, 8080, device.getLocalAddress().getHostAddress(),"TCP","tomcat")) {
-                        new UIMessage("A port is not forwarded!"
-                                ,"You will be unable to use offline media! Please open port 8080 to use offline"
-                                + " media."
-                                , 1);
+                        new UIMessage("UPnP not enabled!"
+                                ,"Please enable UPnP in your router's settings to allow clients to connect" +
+                                "to your sync server."
+                                ,1);
                     } else {
                         tomcatServer = new TomcatServer();
                         new Thread(() -> tomcatServer.start()).start();
@@ -267,7 +268,7 @@ public class Server {
 
                 if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
 
-                if (messages.size() < messages.size()) sendMessagesToClient();
+                if (messages.size() < Server.messages.size()) sendMessagesToClient();
 
                 if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) sendMediaURL();
 
@@ -339,7 +340,7 @@ public class Server {
         private synchronized void sendMessagesToClient() {
             try {
                 ArrayList<String> newMessages = new ArrayList<>();
-                ArrayList<String> messageCache = messages;
+                ArrayList<String> messageCache = Server.messages;
                 for (int i = messages.size(); i < messageCache.size(); i++) {
                     newMessages.add(messageCache.get(i));
                 }

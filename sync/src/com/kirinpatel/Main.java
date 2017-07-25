@@ -62,10 +62,11 @@ public class Main extends JFrame {
         if (VersionChecker.isUpdated()) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                // TODO(ajchili): catch this better
+            } catch(Exception e) {
+                System.out.println("Unable to set look and feel of sync.");
+            } finally {
+                main = new Main();
             }
-            main = new Main();
         } else {
             new UIMessage("Outdated version of sync", "You have an outdated version of sync, please update sync!", 1);
         }

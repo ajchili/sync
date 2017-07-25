@@ -62,6 +62,7 @@ public class ControlPanel extends JPanel {
         chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
         chatWindowScroll = new JScrollPane(chatWindow);
+        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
         JPanel messagePanel = new JPanel(new BorderLayout());
@@ -110,8 +111,10 @@ public class ControlPanel extends JPanel {
         for (String message : messages) {
             chatWindow.append(message + '\n');
         }
-        chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
-        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
+
+        if (chatWindow.getText().length() > 0) {
+            chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
+        }
     }
 
     class SendMessageListener implements ActionListener {

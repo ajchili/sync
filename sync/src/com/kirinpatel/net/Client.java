@@ -47,24 +47,6 @@ public class Client {
 
     class ClientThread implements Runnable {
 
-        private ClientCommunicationThread clientCommunicationThread;
-
-        public void run() {
-            isRunning = true;
-
-            clientCommunicationThread = new ClientCommunicationThread();
-            new Thread(clientCommunicationThread).start();
-        }
-
-        public void stop() {
-            isRunning = false;
-
-            clientCommunicationThread.stop();
-        }
-    }
-
-    class ClientCommunicationThread implements Runnable {
-
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private boolean isConnected = false;
@@ -72,6 +54,8 @@ public class Client {
         private float rate = 1.0f;
 
         public void run() {
+            isRunning = true;
+
             connectToServer();
 
             while(isConnected && isRunning) {
@@ -138,6 +122,8 @@ public class Client {
         }
 
         public void stop() {
+            isRunning = false;
+
             isConnected = false;
         }
 
@@ -146,7 +132,7 @@ public class Client {
                 socket = new Socket(Client.ipAddress, 8000);
                 socket.setKeepAlive(true);
             } catch(UnknownHostException e) {
-                new UIMessage("Error joining server!", "The IP Address provided is not running!", 1);
+                new UIMessage("Error joining server!", "Server is not running!", 1);
                 Client.stop();
                 return;
             } catch(ConnectException e) {

@@ -3,7 +3,7 @@ package com.kirinpatel.util;
 import java.io.Serializable;
 
 /**
- * Message object used to send/comprehend data between clients and a server.
+ * Message object used to send/receive data between clients and a server.
  */
 public class Message implements Serializable {
 

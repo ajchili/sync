@@ -1,8 +1,13 @@
 package com.kirinpatel.util;
 
+/**
+ * The URLEncoding class allows for a provided URL to be encoded to prevent any URL linking errors.
+ */
 public class URLEncoding {
 
     /**
+     * Encodes URL to be used for offline media playback.
+     *
      * Credit: https://www.urlencoder.org/
      *
      * @param url Un-encoded URL
