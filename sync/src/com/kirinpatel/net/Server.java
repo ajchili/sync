@@ -14,10 +14,8 @@ import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
 import org.xml.sax.SAXException;
 
-import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.Duration;
@@ -33,7 +31,6 @@ public class Server {
     private static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean closeServer = false;
-    private boolean isBound = false;
 
     private static int SYNC_PORT = 8000;
     private static int TOMCAT_PORT = 8080;

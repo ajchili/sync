@@ -62,7 +62,6 @@ public class ControlPanel extends JPanel {
         chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
         chatWindowScroll = new JScrollPane(chatWindow);
-        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
         JPanel messagePanel = new JPanel(new BorderLayout());
@@ -101,6 +100,7 @@ public class ControlPanel extends JPanel {
                 chatWindow.append(message);
             }
         }
+
         chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
     }
 
@@ -108,6 +108,7 @@ public class ControlPanel extends JPanel {
         if (!chatWindow.getText().isEmpty()) {
             chatWindow.append("\n");
         }
+
         for (String message : messages) {
             chatWindow.append(message + '\n');
         }
@@ -115,6 +116,8 @@ public class ControlPanel extends JPanel {
         if (chatWindow.getText().length() > 0) {
             chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
         }
+
+        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
     }
 
     class SendMessageListener implements ActionListener {
@@ -136,6 +139,8 @@ public class ControlPanel extends JPanel {
                     chatField.setText("");
                 }
             }
+            
+            chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
         }
     }
 }
