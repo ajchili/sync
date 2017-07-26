@@ -38,8 +38,13 @@ public class ControlPanel extends JPanel {
                 User user = Main.connectedUsers.get(index);
 
                 if (host != null && !host.equals(user) && Main.showUserTimes) {
-                    if (host.getTime() - Main.deSyncTime > user.getTime()) setBackground(Color.RED);
-                    else if (host.getTime() - Main.deSyncWarningTime > user.getTime()) setBackground(Color.YELLOW);
+                    long currentUserTime = user.getTime() + user.getPing();
+
+                    if (host.getTime() - Main.deSyncTime > currentUserTime) {
+                        setBackground(Color.RED);
+                    } else if (host.getTime() - Main.deSyncWarningTime > currentUserTime) {
+                        setBackground(Color.YELLOW);
+                    }
                 }
 
                 if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
@@ -85,8 +90,13 @@ public class ControlPanel extends JPanel {
     public void updateConnectedClients(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            if (Main.showUserTimes) listModel.addElement(user + " (" + VLCJMediaPlayer.formatTime(user.getTime()) + ')');
-            else listModel.addElement(user);
+            String displayedText = user.toString();
+
+            if (Main.showUserTimes) {
+                displayedText += " (" + VLCJMediaPlayer.formatTime(user.getTime()) + ')';
+            }
+
+            listModel.addElement(displayedText + " (" + user.getPing() + " ms)");
         }
         connectedClients.setModel(listModel);
     }

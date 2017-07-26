@@ -2,8 +2,6 @@ package com.kirinpatel.net;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.GUI;
@@ -24,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
+
     public static String ipAddress = "";
     private static GUI gui;
     private static ServerThread server;
@@ -193,7 +192,9 @@ public class Server {
                     break;
                 }
 
-                if (hasConnected && !Main.connectedUsers.contains(user)) disconnectClientFromServer();
+                if (hasConnected && !Main.connectedUsers.contains(user)) {
+                    disconnectClientFromServer();
+                }
 
                 try {
                     if (socket.getInputStream().available() > 0) {
@@ -214,7 +215,9 @@ public class Server {
                                 hasConnected = true;
                                 break;
                             case MEDIA_STATE:
-                                if ((boolean) message.getMessage() != isPaused) sendVideoState();
+                                if ((boolean) message.getMessage() != isPaused) {
+                                    sendVideoState();
+                                }
                                 break;
                             case TIME:
                                 time = (long) message.getMessage();
@@ -234,15 +237,25 @@ public class Server {
                     disconnectClientFromServer();
                 }
 
-                if (System.currentTimeMillis() > lastPingCheck + 1000) sendPing();
+                if (System.currentTimeMillis() > lastPingCheck + 1000) {
+                    sendPing();
+                }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastClientUpdate + 1000) {
+                    sendConnectedUsersToClient();
+                }
 
-                if (messages.size() < Server.messages.size()) sendMessagesToClient();
+                if (messages.size() < Server.messages.size()) {
+                    sendMessagesToClient();
+                }
 
-                if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) sendMediaURL();
+                if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) {
+                    sendMediaURL();
+                }
 
-                if (isPaused != PlaybackPanel.mediaPlayer.isPaused()) sendVideoState();
+                if (isPaused != PlaybackPanel.mediaPlayer.isPaused()) {
+                    sendVideoState();
+                }
             }
 
             try {
