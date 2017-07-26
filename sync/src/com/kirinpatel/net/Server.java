@@ -1,6 +1,10 @@
 package com.kirinpatel.net;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
+
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
@@ -10,27 +14,29 @@ import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
-
     public static String ipAddress = "";
     private static GUI gui;
-    private static GatewayDiscover discover;
-    private static GatewayDevice device;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
     private static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean closeServer = false;
     private boolean isBound = false;
+
+    private static int SYNC_PORT = 8000;
+    private static int TOMCAT_PORT = 8080;
 
     public Server() {
         gui = new GUI(0);
@@ -71,125 +77,90 @@ public class Server {
     }
 
     class ServerThread implements Runnable {
-
         private ExecutorService connectionExecutor;
+        private GatewayDevice device;
         private ServerSocket service;
         private Socket socket;
 
+        @Override
         public void run() {
-            isRunning = true;
-
-            discover = new GatewayDiscover();
             try {
-                discover.discover();
-                device = discover.getValidGateway();
-
-                if (device != null) {
-                    if (!device.addPortMapping(8000, 8000, device.getLocalAddress().getHostAddress(),"TCP","sync")) {
-                        new UIMessage("UPnP not enabled!"
-                                ,"Please enable UPnP in your router's settings to allow clients to connect" +
-                                "to your sync server."
-                                ,1);
-                    }
-
-                    if (!device.addPortMapping(8080, 8080, device.getLocalAddress().getHostAddress(),"TCP","tomcat")) {
-                        new UIMessage("UPnP not enabled!"
-                                ,"Please enable UPnP in your router's settings to allow clients to connect" +
-                                "to your sync server."
-                                ,1);
-                    } else {
-                        tomcatServer = new TomcatServer();
-                        new Thread(() -> tomcatServer.start()).start();
-                    }
-                }
-            } catch(IOException e) {
-                e.printStackTrace();
-            } catch(SAXException e) {
-                e.printStackTrace();
-            } catch(ParserConfigurationException e) {
-                e.printStackTrace();
+                device = createGatewayDevice();
+                tomcatServer = new TomcatServer();
+                new Thread(() -> tomcatServer.start()).start();
+                connectionExecutor = Executors.newFixedThreadPool(10);
+                service = new ServerSocket(SYNC_PORT);
+                isRunning = true;
+                gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
+                gui.setVisible(true);
+            } catch (IOException e) {
+                UIMessage.showErrorDialogueAndExit(e.getMessage(), "Couldn't open server", gui);
+                return;
             }
-
-            connectionExecutor = Executors.newFixedThreadPool(10);
-
             try {
-                service = new ServerSocket(8000);
-
-                try {
-                    gui.setTitle(gui.getTitle() + " (" + device.getExternalIPAddress() + ":8000)");
-                    Server.ipAddress = device.getExternalIPAddress();
-                    gui.setVisible(true);
-                } catch(SAXException e) {
-                    server.stop();
-                    new UIMessage("Unable to start server!"
-                            ,"Please ensure that UPnP is enabled in your router."
-                            , 1);
-                }
-
                 while (isRunning) {
                     socket = service.accept();
-
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
-            } catch(BindException e) {
-                gui.dispose();
-                isBound = true;
             } catch(IOException e) {
-                e.printStackTrace();
+                // Couldn't accept a client, just ignore exception.
             } finally {
                 connectionExecutor.shutdown();
                 while(!connectionExecutor.isTerminated()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        e.printStackTrace();
-                    }
+                    sleep(Duration.ofSeconds(1));
                 }
+            }
+        }
 
-                if (isBound) {
-                    new UIMessage("Unable to start server!",
-                            "The address is in use by another application!",
-                            1);
-                    Server.stop();
+        private GatewayDevice createGatewayDevice() throws IOException {
+            GatewayDiscover discover = new GatewayDiscover();
+            try {
+                discover.discover();
+                GatewayDevice device = discover.getValidGateway();
+                checkNotNull(device);
+                boolean isSyncMapped = device.addPortMapping(
+                        SYNC_PORT,
+                        SYNC_PORT,
+                        device.getLocalAddress().getHostAddress(),
+                        "TCP",
+                        "sync");
+                boolean isTomcatMapped = device.addPortMapping(
+                        TOMCAT_PORT,
+                        TOMCAT_PORT,
+                        device.getLocalAddress().getHostAddress(),
+                        "TCP",
+                        "tomcat");
+                if (isSyncMapped && isTomcatMapped) {
+                    Server.ipAddress = device.getExternalIPAddress();
+                    return device;
                 }
+                throw new IOException("Couldn't map port " + SYNC_PORT + " or " + TOMCAT_PORT + " ensure UPnP is enabled");
+            } catch (SAXException | ParserConfigurationException e) {
+                throw new IOException(e);
             }
         }
 
         public void stop() {
             isRunning = false;
-
-            if (device != null) {
-                try {
-                    device.deletePortMapping(8000,"TCP");
-                    device.deletePortMapping(8080,"TCP");
-                } catch(IOException e) {
-                    e.printStackTrace();
-                } catch(SAXException e) {
-                    e.printStackTrace();
-                }
-            }
-
             try {
-                if (socket != null) {
-                    socket.close();
-                }
-                if (service != null) {
-                    service.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+                device.deletePortMapping(SYNC_PORT, "TCP");
+                device.deletePortMapping(TOMCAT_PORT, "TCP");
+            } catch (NullPointerException | IOException | SAXException e) {
+                // If this fails, nothing left to do
             }
-
+            try {
+                socket.close();
+            } catch (IOException | NullPointerException e) {
+                // If this fails, nothing left to do
+            }
+            try {
+                service.close();
+            } catch (IOException | NullPointerException e) {
+                // If this fails, nothing left to do
+            }
             if (tomcatServer != null) {
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(5000);
-                        tomcatServer.stop();
-                    } catch(InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+                sleep(Duration.ofSeconds(5));
+                tomcatServer.stop();
             }
         }
     }
@@ -400,5 +371,13 @@ public class Server {
                 }
             }
         }
+    }
+
+    private void sleep(Duration time) {
+       try {
+           Thread.sleep(time.toMillis());
+       } catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+       }
     }
 }

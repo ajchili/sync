@@ -13,5 +13,6 @@
     <orderEntry type="library" name="slf4j" level="project" />
     <orderEntry type="library" name="Tomcat" level="project" />
     <orderEntry type="library" name="weupnp" level="project" />
+    <orderEntry type="library" name="com.google.guava:guava:22.0" level="project" />
   </component>
 </module>

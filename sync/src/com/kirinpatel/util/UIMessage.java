@@ -1,5 +1,8 @@
 package com.kirinpatel.util;
 
+import com.kirinpatel.Main;
+import com.kirinpatel.gui.GUI;
+
 import javax.swing.*;
 
 /**
@@ -21,6 +24,12 @@ public class UIMessage {
      */
     public UIMessage(String title, String message, int type) {
         JOptionPane.showMessageDialog(null, message, title, this.TYPE[type]);
+    }
+
+    public static void showErrorDialogueAndExit(String errorMessage, String title, GUI gui) {
+        JOptionPane.showMessageDialog(null, errorMessage, title, JOptionPane.INFORMATION_MESSAGE);
+        gui.hide();
+        new Main();
     }
 
     /**
