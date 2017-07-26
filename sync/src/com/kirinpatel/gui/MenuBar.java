@@ -32,12 +32,18 @@ public class MenuBar extends JMenuBar {
             setURL.addActionListener(e -> {
                 String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
                 if (mediaURL != null && !mediaURL.isEmpty()) {
-                    if (mediaURL.startsWith("http")) PlaybackPanel.mediaPlayer.setMediaURL(mediaURL);
-                    else PlaybackPanel.mediaPlayer.setMediaURL("http://" + mediaURL);
+                    if (mediaURL.startsWith("http")) {
+                        PlaybackPanel.mediaPlayer.setMediaURL(mediaURL);
+                    } else {
+                        PlaybackPanel.mediaPlayer.setMediaURL("http://" + mediaURL);
+                    }
                 } else {
-                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) PlaybackPanel.mediaPlayer.setMediaURL("");
-                    else {
-                        new UIMessage("Error setting Media URL!", "The Media URL must be specified!", 1);
+                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
+                        PlaybackPanel.mediaPlayer.setMediaURL("");
+                    } else {
+                        UIMessage.showMessageDialog(
+                                "The Media URL must be specified!",
+                                "Error setting Media URL!");
                     }
                 }
             });
@@ -52,10 +58,10 @@ public class MenuBar extends JMenuBar {
                     else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
                 } else {
                     if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                        new UIMessage("Error selecting media!",
+                        UIMessage.showMessageDialog(
                                 "The media file that you selected could not be used.\n" +
-                                        "Please make sure that it is inside of the media directory."
-                                ,1);
+                                        "Please make sure that it is inside of the media directory.",
+                                "Error selecting media!");
                     }
                 }
             });
@@ -77,10 +83,6 @@ public class MenuBar extends JMenuBar {
                                         ? Server.ipAddress
                                         : Client.ipAddress),
                                 null);
-                new UIMessage(
-                        "Server Address Copied",
-                        "The server address has been copied to your clipboard.",
-                        0);
             });
             sync.add(share);
             sync.add(new JSeparator());

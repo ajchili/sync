@@ -32,8 +32,8 @@ public class Server {
     private static boolean isRunning = false;
     private static boolean closeServer = false;
 
-    private static int SYNC_PORT = 8000;
-    private static int TOMCAT_PORT = 8080;
+    public static int SYNC_PORT = 8000;
+    public static int TOMCAT_PORT = 8080;
 
     public Server() {
         gui = new GUI(0);
@@ -81,6 +81,7 @@ public class Server {
 
         @Override
         public void run() {
+            UIMessage messager = new UIMessage(gui);
             try {
                 device = createGatewayDevice();
                 tomcatServer = new TomcatServer();
@@ -91,7 +92,7 @@ public class Server {
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
             } catch (IOException e) {
-                UIMessage.showErrorDialogueAndExit(e.getMessage(), "Couldn't open server", gui);
+                messager.showErrorDialogAndExit(e, "Couldn't open server");
                 return;
             }
             try {

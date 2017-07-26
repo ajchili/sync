@@ -68,7 +68,9 @@ public class Main extends JFrame {
                 main = new Main();
             }
         } else {
-            new UIMessage("Outdated version of sync", "You have an outdated version of sync, please update sync!", 1);
+            UIMessage.showMessageDialog(
+                    "You have an outdated version of sync, please update sync!",
+                    "Outdated version of sync.");
         }
     }
 
@@ -246,7 +248,9 @@ public class Main extends JFrame {
                 frame.dispose();
                 main.dispose();
             } else {
-                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
+                UIMessage.showMessageDialog(
+                        "No IP address provided! An IP address must be provided!",
+                        "Error with provided IP address!");
             }
         }
     }

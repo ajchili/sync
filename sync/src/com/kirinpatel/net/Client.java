@@ -131,16 +131,10 @@ public class Client {
             try {
                 socket = new Socket(Client.ipAddress, 8000);
                 socket.setKeepAlive(true);
-            } catch(UnknownHostException e) {
-                new UIMessage("Error joining server!", "Server is not running!", 1);
-                Client.stop();
-                return;
-            } catch(ConnectException e) {
-                new UIMessage("Error joining server!", "Server is either full or not running!", 1);
-                Client.stop();
-                return;
             } catch(IOException e) {
-                e.printStackTrace();
+                UIMessage.showErrorDialog(e, "Couldn't connect to server!");
+                isConnected = false;
+                return;
             }
 
             try {
@@ -166,7 +160,9 @@ public class Client {
                     output.writeObject(new Message(DISCONNECTING, ""));
                     output.flush();
                 } else if (isServerClosed) {
-                    new UIMessage("Server shutdown.", "The sync server that you were connected to has shutdown.", 0);
+                    UIMessage.showMessageDialog(
+                            "The sync server that you were connected to has shutdown.",
+                            "Server shut down.");
                 }
             } catch(IOException e) {
                 // TODO(ajchili): catch this better

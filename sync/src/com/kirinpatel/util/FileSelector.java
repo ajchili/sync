@@ -60,10 +60,10 @@ public class FileSelector {
                 time = System.currentTimeMillis();
                 progressView.setProgress(newFile.length(), selectedFile.length());
                 if (timeout + (1000 * 300) < time) {
-                    new UIMessage("Unable to move media",
+                    UIMessage.showMessageDialog(
                             "Your media was unable to be moved." +
                                     "\nPlease try to manually move your media to the Tomcat directory.",
-                            1);
+                            "Unable to move media");
                     break;
                 }
             }
@@ -71,9 +71,9 @@ public class FileSelector {
             progressView.dispose();
             Server.setEnabled(true);
             if (timeout + (1000 * 300) > time) {
-                new UIMessage("Your media is ready",
+                UIMessage.showMessageDialog(
                         "Your media has been moved to the\nTomcat folder and is ready for playback.",
-                        0);
+                        "Your media is ready");
             }
         }).start();
 

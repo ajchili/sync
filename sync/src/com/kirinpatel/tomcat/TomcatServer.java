@@ -6,24 +6,29 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static com.kirinpatel.net.Server.TOMCAT_PORT;
 
 public class TomcatServer {
-
     private Tomcat tomcat;
 
-    public TomcatServer() {
-        File mediaPath = new File("tomcat/webapps/media");
-        if (!mediaPath.getAbsoluteFile().exists() && mediaPath.mkdirs()) {
-            new UIMessage("Tomcat directory created!",
+    public TomcatServer() throws IOException {
+        Path mediaPath = Paths.get("tomcat/webapps/media");
+        if (Files.exists(Files.createDirectories(mediaPath))) {
+            UIMessage.showMessageDialog(
                     "A new folder has been added for offline media.\nPlease open \""
-                            + mediaPath.getAbsolutePath()
+                            + mediaPath.toAbsolutePath()
                             + "\"\nand add any media files that you would like to use for sync.",
-                    0);
+                    "Tomcat directory created!");
+        } else {
+            throw new IOException("Couldn't make tomcat directory at: " + mediaPath.toAbsolutePath());
         }
-
         tomcat = new Tomcat();
-        tomcat.setPort(8080);
+        tomcat.setPort(TOMCAT_PORT);
         tomcat.setBaseDir("./tomcat");
 
         Context ctx = tomcat.addContext("","./media");
