@@ -12,10 +12,8 @@ import com.kirinpatel.util.User;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 public class Client {
@@ -27,7 +25,7 @@ public class Client {
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
     private Socket socket;
-    private GUI gui;
+    private static GUI gui;
 
     public Client(String ipAddress) {
         Client.ipAddress = ipAddress;
@@ -38,6 +36,9 @@ public class Client {
     }
 
     public static void stop() {
+        if (gui.isVisible()){
+            gui.hide();
+        }
         clientThread.stop();
     }
 
@@ -66,8 +67,6 @@ public class Client {
                             case CLOSING:
                                 isServerClosed = true;
                                 gui.hide();
-                                Client.stop();
-                                stop();
                                 break;
                             case PING_TESTING:
                                 sendPing();

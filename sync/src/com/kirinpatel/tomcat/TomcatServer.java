@@ -17,6 +17,7 @@ public class TomcatServer {
     private Tomcat tomcat;
 
     public TomcatServer() throws IOException {
+        // TODO: (cltsd27) Re-look over this code, it always creates the folder on server start
         Path mediaPath = Paths.get("tomcat/webapps/media");
         if (Files.exists(Files.createDirectories(mediaPath))) {
             UIMessage.showMessageDialog(
@@ -49,6 +50,7 @@ public class TomcatServer {
         try {
             tomcat.start();
         } catch(LifecycleException e) {
+            // If this fails, close the server
             System.exit(0);
         }
         tomcat.getServer().await();
@@ -59,8 +61,7 @@ public class TomcatServer {
             tomcat.getServer().stop();
             tomcat.getServer().destroy();
         } catch(LifecycleException e) {
-            // TODO(ajchili): catch this better
-        } finally {
+            // If this fails, close the server
             System.exit(0);
         }
     }

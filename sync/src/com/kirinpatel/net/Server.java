@@ -45,6 +45,9 @@ public class Server {
     }
 
     public static void stop() {
+        if (gui.isVisible()){
+            gui.hide();
+        }
         if (Main.connectedUsers.size() == 1) {
             server.stop();
         }
@@ -100,7 +103,7 @@ public class Server {
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
             } catch(IOException e) {
-                // Couldn't accept a client, just ignore exception.
+                // Couldn't accept a client or on called on server close, just ignore exception.
             } finally {
                 connectionExecutor.shutdown();
                 while(!connectionExecutor.isTerminated()) {
@@ -156,7 +159,6 @@ public class Server {
                 // If this fails, nothing left to do
             }
             if (tomcatServer != null) {
-                sleep(Duration.ofSeconds(5));
                 tomcatServer.stop();
             }
         }

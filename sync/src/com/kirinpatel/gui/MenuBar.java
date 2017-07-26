@@ -10,8 +10,6 @@ import com.kirinpatel.util.URLEncoding;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 
 public class MenuBar extends JMenuBar {
@@ -54,8 +52,11 @@ public class MenuBar extends JMenuBar {
                 if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
                     String url = "http://" + Server.ipAddress + ":8080/";
                     String fileName = mediaFile.getName();
-                    if (playbackPanel.type == 0) PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), "_" + URLEncoding.encode(fileName));
-                    else PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
+                    if (playbackPanel.type == 0) {
+                        PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), "_" + URLEncoding.encode(fileName));
+                    } else {
+                        PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
+                    }
                 } else {
                     if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
                         UIMessage.showMessageDialog(
@@ -92,8 +93,11 @@ public class MenuBar extends JMenuBar {
              */
             JMenuItem close = new JMenuItem("Close sync");
             close.addActionListener(e -> {
-                if (playbackPanel.type == 0) Server.stop();
-                else Client.stop();
+                if (playbackPanel.type == 0) {
+                    Server.stop();
+                } else {
+                    Client.stop();
+                }
             });
             sync.add(close);
 
@@ -223,44 +227,6 @@ public class MenuBar extends JMenuBar {
             JMenu video = new JMenu("Video Settings");
             JMenuItem videoSettings = new JMenuItem("Show Video Settings Window");
             video.add(videoSettings);
-            JMenu videoRenderQuality = new JMenu("Video Render Quality");
-            JSlider qualitySlider = new JSlider(1, 100, Main.videoQuality);
-            qualitySlider.addChangeListener(e -> {
-                Main.videoQuality = ((JSlider) e.getSource()).getValue();
-            });
-            qualitySlider.addMouseListener(new MouseListener() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    String ipAddress = Client.ipAddress;
-                    Client.stop();
-                    new Client(ipAddress);
-                }
-
-                @Override
-                public void mouseEntered(MouseEvent e) {
-
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-
-                }
-            });
-            videoRenderQuality.add(qualitySlider);
-            if (playbackPanel.type == 2) {
-                video.add(new JSeparator());
-                video.add(videoRenderQuality);
-            }
             // settings.add(video);
 
             /*

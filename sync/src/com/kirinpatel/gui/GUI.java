@@ -8,12 +8,20 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+/**
+ *
+ */
 public class GUI extends JFrame {
 
     private final int type;
     public static PlaybackPanel playbackPanel;
     public static ControlPanel controlPanel;
 
+    /**
+     * Primary constructor that will create the GUI of sync.
+     *
+     * @param type Type
+     */
     public GUI(int type) {
         super(type == 0 ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
@@ -35,6 +43,9 @@ public class GUI extends JFrame {
         setVisible(type == 1);
     }
 
+    /**
+     * This inner class will handle all resizing and closing of the GUI class.
+     */
     class ResizeListener implements ComponentListener {
 
         @Override

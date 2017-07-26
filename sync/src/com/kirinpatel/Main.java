@@ -16,7 +16,6 @@ import java.util.ArrayList;
 public class Main extends JFrame {
 
     // Global variables
-    public static int videoQuality = 100;
     public static boolean showUserTimes = false;
     public static ArrayList<User> connectedUsers = new ArrayList<>();
     public static long deSyncWarningTime = 1000;

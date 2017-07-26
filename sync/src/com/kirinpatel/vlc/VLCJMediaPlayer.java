@@ -56,11 +56,9 @@ public class VLCJMediaPlayer extends JPanel {
         setBackground(Color.BLACK);
         setOpaque(true);
 
-        // Width and height values are not scalable because VLCJ does not support real-time scaling of mediaplayer.
-        WIDTH = 1280; // (1280 * Main.videoQuality) / 100;
-        HEIGHT = 720; //(720 * Main.videoQuality) / 100;
+        WIDTH = 1280;
+        HEIGHT = 720;
         this.playbackPanel = playbackPanel;
-
 
         image = GraphicsEnvironment
                         .getLocalGraphicsEnvironment()
