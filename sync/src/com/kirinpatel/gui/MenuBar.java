@@ -3,9 +3,6 @@ package com.kirinpatel.gui;
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.util.FileSelector;
-import com.kirinpatel.util.UIMessage;
-import com.kirinpatel.util.URLEncoding;
 
 import javax.swing.*;
 import java.awt.*;
@@ -89,6 +86,19 @@ public class MenuBar extends JMenuBar {
                  * Control Panel
                  */
                 JMenu controlPanel = new JMenu("Control Panel");
+                JPanel controlPanelSizePanel = new JPanel(new BorderLayout());
+                JSlider controlPanelSizeSlider = new JSlider(200, 640, 300);
+                controlPanelSizeSlider.setPaintTicks(true);
+                controlPanelSizeSlider.setMajorTickSpacing(100);
+                controlPanelSizeSlider.setMinorTickSpacing(50);
+                controlPanelSizeSlider.setToolTipText("Size: " + controlPanelSizeSlider.getValue());
+                controlPanelSizeSlider.addChangeListener(e -> {
+                        ControlPanel.width = controlPanelSizeSlider.getValue();
+                        controlPanelSizeSlider.setToolTipText("Size: " + controlPanelSizeSlider.getValue());
+                    });
+                controlPanelSizePanel.add(new JLabel("Size: ", JLabel.LEFT), BorderLayout.WEST);
+                controlPanelSizePanel.add(controlPanelSizeSlider, BorderLayout.CENTER);
+                controlPanel.add(controlPanelSizePanel);
                 JMenu controlPanelLocation = new JMenu("Location");
                 ButtonGroup locationControlPanelButtons = new ButtonGroup();
                 JRadioButtonMenuItem rightControlPanel = new JRadioButtonMenuItem("Display on Right");

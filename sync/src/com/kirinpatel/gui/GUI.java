@@ -35,7 +35,7 @@ public class GUI extends JFrame {
 
         playbackPanel = new PlaybackPanel(type);
         add(playbackPanel, BorderLayout.CENTER);
-        controlPanel = new ControlPanel(type);
+        controlPanel = new ControlPanel(this, type);
         controlPanel.resizePanel(getHeight());
         add(controlPanel, BorderLayout.EAST);
         setJMenuBar(new MenuBar(playbackPanel));

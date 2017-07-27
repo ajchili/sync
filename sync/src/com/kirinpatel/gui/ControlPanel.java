@@ -21,10 +21,14 @@ public class ControlPanel extends JPanel {
     private JTextArea chatWindow;
     private JScrollPane chatWindowScroll;
     private JTextField chatField;
+    private GUI gui;
     public static boolean isUserDisplayShown = false;
+    public static int width = 300;
 
-    public ControlPanel(int type) {
+    public ControlPanel(GUI gui, int type) {
         super(new GridLayout(2, 1));
+
+        this.gui = gui;
 
         connectedClients = new JList();
         connectedClients.setToolTipText("Connected Clients");
@@ -81,7 +85,7 @@ public class ControlPanel extends JPanel {
         chatField.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(chatField, BorderLayout.CENTER);
         JButton send = new JButton("Send");
-        send.setInputMap(0, null);
+        send.setInputMap(WHEN_FOCUSED, null);
         send.addActionListener(new ControlPanel.SendMessageListener(type));
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
@@ -89,8 +93,11 @@ public class ControlPanel extends JPanel {
     }
 
     public void resizePanel(int height) {
-        connectedClientsScroll.setPreferredSize(new Dimension(300, height / 2));
-        chatPanel.setPreferredSize(new Dimension(300, height / 2));
+        gui.setMinimumSize(new Dimension(640 + width, 360));
+        connectedClientsScroll.setPreferredSize(new Dimension(width, height / 2));
+        chatPanel.setPreferredSize(new Dimension(width, height / 2));
+        revalidate();
+        repaint();
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
