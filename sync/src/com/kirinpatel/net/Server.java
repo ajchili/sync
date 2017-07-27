@@ -5,6 +5,7 @@ import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.GUI;
+import com.kirinpatel.gui.MediaSelectorGUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.tomcat.TomcatServer;
 import com.kirinpatel.util.*;
@@ -93,6 +94,7 @@ public class Server {
                 isRunning = true;
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
+                new MediaSelectorGUI();
             } catch (IOException e) {
                 messager.showErrorDialogAndExit(e, "Couldn't open server");
                 return;

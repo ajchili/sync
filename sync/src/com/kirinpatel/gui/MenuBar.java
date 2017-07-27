@@ -25,48 +25,10 @@ public class MenuBar extends JMenuBar {
             /*
               Media section
              */
-            JMenu file = new JMenu("Set Media");
-            JMenuItem setURL = new JMenuItem("Set Media URL");
-            setURL.addActionListener(e -> {
-                String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
-                if (mediaURL != null && !mediaURL.isEmpty()) {
-                    if (mediaURL.startsWith("http")) {
-                        PlaybackPanel.mediaPlayer.setMediaURL(mediaURL);
-                    } else {
-                        PlaybackPanel.mediaPlayer.setMediaURL("http://" + mediaURL);
-                    }
-                } else {
-                    if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
-                        PlaybackPanel.mediaPlayer.setMediaURL("");
-                    } else {
-                        UIMessage.showMessageDialog(
-                                "The Media URL must be specified!",
-                                "Error setting Media URL!");
-                    }
-                }
+            JMenuItem file = new JMenuItem("Set Media");
+            file.addActionListener(e -> {
+                new MediaSelectorGUI();
             });
-            file.add(setURL);
-            JMenuItem setFile = new JMenuItem("Set Media File");
-            setFile.addActionListener(e -> {
-                File mediaFile = FileSelector.getFile(this);
-                if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                    String url = "http://" + Server.ipAddress + ":8080/";
-                    String fileName = mediaFile.getName();
-                    if (playbackPanel.type == 0) {
-                        PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), "_" + URLEncoding.encode(fileName));
-                    } else {
-                        PlaybackPanel.mediaPlayer.setMediaURL(url + fileName);
-                    }
-                } else {
-                    if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                        UIMessage.showMessageDialog(
-                                "The media file that you selected could not be used.\n" +
-                                        "Please make sure that it is inside of the media directory.",
-                                "Error selecting media!");
-                    }
-                }
-            });
-            file.add(setFile);
             if (playbackPanel.type == 0) {
                 sync.add(file);
                 sync.add(new JSeparator());
