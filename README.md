@@ -27,7 +27,7 @@ a Java based multi-client video and audio syncing application
 		1. Obtain your IP Address
             * Located either in the title of the window or under `sync` -> `Share Server Address` in the menu bar
 		2. Load your media into sync and share your IP Address
-            1. Click `sync` in the menu of the server
+            1. Click `sync` -> `Set Media` in the menu of the server
             2. Select media type
                 * For online media, click `Set Media URL` and provide the link
                     * _Should your media link be anything other than `http://`, please provide that_
