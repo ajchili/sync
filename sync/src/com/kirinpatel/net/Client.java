@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.time.Duration;
 import java.util.ArrayList;
 
 public class Client {
@@ -36,7 +37,7 @@ public class Client {
     }
 
     public static void stop() {
-        if (gui.isVisible()){
+        if (gui.isVisible()) {
             gui.hide();
         }
         clientThread.stop();
@@ -52,7 +53,6 @@ public class Client {
         private ObjectOutputStream output;
         private boolean isConnected = false;
         private long lastSentTime = 0;
-        private float rate = 1.0f;
 
         public void run() {
             isRunning = true;
@@ -74,14 +74,18 @@ public class Client {
                             case CONNECTED_CLIENTS:
                                 Main.connectedUsers = (ArrayList<User>) message.getMessage();
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                sendVideoState();
                                 break;
                             case MEDIA_URL:
                                 PlaybackPanel.mediaPlayer.setMediaURL(message.getMessage().toString());
                                 lastSentTime = 0;
                                 break;
                             case MEDIA_STATE:
-                                if ((boolean) message.getMessage()) PlaybackPanel.mediaPlayer.pause();
-                                else PlaybackPanel.mediaPlayer.play();
+                                if ((boolean) message.getMessage()) {
+                                    PlaybackPanel.mediaPlayer.pause();
+                                } else {
+                                    PlaybackPanel.mediaPlayer.play();
+                                }
                                 break;
                             case TIME:
                                 PlaybackPanel.mediaPlayer.seekTo((long) message.getMessage());
@@ -89,17 +93,9 @@ public class Client {
                                 sendVideoState();
                                 break;
                             case PLAYBACK_RATE:
-                                rate = ((float) message.getMessage() > 0.75f ? (float) message.getMessage() : 0.75f);
-                                PlaybackPanel.mediaPlayer.setRate(rate);
-                                new Thread(() -> {
-                                    try {
-                                        Thread.sleep(200);
-                                        PlaybackPanel.mediaPlayer.setRate(1.0f);
-                                    } catch(InterruptedException e) {
-                                        Thread.currentThread().interrupt();
-                                        e.printStackTrace();
-                                    }
-                                }).start();
+                                PlaybackPanel.mediaPlayer.setRate((float) message.getMessage() >= 0.75f ? (float) message.getMessage() : 0.75f);
+                                sleep(Duration.ofSeconds(1 / 5));
+                                PlaybackPanel.mediaPlayer.setRate(1.0f);
                                 break;
                             case MESSAGES:
                                 GUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
@@ -230,6 +226,14 @@ public class Client {
             } catch(IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void sleep(Duration time) {
+        try {
+            Thread.sleep(time.toMillis());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }

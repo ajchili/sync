@@ -142,6 +142,7 @@ public class Server {
 
         public void stop() {
             isRunning = false;
+            sleep(Duration.ofSeconds(1));
             try {
                 device.deletePortMapping(SYNC_PORT, "TCP");
                 device.deletePortMapping(TOMCAT_PORT, "TCP");
@@ -176,7 +177,7 @@ public class Server {
         private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
         private long lastClientUpdate = System.currentTimeMillis() - 1000;
-        private long lastPingCheck = System.currentTimeMillis() - 1000;
+        private long lastPingCheck = System.currentTimeMillis() - 500;
         private long time = 0;
 
         public ServerSocketTask(Socket socket) {
@@ -209,6 +210,7 @@ public class Server {
                                 break;
                             case PING_TESTING:
                                 user.setPing(System.currentTimeMillis() - lastPingCheck);
+                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 break;
                             case CLIENT_NAME:
                                 user = new User(message.getMessage().toString());
@@ -239,7 +241,7 @@ public class Server {
                     disconnectClientFromServer();
                 }
 
-                if (System.currentTimeMillis() > lastPingCheck + 1000) {
+                if (System.currentTimeMillis() > lastPingCheck + 500) {
                     sendPing();
                 }
 
@@ -364,7 +366,8 @@ public class Server {
         private synchronized void sendVideoTime() {
             try {
                 output.reset();
-                output.writeObject(new Message(TIME, PlaybackPanel.mediaPlayer.getMediaTime()));
+                long ping = user != null ? user.getPing() : 0;
+                output.writeObject(new Message(TIME, PlaybackPanel.mediaPlayer.getMediaTime() + ping));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
