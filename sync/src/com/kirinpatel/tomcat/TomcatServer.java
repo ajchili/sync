@@ -17,16 +17,17 @@ public class TomcatServer {
     private Tomcat tomcat;
 
     public TomcatServer() throws IOException {
-        // TODO: (cltsd27) Re-look over this code, it always creates the folder on server start
         Path mediaPath = Paths.get("tomcat/webapps/media");
-        if (Files.exists(Files.createDirectories(mediaPath))) {
-            UIMessage.showMessageDialog(
-                    "A new folder has been added for offline media.\nPlease open \""
-                            + mediaPath.toAbsolutePath()
-                            + "\"\nand add any media files that you would like to use for sync.",
-                    "Tomcat directory created!");
-        } else {
-            throw new IOException("Couldn't make tomcat directory at: " + mediaPath.toAbsolutePath());
+        if (!Files.exists(mediaPath)) {
+            if(!Files.exists(Files.createDirectories(mediaPath))) {
+                throw new IOException("Couldn't make tomcat directory at: " + mediaPath.toAbsolutePath());
+            } else {
+                UIMessage.showMessageDialog(
+                        "A new folder has been added for offline media.\nPlease open \""
+                                + mediaPath.toAbsolutePath()
+                                + "\"\nand add any media files that you would like to use for sync.",
+                        "Tomcat directory created!");
+            }
         }
         tomcat = new Tomcat();
         tomcat.setPort(TOMCAT_PORT);
@@ -51,7 +52,8 @@ public class TomcatServer {
             tomcat.start();
         } catch(LifecycleException e) {
             // If this fails, close the server
-            System.exit(0);
+            stop();
+            return;
         }
         tomcat.getServer().await();
     }
