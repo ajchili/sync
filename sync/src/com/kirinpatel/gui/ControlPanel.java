@@ -7,6 +7,7 @@ import com.kirinpatel.util.User;
 import com.kirinpatel.vlc.VLCJMediaPlayer;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,6 +67,11 @@ public class ControlPanel extends JPanel {
         chatWindow.setLineWrap(true);
         chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
+        /*
+            Credit: https://stackoverflow.com/a/1627068
+         */
+        DefaultCaret caret = (DefaultCaret)chatWindow.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
@@ -83,8 +89,8 @@ public class ControlPanel extends JPanel {
     }
 
     public void resizePanel(int height) {
-        connectedClientsScroll.setPreferredSize(new Dimension(200, height / 2));
-        chatPanel.setPreferredSize(new Dimension(200, height / 2));
+        connectedClientsScroll.setPreferredSize(new Dimension(300, height / 2));
+        chatPanel.setPreferredSize(new Dimension(300, height / 2));
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
@@ -110,8 +116,6 @@ public class ControlPanel extends JPanel {
                 chatWindow.append(message);
             }
         }
-
-        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
     }
 
     public void addMessages(ArrayList<String> messages) {
@@ -126,8 +130,6 @@ public class ControlPanel extends JPanel {
         if (chatWindow.getText().length() > 0) {
             chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
         }
-
-        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
     }
 
     class SendMessageListener implements ActionListener {
@@ -149,8 +151,6 @@ public class ControlPanel extends JPanel {
                     chatField.setText("");
                 }
             }
-            
-            chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
         }
     }
 }

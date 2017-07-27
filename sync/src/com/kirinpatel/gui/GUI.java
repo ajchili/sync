@@ -26,8 +26,8 @@ public class GUI extends JFrame {
         super(type == 0 ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
 
-        setSize(new Dimension(840, 360));
-        setMinimumSize(new Dimension(840, 360));
+        setSize(new Dimension(940, 360));
+        setMinimumSize(new Dimension(940, 360));
         setLayout(new BorderLayout());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
