@@ -42,11 +42,11 @@ public class ControlPanel extends JPanel {
                 User user = Main.connectedUsers.get(index);
 
                 if (host != null && !host.equals(user) && Main.showUserTimes) {
-                    long currentUserTime = user.getTime() + user.getPing();
+                    long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
-                    if (host.getTime() - Main.deSyncTime > currentUserTime) {
+                    if (host.getMedia().getCurrentTime() - Main.deSyncTime > currentUserTime) {
                         setBackground(Color.RED);
-                    } else if (host.getTime() - Main.deSyncWarningTime > currentUserTime) {
+                    } else if (host.getMedia().getCurrentTime() - Main.deSyncWarningTime > currentUserTime) {
                         setBackground(Color.YELLOW);
                     }
                 }
@@ -105,7 +105,7 @@ public class ControlPanel extends JPanel {
             String displayedText = user.toString();
 
             if (Main.showUserTimes) {
-                displayedText += " (" + VLCJMediaPlayer.formatTime(user.getTime()) + ')';
+                displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
             }
 
             if (!user.equals(users.get(0))) {

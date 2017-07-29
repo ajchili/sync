@@ -57,7 +57,9 @@ public class PlaybackPanel extends JPanel {
                 if (e.getY() >= Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 50) {
                     showBar = true;
                     controlPanel.setVisible(true);
-                    if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
+                    if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
+                        repaint();
+                    }
                 } else {
                     new Thread(() -> {
                         try {
@@ -66,7 +68,7 @@ public class PlaybackPanel extends JPanel {
 
                             if (!showBar && isFullscreen) {
                                 controlPanel.setVisible(false);
-                                if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+                                if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
                                     repaint();
                                 }
                             }
@@ -116,7 +118,7 @@ public class PlaybackPanel extends JPanel {
         add(mediaPlayer, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
         controlPanel.setVisible(true);
-        if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+        if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
             mediaPlayer.repaint();
             controlPanel.repaint();
             repaint();
@@ -198,7 +200,7 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+            if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
                 mediaPlayer.revalidate();
                 mediaPlayer.repaint();
             }
@@ -206,7 +208,7 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+            if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
                 mediaPlayer.revalidate();
                 mediaPlayer.repaint();
             }

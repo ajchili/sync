@@ -175,14 +175,12 @@ public class Server {
         private User user;
         private boolean isClientConnected = false;
         private boolean hasConnected = false;
-        private String mediaURL = "";
-        private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis() - 1000;
-        private long lastPingCheck = System.currentTimeMillis() - 500;
-        private long time = 0;
+        private long lastPingCheck = 0;
+        private long lastClientUpdate = 0;
+        private long lastMediaUpdate = 0;
 
-        public ServerSocketTask(Socket socket) {
+        ServerSocketTask(Socket socket) {
             this.socket = socket;
         }
 
@@ -210,7 +208,7 @@ public class Server {
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 isClientConnected = false;
                                 break;
-                            case PING_TESTING:
+                            case PING:
                                 user.setPing(System.currentTimeMillis() - lastPingCheck);
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 break;
@@ -220,15 +218,9 @@ public class Server {
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 hasConnected = true;
                                 break;
-                            case MEDIA_STATE:
-                                if ((boolean) message.getMessage() != isPaused) {
-                                    sendVideoState();
-                                }
-                                break;
-                            case TIME:
-                                time = (long) message.getMessage();
-                                if (user != null) user.setTime(time);
-                                sendVideoRate();
+                            case MEDIA:
+                                user.setMedia((Media) message.getMessage());
+                                sendMedia();
                                 break;
                             case CLIENT_MESSAGES:
                                 for (String m : (ArrayList<String>) message.getMessage()) {
@@ -243,24 +235,20 @@ public class Server {
                     disconnectClientFromServer();
                 }
 
-                if (System.currentTimeMillis() > lastPingCheck + 500) {
+                if (lastPingCheck < System.currentTimeMillis() - 500) {
                     sendPing();
                 }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 1000) {
+                if (lastClientUpdate < System.currentTimeMillis() - 1500) {
                     sendConnectedUsersToClient();
+                }
+
+                if (lastMediaUpdate < System.currentTimeMillis() - 3000) {
+                    sendMedia();
                 }
 
                 if (messages.size() < Server.messages.size()) {
                     sendMessagesToClient();
-                }
-
-                if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) {
-                    sendMediaURL();
-                }
-
-                if (isPaused != PlaybackPanel.mediaPlayer.isPaused()) {
-                    sendVideoState();
                 }
             }
 
@@ -272,7 +260,7 @@ public class Server {
             }
         }
 
-        public void stop() {
+        void stop() {
             disconnectClientFromServer();
 
             server.stop();
@@ -284,13 +272,12 @@ public class Server {
                 Message message = (Message) input.readObject();
                 isClientConnected = message.getType() == CONNECTING;
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(CONNECTED, ""));
+                output.writeObject(new Message(CONNECTED, null));
                 output.flush();
-                sendVideoState();
-                sendVideoTime();
+                sendMedia();
                 sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
-                // TODO(ajchili): catch this better
+                disconnectClientFromServer();
             }
         }
 
@@ -308,7 +295,7 @@ public class Server {
         private synchronized void sendPing() {
             try {
                 lastPingCheck = System.currentTimeMillis();
-                output.writeObject(new Message(PING_TESTING, ""));
+                output.writeObject(new Message(PING, null));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
@@ -343,50 +330,14 @@ public class Server {
             }
         }
 
-        private synchronized void sendMediaURL() {
+        private synchronized void sendMedia() {
             try {
-                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.mediaPlayer.getMediaURL()));
+                lastMediaUpdate = System.currentTimeMillis();
                 output.flush();
-                mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
-                time = 0;
-                Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
-            } catch(IOException e) {
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendVideoState() {
-            try {
-                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.mediaPlayer.isPaused()));
-                output.flush();
-                isPaused = PlaybackPanel.mediaPlayer.isPaused();
-            } catch(IOException e) {
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendVideoTime() {
-            try {
-                output.reset();
-                long ping = user != null ? user.getPing() : 0;
-                output.writeObject(new Message(TIME, PlaybackPanel.mediaPlayer.getMediaTime() + ping));
+                output.writeObject(new Message(MEDIA, PlaybackPanel.mediaPlayer.getMedia()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendVideoRate() {
-            long timeDifference = PlaybackPanel.mediaPlayer.getMediaTime() - time;
-            if (Math.abs(timeDifference) > 2000) {
-                sendVideoTime();
-            } else if (Math.abs(timeDifference) > 1000) {
-                try {
-                    output.writeObject(new Message(PLAYBACK_RATE, (timeDifference + 1000) * 1.0f / 1000));
-                    output.flush();
-                } catch(IOException e) {
-                    disconnectClientFromServer();
-                }
             }
         }
     }

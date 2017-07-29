@@ -1,30 +1,33 @@
 package com.kirinpatel.util;
 
-import java.io.File;
+import java.io.Serializable;
+import java.nio.file.Path;
 
-public class Media {
+public class Media implements Serializable {
 
     private String url;
-    private File file;
+    private String filePath;
     private long currentTime = -1;
     private long length = -1;
+    private float rate = 1.0f;
     private boolean isPaused;
 
     public Media(String url) {
         this.url = url;
+        this.filePath = "null";
     }
 
-    public Media(File file) {
-        this.file = file;
-        this.url = "_" + file.getName();
+    public Media(Path filePath) {
+        this.filePath = filePath.toString();
+        this.url = "_" + URLEncoding.encode(filePath.getFileName().toString());
     }
 
-    public void setUrl(String url) {
+    public void setURL(String url) {
         this.url = url;
     }
 
-    public void File(File file) {
-        this.file = file;
+    public void setFilePath(Path filePath) {
+        this.filePath = filePath.toString();
     }
 
     public void setCurrentTime(long currentTime) {
@@ -35,16 +38,20 @@ public class Media {
         this.length = length;
     }
 
+    public void setRate(float rate) {
+        this.rate = rate >= 0.75f ? rate : 0.75f;
+    }
+
     public void setPaused(boolean isPaused) {
         this.isPaused = isPaused;
     }
 
-    public String getUrl() {
+    public String getURL() {
         return url;
     }
 
-    public File getFile() {
-        return file;
+    public String getFilePath() {
+        return filePath;
     }
 
     public long getCurrentTime() {
@@ -53,6 +60,10 @@ public class Media {
 
     public long getLength() {
         return length;
+    }
+
+    public float getRate() {
+        return rate;
     }
 
     public boolean isPaused() {

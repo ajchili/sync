@@ -1,8 +1,8 @@
 package com.kirinpatel.gui;
 
 import com.kirinpatel.util.FileSelector;
+import com.kirinpatel.util.Media;
 import com.kirinpatel.util.UIMessage;
-import com.kirinpatel.util.URLEncoding;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * The MediaSelectorGUI will display a gui to the user when prompted and allow for on start media selection to occur.
@@ -104,14 +105,12 @@ public class MediaSelectorGUI extends JFrame {
                     String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
                     if (mediaURL != null && !mediaURL.isEmpty()) {
                         if (mediaURL.startsWith("http")) {
-                            PlaybackPanel.mediaPlayer.setMediaURL(mediaURL);
+                            PlaybackPanel.mediaPlayer.setMediaSource(new Media(mediaURL));
                         } else {
-                            PlaybackPanel.mediaPlayer.setMediaURL("http://" + mediaURL);
+                            PlaybackPanel.mediaPlayer.setMediaSource(new Media("http://" + mediaURL));
                         }
                     } else {
-                        if (!PlaybackPanel.mediaPlayer.getMediaURL().isEmpty()) {
-                            PlaybackPanel.mediaPlayer.setMediaURL("");
-                        } else {
+                        if (mediaURL != null) {
                             UIMessage.showMessageDialog(
                                     "The Media URL must be specified!",
                                     "Error setting Media URL!");
@@ -121,13 +120,11 @@ public class MediaSelectorGUI extends JFrame {
                 case 1:
                     File mediaFile = FileSelector.getFile(null);
                     if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                        String fileName = mediaFile.getName();
-                        PlaybackPanel.mediaPlayer.setMediaFile(mediaFile.getAbsolutePath(), "_" + URLEncoding.encode(fileName));
+                        PlaybackPanel.mediaPlayer.setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
                     } else {
-                        if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
+                        if (mediaFile != null) {
                             UIMessage.showMessageDialog(
-                                    "The media file that you selected could not be used.\n" +
-                                            "Please make sure that it is inside of the media directory.",
+                                    "The media file that you selected could not be used.",
                                     "Error selecting media!");
                         }
                     }

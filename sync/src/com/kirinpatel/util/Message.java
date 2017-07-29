@@ -15,13 +15,10 @@ public class Message implements Serializable {
         CONNECTING(1),
         CONNECTED(2),
         CLOSING(3),
-        PING_TESTING(4),
+        PING(4),
         CLIENT_NAME(10),
         CONNECTED_CLIENTS(11),
-        MEDIA_URL(20),
-        MEDIA_STATE(21),
-        TIME(22),
-        PLAYBACK_RATE(23),
+        MEDIA(20),
         MESSAGES(30),
         CLIENT_MESSAGES(31);
 

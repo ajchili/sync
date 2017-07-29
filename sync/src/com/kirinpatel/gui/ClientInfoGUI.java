@@ -77,13 +77,12 @@ public class ClientInfoGUI extends JFrame {
         public void run() {
             while(isRunning) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                     if (index <= Main.connectedUsers.size()) {
                         ping.setText("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
                     }
                 } catch(InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    e.printStackTrace();
                 }
             }
         }

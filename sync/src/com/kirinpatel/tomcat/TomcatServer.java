@@ -1,5 +1,6 @@
 package com.kirinpatel.tomcat;
 
+import com.kirinpatel.net.Server;
 import com.kirinpatel.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -52,7 +53,7 @@ public class TomcatServer {
             tomcat.start();
         } catch(LifecycleException e) {
             // If this fails, close the server
-            stop();
+            Server.stop();
             return;
         }
         tomcat.getServer().await();

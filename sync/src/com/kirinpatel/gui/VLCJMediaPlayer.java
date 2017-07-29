@@ -2,6 +2,7 @@ package com.kirinpatel.gui;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
+import com.kirinpatel.net.Server;
 import com.kirinpatel.util.Media;
 import com.kirinpatel.util.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -23,19 +24,20 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.nio.file.Paths;
 
 /**
  * Modified JPanel that will play media for the sync application.
  */
 public class VLCJMediaPlayer extends JPanel {
 
-    private final int WIDTH;
-    private final int HEIGHT;
+    private static final int WIDTH = 1280;
+    private static final int HEIGHT = 720;
     private final PlaybackPanel playbackPanel;
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
     private BufferedImage scale;
-    private static Media media;
+    private static Media media = new Media("");;
     private boolean isScrubbing = false;
     private boolean isFile = false;
 
@@ -44,13 +46,11 @@ public class VLCJMediaPlayer extends JPanel {
      *
      * @param playbackPanel Returns MediaPanel
      */
-    public VLCJMediaPlayer(PlaybackPanel playbackPanel) {
+    VLCJMediaPlayer(PlaybackPanel playbackPanel) {
         new NativeDiscovery().discover();
         setBackground(Color.BLACK);
         setOpaque(true);
 
-        WIDTH = 1280;
-        HEIGHT = 720;
         this.playbackPanel = playbackPanel;
 
         image = GraphicsEnvironment
@@ -73,8 +73,6 @@ public class VLCJMediaPlayer extends JPanel {
         AudioSettingsGUI.setEqualizer(equalizer);
         AudioSettingsGUI.loadSettings();
         mediaPlayer.setEqualizer(equalizer);
-
-        media = new Media("");
     }
 
     /**
@@ -120,7 +118,7 @@ public class VLCJMediaPlayer extends JPanel {
             playbackPanel.mediaPosition.addChangeListener(e -> {
                 if (isScrubbing) {
                     int position = playbackPanel.mediaPosition.getValue();
-                    mediaPlayer.setTime(position * getMediaLength() / 1000);
+                    mediaPlayer.setTime(position * media.getLength() / 1000);
                 }
             });
         }
@@ -135,7 +133,7 @@ public class VLCJMediaPlayer extends JPanel {
 
         if (playbackPanel.type == 0) {
             for (User client : Main.connectedUsers) {
-                client.setTime(0);
+                client.getMedia().setCurrentTime(0);
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }
@@ -144,74 +142,82 @@ public class VLCJMediaPlayer extends JPanel {
     }
 
     public void play() {
-        if (!media.getUrl().isEmpty() && media.isPaused()) {
+        if (!media.getURL().isEmpty() && media.isPaused()) {
+            VLCJMediaPlayer.media.setPaused(false);
             mediaPlayer.play();
         }
     }
 
     public void pause() {
-        if (!media.getUrl().isEmpty() && !media.isPaused()) {
+        if (!media.getURL().isEmpty() && !media.isPaused()) {
+            VLCJMediaPlayer.media.setPaused(true);
             mediaPlayer.pause();
         }
     }
 
-    public void release() {
+    void release() {
         mediaPlayer.stop();
         mediaPlayer.release();
     }
 
-    public void setMediaURL(String mediaURL) {
-        if (!mediaURL.isEmpty() && !mediaURL.equals(media.getUrl())) {
+    public void setMedia(Media media) {
+        VLCJMediaPlayer.media = media;
+        VLCJMediaPlayer.media.setURL(VLCJMediaPlayer.media.getURL());
+        VLCJMediaPlayer.media.setFilePath(Paths.get("null"));
+        mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getURL());
+        mediaPlayer.parseMedia();
+        initControls();
+    }
+
+    void setMediaSource(Media media) {
+        if (!media.getURL().equals(VLCJMediaPlayer.media.getURL()) && media.getFilePath().equals("null")) {
             isFile = false;
-            mediaPlayer.prepareMedia(mediaURL.startsWith("_")
-                    ? "http://" + Client.ipAddress + ":8080/" + mediaURL.substring(1)
-                    : mediaURL);
+            VLCJMediaPlayer.media.setURL(media.getURL().startsWith("_")
+                    ? "http://" + Server.ipAddress + ":8080/" + media.getURL().substring(1)
+                    : media.getURL());
+            VLCJMediaPlayer.media.setFilePath(Paths.get("null"));
+            mediaPlayer.prepareMedia(media.getURL());
             mediaPlayer.parseMedia();
             initControls();
-        }
-    }
-
-    public void setMediaFile(String filePath, String mediaURL) {
-        if (!filePath.isEmpty()
-                && !mediaURL.isEmpty()
-                && !filePath.equals(media.getFile())
-                && !mediaURL.equals(media.getUrl())) {
+        } else if (!media.getFilePath().equals(VLCJMediaPlayer.media.getFilePath()) && playbackPanel.type == 0) {
             isFile = true;
-            media.setUrl(mediaURL);
-            mediaPlayer.prepareMedia(filePath);
-            mediaPlayer.parseMedia();
-            initControls();
+            VLCJMediaPlayer.media.setURL(media.getURL().startsWith("_")
+                    ? "http://" + Server.ipAddress + ":8080/" + media.getURL().substring(1)
+                    : media.getURL());
+            VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
+            mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getFilePath());
         }
+        mediaPlayer.parseMedia();
+        initControls();
     }
 
-    public void setVolume(int volume) {
+    void setVolume(int volume) {
         mediaPlayer.setVolume(volume);
     }
 
     public void seekTo(long time) {
+        VLCJMediaPlayer.media.setCurrentTime(time);
         mediaPlayer.setTime(time);
     }
 
     public void setRate(float rate) {
         if (!media.isPaused()) {
+            VLCJMediaPlayer.media.setRate(rate);
             mediaPlayer.setRate(rate);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(200);
+                    VLCJMediaPlayer.media.setRate(1.0f);
+                    mediaPlayer.setRate(1.0f);
+                } catch(InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
         }
     }
 
-    public boolean isPaused() {
-        return media.isPaused();
-    }
-
-    public String getMediaURL() {
-        return media.getUrl();
-    }
-
-    public long getMediaTime() {
-        return media.getCurrentTime() == -1 ? 0 : media.getCurrentTime();
-    }
-
-    public long getMediaLength() {
-        return media.getLength() == -1 ? 0 : media.getLength();
+    public Media getMedia() {
+        return media;
     }
 
     /**
@@ -220,7 +226,7 @@ public class VLCJMediaPlayer extends JPanel {
      * @param value Time
      * @return Time in displayable string format
      */
-    public static String formatTime(long value) {
+    static String formatTime(long value) {
         value /= 1000;
         int hours = (int) value / 3600;
         int remainder = (int) value - hours * 3600;
@@ -237,7 +243,7 @@ public class VLCJMediaPlayer extends JPanel {
 
     class MediaRenderCallback extends RenderCallbackAdapter {
 
-        public MediaRenderCallback() {
+        MediaRenderCallback() {
             super(new int[WIDTH * HEIGHT]);
         }
 
@@ -253,10 +259,10 @@ public class VLCJMediaPlayer extends JPanel {
             scale = scaleOp.filter(image, after);
             repaint();
             if (playbackPanel.type == 0) {
-                Main.connectedUsers.get(0).setTime(getMediaTime());
+                Main.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             } else {
-                Client.user.setTime(getMediaTime());
+                Client.user.getMedia().setCurrentTime(media.getCurrentTime());
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             }
         }
@@ -268,7 +274,7 @@ public class VLCJMediaPlayer extends JPanel {
         public void mediaChanged(MediaPlayer mediaPlayer,
                                  libvlc_media_t libvlc_media_t,
                                  String s) {
-            if (!isFile) media.setUrl(s);
+            if (!isFile) media.setURL(s);
         }
 
         @Override

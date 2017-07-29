@@ -10,33 +10,20 @@ public class User implements Serializable {
 
     private String username;
     private long userID;
-    private long time = -1;
+    private Media media;
     private long ping = 0;
-    private boolean wantsToPause = false;
 
-    /**
-     *
-     * @param username
-     */
     public User(String username) {
         this.username = username;
         this.userID = Math.abs(new Random().nextLong());
+        this.media = new Media("");
     }
 
-    /**
-     *
-     * @return Returns user in printable string
-     */
     @Override
     public String toString() {
         return username;
     }
 
-    /**
-     *
-     * @param o Object
-     * @return Returns if object is equal to user
-     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof User)) {
@@ -47,57 +34,24 @@ public class User implements Serializable {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     public String getUsername() {
         return username;
     }
 
-    /**
-     *
-     * @return
-     */
     public long getUserID() {
         return userID;
     }
 
-    /**
-     *
-     * @return
-     */
-    public long getTime() {
-        return time;
-    }
-
-    public boolean doesWantToPause() {
-        return wantsToPause;
+    public Media getMedia() {
+        return media;
     }
 
     public long getPing() {
         return ping;
     }
 
-
-    /**
-     *
-     * @param time
-     */
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public void setWantsToPause(boolean wantsToPause) {
-        this.wantsToPause = wantsToPause;
-        new Thread(() -> {
-            try {
-                Thread.sleep(2500);
-                setWantsToPause(false);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+    public void setMedia(Media media) {
+        this.media = media;
     }
 
     public void setPing(long ping) {
