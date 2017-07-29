@@ -1,21 +1,28 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.util.UIMessage;
+import uk.co.caprica.vlcj.player.Equalizer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * AudioSettingsGUI class will be used to show the Audio Equalizer to allow a user to set the db boost of each audio
  * frequency band.
  */
-public class AudioSettingsGUI extends JFrame {
+class AudioSettingsGUI extends JFrame {
+    private static final Path SETTINGS_PATH = Paths.get("equalizer.dat");
 
-    private int[] frequencies = new int[10];
+    private static Equalizer equalizer;
 
     /**
      * Main constructor that will create the AudioSettingsGUI.
      */
-    public AudioSettingsGUI() {
+    AudioSettingsGUI() {
         super("Audio Equalizer");
 
         setSize(new Dimension(450, 300));
@@ -25,13 +32,18 @@ public class AudioSettingsGUI extends JFrame {
         setLocationRelativeTo(null);
 
         for (int i = 32; i <= 16384; i *= 2) {
-            final int index = i;
+            // Calculate the 0-9 index from the above i
+            final int index = (int) (Math.log(i/32)/Math.log(2));
 
             JPanel panel = new JPanel(new BorderLayout());
-            JLabel label = new JLabel(i < 1000 ? i + "" : "" + (i / 1000) + 'K', SwingConstants.CENTER);
+            JLabel label = new JLabel(
+                    i < 1000
+                    ? Integer.toString(i)
+                    : Integer.toString(i / 1000) + 'K',
+                    SwingConstants.CENTER);
             panel.add(label, BorderLayout.NORTH);
             JSlider slider = new JSlider(1, -20, 20, 0);
-            slider.setValue(loadSettings(i));
+            slider.setValue((int) equalizer.getAmp(index));
             slider.setPaintTicks(true);
             slider.setPaintLabels(true);
             slider.setMajorTickSpacing(4);
@@ -51,49 +63,38 @@ public class AudioSettingsGUI extends JFrame {
      * @param value Value of band
      */
     private void setBandValue(int index, int value) {
-        int band = 0;
-        for (int i = index; i > 32; i /= 2) band++;
-        frequencies[band] = value;
-        VLCJMediaPlayer.equalizer.setAmp(band, frequencies[band]);
+        equalizer.setAmp(index, value);
         saveSettings();
     }
 
     /**
-     * Provides db boost of a provided frequency band.
-     *
-     * @param band Frequency band number
-     * @return Returns db boost of provided frequency band
+     * Load the settings into the equalizer
      */
-    public static int loadSettings(int band) {
-        int location = 0;
-        for (int i = band; i > 32; i /= 2) location++;
-
-        File file = new File("equalizer.dat");
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                for (int i = 0; i < location; i++) {
-                    reader.readLine();
+    static void loadSettings() {
+        if (Files.exists(SETTINGS_PATH)) {
+            try (BufferedReader reader = Files.newBufferedReader(SETTINGS_PATH)) {
+                for (int i = 0; i < 10; i++) {
+                    int boost = Integer.parseInt(reader.readLine());
+                    equalizer.setAmp(i, boost);
                 }
-
-                return Integer.parseInt(reader.readLine());
-            } catch (IOException e) {
-                return 0;
-            }
+            } catch (IOException e) {}
         }
-        return 0;
     }
 
     /**
      * Saves user equalization settings.
      */
     private void saveSettings() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File("equalizer.dat")))) {
+        try (BufferedWriter writer = Files.newBufferedWriter(SETTINGS_PATH)) {
             for (int i = 0; i < 10; i++) {
-                writer.write(frequencies[i] + "\n");
+                writer.write((int) equalizer.getAmp(i) + "\n");
             }
         } catch(IOException e) {
-            // TODO: (ajchili) Properly handle exception
-            e.printStackTrace();
+            UIMessage.showErrorDialog(e, "Couldn't save equalizer settings!");
         }
+    }
+
+    static void setEqualizer(Equalizer equalizer) {
+        AudioSettingsGUI.equalizer = equalizer;
     }
 }

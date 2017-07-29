@@ -34,7 +34,6 @@ public class VLCJMediaPlayer extends JPanel {
     private final PlaybackPanel playbackPanel;
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
-    public static Equalizer equalizer;
     private BufferedImage scale;
     private static Media media;
     private boolean isScrubbing = false;
@@ -70,8 +69,9 @@ public class VLCJMediaPlayer extends JPanel {
         mediaPlayer.setStandardMediaOptions();
         mediaPlayer.setPlaySubItems(true);
         mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
-        equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
-        for (int i = 0; i < 10; i++) equalizer.setAmp(i, AudioSettingsGUI.loadSettings(i));
+        Equalizer equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
+        AudioSettingsGUI.setEqualizer(equalizer);
+        AudioSettingsGUI.loadSettings();
         mediaPlayer.setEqualizer(equalizer);
 
         media = new Media("");
