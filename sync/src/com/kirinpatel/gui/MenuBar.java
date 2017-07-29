@@ -7,7 +7,6 @@ import com.kirinpatel.net.Server;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.io.File;
 
 public class MenuBar extends JMenuBar {
 
