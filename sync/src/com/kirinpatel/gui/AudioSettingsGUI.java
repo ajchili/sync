@@ -1,7 +1,5 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.vlc.VLCJMediaPlayer;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;

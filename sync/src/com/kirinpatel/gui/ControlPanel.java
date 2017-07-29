@@ -4,7 +4,6 @@ import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.User;
-import com.kirinpatel.vlc.VLCJMediaPlayer;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -109,7 +108,11 @@ public class ControlPanel extends JPanel {
                 displayedText += " (" + VLCJMediaPlayer.formatTime(user.getTime()) + ')';
             }
 
-            listModel.addElement(displayedText + " (" + user.getPing() + " ms)");
+            if (!user.equals(users.get(0))) {
+                displayedText += " (" + user.getPing() + " ms)";
+            }
+
+            listModel.addElement(displayedText);
         }
         connectedClients.setModel(listModel);
     }

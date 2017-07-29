@@ -1,7 +1,6 @@
 package com.kirinpatel.gui;
 
 import com.kirinpatel.util.KeyDispatcher;
-import com.kirinpatel.vlc.VLCJMediaPlayer;
 
 import javax.swing.*;
 import java.awt.*;

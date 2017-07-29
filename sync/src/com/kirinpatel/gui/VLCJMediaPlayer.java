@@ -1,4 +1,4 @@
-package com.kirinpatel.vlc;
+package com.kirinpatel.gui;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.gui.AudioSettingsGUI;
