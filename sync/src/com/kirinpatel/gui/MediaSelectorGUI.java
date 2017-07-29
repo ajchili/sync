@@ -87,7 +87,7 @@ public class MediaSelectorGUI extends JFrame {
          *
          * @param type Type
          */
-        public MediaButtonEvent(int type) {
+        MediaButtonEvent(int type) {
             this.type = type;
         }
 

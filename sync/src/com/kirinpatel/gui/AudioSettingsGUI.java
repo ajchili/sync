@@ -77,7 +77,9 @@ class AudioSettingsGUI extends JFrame {
                     int boost = Integer.parseInt(reader.readLine());
                     equalizer.setAmp(i, boost);
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                UIMessage.showErrorDialog(e, "Couldn't load equalizer settings!");
+            }
         }
     }
 

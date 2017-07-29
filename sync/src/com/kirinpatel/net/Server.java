@@ -32,7 +32,7 @@ public class Server {
     private static boolean isRunning = false;
     private static boolean closeServer = false;
 
-    public static int SYNC_PORT = 8000;
+    static int SYNC_PORT = 8000;
     public static int TOMCAT_PORT = 8080;
 
     public Server() {
@@ -142,7 +142,7 @@ public class Server {
             }
         }
 
-        public void stop() {
+        void stop() {
             isRunning = false;
             sleep(Duration.ofSeconds(1));
             try {

@@ -91,7 +91,7 @@ public class ControlPanel extends JPanel {
         add(chatPanel);
     }
 
-    public void resizePanel(int height) {
+    void resizePanel(int height) {
         gui.setMinimumSize(new Dimension(640 + width, 360));
         connectedClientsScroll.setPreferredSize(new Dimension(width, height / 2));
         chatPanel.setPreferredSize(new Dimension(width, height / 2));
@@ -146,7 +146,7 @@ public class ControlPanel extends JPanel {
 
         private int type;
 
-        public SendMessageListener(int type) {
+        SendMessageListener(int type) {
             this.type = type;
         }
 

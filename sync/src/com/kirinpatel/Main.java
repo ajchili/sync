@@ -210,7 +210,7 @@ public class Main extends JFrame {
          *
          * @param type Type
          */
-        public LauncherButtonEvent(int type) {
+        LauncherButtonEvent(int type) {
             this.type = type;
         }
 

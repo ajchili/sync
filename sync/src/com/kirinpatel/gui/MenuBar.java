@@ -8,9 +8,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
-public class MenuBar extends JMenuBar {
+class MenuBar extends JMenuBar {
 
-    public MenuBar(PlaybackPanel playbackPanel) {
+    MenuBar(PlaybackPanel playbackPanel) {
         super();
 
         /*

@@ -133,7 +133,7 @@ public class Client {
             disconnectFromServer();
         }
 
-        public void stop() {
+        void stop() {
             isRunning = false;
 
             isConnected = false;

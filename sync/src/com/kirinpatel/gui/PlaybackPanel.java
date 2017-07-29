@@ -10,10 +10,10 @@ public class PlaybackPanel extends JPanel {
 
     public static VLCJMediaPlayer mediaPlayer;
     public static JButton pauseMedia;
-    public final int type;
-    public JLabel mediaPositionLabel;
-    public JSlider mediaPosition;
-    public JSlider mediaVolume;
+    final int type;
+    JLabel mediaPositionLabel;
+    JSlider mediaPosition;
+    JSlider mediaVolume;
     public boolean isFullscreen = false;
     private JPanel controlPanel;
     private JFrame fullscreen;
