@@ -1,4 +1,4 @@
-package com.kirinpatel.tomcat;
+package com.kirinpatel.net;
 
 import com.kirinpatel.net.Server;
 import com.kirinpatel.util.UIMessage;
