@@ -33,6 +33,7 @@ public class ClientInfoGUI extends JFrame {
         disconnectUser.addActionListener(e -> {
             Server.kickUser(index);
             ControlPanel.isUserDisplayShown = false;
+            updateUIThread.stop();
             dispose();
         });
         add(disconnectUser);
@@ -78,7 +79,7 @@ public class ClientInfoGUI extends JFrame {
             while(isRunning) {
                 try {
                     Thread.sleep(1000);
-                    if (index <= Main.connectedUsers.size()) {
+                    if (index < Main.connectedUsers.size()) {
                         ping.setText("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
                     }
                 } catch(InterruptedException e) {
