@@ -12,6 +12,8 @@ public class ClientInfoGUI extends JFrame {
 
     private int index;
     private JLabel ping;
+    private JLabel mediaTime;
+    private JLabel mediaState;
     private UpdateUIThread updateUIThread;
 
     public ClientInfoGUI(int index) {
@@ -20,7 +22,7 @@ public class ClientInfoGUI extends JFrame {
         this.index = index;
 
         setResizable(false);
-        setLayout(new GridLayout(4, 1));
+        setLayout(new GridLayout(6, 1));
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         addComponentListener(new ClientInfoComponentListener());
         setLocationRelativeTo(null);
@@ -29,6 +31,13 @@ public class ClientInfoGUI extends JFrame {
         add(new JLabel("UserID: " + Main.connectedUsers.get(index).getUserID()));
         ping = new JLabel("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
         add(ping);
+        mediaTime = new JLabel("Playback Time: "
+                + VLCJMediaPlayer.formatTime(Main.connectedUsers.get(index).getMedia().getCurrentTime())
+                + ":" + Main.connectedUsers.get(index).getMedia().getCurrentTime() % 1000);
+        add(mediaTime);
+        mediaState = new JLabel("Playback State: "
+                + (Main.connectedUsers.get(index).getMedia().isPaused() ? "Paused" : "Playing"));
+        add(mediaState);
         JButton disconnectUser = new JButton("Kick Client");
         disconnectUser.addActionListener(e -> {
             Server.kickUser(index);
@@ -78,9 +87,14 @@ public class ClientInfoGUI extends JFrame {
         public void run() {
             while(isRunning) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(250);
                     if (index < Main.connectedUsers.size()) {
                         ping.setText("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
+                        mediaTime.setText("Playback Time: "
+                                + VLCJMediaPlayer.formatTime(Main.connectedUsers.get(index).getMedia().getCurrentTime())
+                                + ":" + Main.connectedUsers.get(index).getMedia().getCurrentTime() % 1000);
+                        mediaState.setText("Playback State: "
+                                + (Main.connectedUsers.get(index).getMedia().isPaused() ? "Paused" : "Playing"));
                     }
                 } catch(InterruptedException e) {
                     Thread.currentThread().interrupt();
