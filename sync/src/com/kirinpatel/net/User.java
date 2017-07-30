@@ -1,4 +1,4 @@
-package com.kirinpatel.util;
+package com.kirinpatel.net;
 
 import java.io.Serializable;
 import java.util.Random;

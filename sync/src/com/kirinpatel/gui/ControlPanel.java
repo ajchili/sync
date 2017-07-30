@@ -3,7 +3,7 @@ package com.kirinpatel.gui;
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.util.User;
+import com.kirinpatel.net.User;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;

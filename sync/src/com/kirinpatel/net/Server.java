@@ -218,8 +218,8 @@ public class Server {
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 hasConnected = true;
                                 break;
-                            case MEDIA:
-                                user.setMedia((Media) message.getMessage());
+                            case MEDIA_URL:
+                                user.getMedia().setURL((String) message.getMessage());
                                 break;
                             case MEDIA_TIME:
                                 user.getMedia().setCurrentTime((long) message.getMessage());
@@ -254,9 +254,9 @@ public class Server {
                 }
 
                 if (System.currentTimeMillis() > lastMediaUpdate + 5000
-                        || user != null
-                        && !user.getMedia().getURL().equals(PlaybackPanel.mediaPlayer.getMedia().getURL())) {
-                    sendMedia();
+                        || (user != null
+                        && !user.getMedia().getURL().equals(PlaybackPanel.mediaPlayer.getMedia().getURL()))) {
+                    sendMediaURL();
                 }
 
                 if (user != null &&PlaybackPanel.mediaPlayer.getMedia().isPaused() != user.getMedia().isPaused()) {
@@ -278,7 +278,6 @@ public class Server {
 
         void stop() {
             disconnectClientFromServer();
-
             server.stop();
         }
 
@@ -344,11 +343,11 @@ public class Server {
             }
         }
 
-        private synchronized void sendMedia() {
+        private synchronized void sendMediaURL() {
             try {
                 lastMediaUpdate = System.currentTimeMillis();
                 output.flush();
-                output.writeObject(new Message(MEDIA, PlaybackPanel.mediaPlayer.getMedia()));
+                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.mediaPlayer.getMedia().getURL()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();

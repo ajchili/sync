@@ -2,9 +2,8 @@ package com.kirinpatel.gui;
 
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
-import com.kirinpatel.util.Media;
-import com.kirinpatel.util.User;
+import com.kirinpatel.net.Media;
+import com.kirinpatel.net.User;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
@@ -37,7 +36,7 @@ public class VLCJMediaPlayer extends JPanel {
     private final BufferedImage image;
     private final DirectMediaPlayer mediaPlayer;
     private BufferedImage scale;
-    private static Media media = new Media("");;
+    private static Media media = new Media("");
     private boolean isScrubbing = false;
     private boolean isFile = false;
 
@@ -163,7 +162,6 @@ public class VLCJMediaPlayer extends JPanel {
     public void setMedia(Media media) {
         isFile = false;
         VLCJMediaPlayer.media = media;
-        VLCJMediaPlayer.media.setFilePath(Paths.get("null"));
         mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getURL());
         mediaPlayer.parseMedia();
         initControls();
@@ -171,9 +169,7 @@ public class VLCJMediaPlayer extends JPanel {
 
     void setMediaSource(Media media) {
         if (!media.getURL().equals(VLCJMediaPlayer.media.getURL())|| !media.getFilePath().equals(VLCJMediaPlayer.media.getFilePath())) {
-            VLCJMediaPlayer.media.setURL(media.getURL().startsWith("_")
-                    ? "http://" + Server.ipAddress + ":8080/" + media.getURL().substring(1)
-                    : media.getURL());
+            VLCJMediaPlayer.media.setURL(media.getURL());
             isFile = !media.getFilePath().equals("null");
             if (isFile) {
                 VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
@@ -198,12 +194,12 @@ public class VLCJMediaPlayer extends JPanel {
     public void setRate(float rate) {
         if (!media.isPaused()) {
             VLCJMediaPlayer.media.setRate(rate);
-            mediaPlayer.setRate(rate);
+            mediaPlayer.setRate(VLCJMediaPlayer.media.getRate());
             new Thread(() -> {
                 try {
                     Thread.sleep(200);
                     VLCJMediaPlayer.media.setRate(1.0f);
-                    mediaPlayer.setRate(1.0f);
+                    mediaPlayer.setRate(VLCJMediaPlayer.media.getRate());
                 } catch(InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -213,6 +209,10 @@ public class VLCJMediaPlayer extends JPanel {
 
     public Media getMedia() {
         return media;
+    }
+
+    public boolean isPaused() {
+        return !mediaPlayer.isPlaying();
     }
 
     /**

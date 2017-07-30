@@ -1,4 +1,4 @@
-package com.kirinpatel.util;
+package com.kirinpatel.net;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -13,13 +13,11 @@ public class Media implements Serializable {
     private boolean isPaused;
 
     public Media(String url) {
-        this.url = url;
-        this.filePath = "null";
+        setURL(url);
     }
 
     public Media(Path filePath) {
-        this.filePath = filePath.toString();
-        this.url = "_" + encode(filePath.getFileName().toString());
+        setFilePath(filePath);
     }
 
     public void setURL(String url) {
@@ -28,7 +26,8 @@ public class Media implements Serializable {
     }
 
     public void setFilePath(Path filePath) {
-        this.filePath = filePath.toString();
+        this.url = "http://" + Server.ipAddress + ":8080/" + encode(filePath.getFileName().toString());
+        this.filePath = filePath.toAbsolutePath().toString();
     }
 
     public void setCurrentTime(long currentTime) {

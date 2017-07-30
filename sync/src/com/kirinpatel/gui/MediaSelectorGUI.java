@@ -1,7 +1,7 @@
 package com.kirinpatel.gui;
 
 import com.kirinpatel.util.FileSelector;
-import com.kirinpatel.util.Media;
+import com.kirinpatel.net.Media;
 import com.kirinpatel.util.UIMessage;
 
 import javax.swing.*;
