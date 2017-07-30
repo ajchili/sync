@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+
 public class ControlPanel extends JPanel {
 
     private JList connectedClients;
@@ -24,7 +26,7 @@ public class ControlPanel extends JPanel {
     public static boolean isUserDisplayShown = false;
     public static int width = 300;
 
-    public ControlPanel(GUI gui, int type) {
+    public ControlPanel(GUI gui, PlaybackPanel.PANEL_TYPE type) {
         super(new GridLayout(2, 1));
 
         this.gui = gui;
@@ -52,7 +54,7 @@ public class ControlPanel extends JPanel {
                         }
                     }
 
-                    if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
+                    if (!isUserDisplayShown && type == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
                         chatWindow.requestFocus();
                         new ClientInfoGUI(index);
@@ -146,16 +148,16 @@ public class ControlPanel extends JPanel {
 
     class SendMessageListener implements ActionListener {
 
-        private int type;
+        private PlaybackPanel.PANEL_TYPE type;
 
-        SendMessageListener(int type) {
+        SendMessageListener(PlaybackPanel.PANEL_TYPE type) {
             this.type = type;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                if (type == 0) {
+                if (type == SERVER) {
                     Server.sendMessage(Main.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {

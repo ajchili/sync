@@ -1,5 +1,6 @@
 package com.kirinpatel.net;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.Main;
@@ -166,7 +167,7 @@ public class Client {
                 disconnectFromServer();
             }
 
-            gui = new GUI(1);
+            gui = new GUI(CLIENT);
             Main.saveIPAddress(ipAddress);
 
             sendUsernameToServer();

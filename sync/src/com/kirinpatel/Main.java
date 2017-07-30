@@ -10,6 +10,9 @@ import java.awt.event.*;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -70,7 +73,7 @@ public class Main extends JFrame {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch(Exception e) {
-                System.out.println("Unable to set look and feel of sync.");
+                UIMessage.showErrorDialog(e, "Unable to set look and feel of sync.");
             } finally {
                 main = new Main();
             }
@@ -186,9 +189,9 @@ public class Main extends JFrame {
      * @return ArrayList of previous server IP addresses
      */
     private static ArrayList<String> getPreviousAddresses() {
-        File file = new File("launcherData.dat");
-        if (file.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        Path filePath = Paths.get("launcherData.dat");
+        if (Files.exists(filePath)) {
+            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
                 String ipAddress;
                 ArrayList<String> ipAddresses = new ArrayList<>();
 
@@ -198,7 +201,7 @@ public class Main extends JFrame {
 
                 return ipAddresses;
             } catch (IOException e) {
-                e.printStackTrace();
+                UIMessage.showErrorDialog(e, "Unable to load previous servers");
             }
         }
         return null;
@@ -239,18 +242,11 @@ public class Main extends JFrame {
                 }
             }
 
-            if (VERSION != v) return false;
-            else {
-                if (BUILD < b) return false;
-                else {
-                    if (REVISION < r && BUILD == b) return false;
-                }
-            }
+            return !(VERSION != v || BUILD < b || REVISION < r && BUILD == b);
         } catch(MalformedURLException e) {
-            e.printStackTrace();
+            UIMessage.showErrorDialog(e, "Unable to verify version");
+            return false;
         }
-
-        return true;
     }
 
     /**

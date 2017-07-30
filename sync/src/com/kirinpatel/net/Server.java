@@ -1,6 +1,7 @@
 package com.kirinpatel.net;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.Main;
@@ -35,7 +36,7 @@ public class Server {
     public static int TOMCAT_PORT = 8080;
 
     public Server() {
-        gui = new GUI(0);
+        gui = new GUI(SERVER);
 
         Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
         GUI.controlPanel.updateConnectedClients(Main.connectedUsers);

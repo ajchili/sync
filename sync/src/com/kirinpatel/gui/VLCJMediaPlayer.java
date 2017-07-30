@@ -25,6 +25,8 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.nio.file.Paths;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+
 /**
  * Modified JPanel that will play media for the sync application.
  */
@@ -78,7 +80,7 @@ public class VLCJMediaPlayer extends JPanel {
      * Initialize media controls or reset them after media is changed.
      */
     private void initControls() {
-        if (playbackPanel.type == 0 && playbackPanel.mediaPosition.getMaximum() != 1000) {
+        if (playbackPanel.type == SERVER && playbackPanel.mediaPosition.getMaximum() != 1000) {
             PlaybackPanel.pauseMedia.addActionListener(e -> {
                 if (media.isPaused()) {
                     mediaPlayer.play();
@@ -130,7 +132,7 @@ public class VLCJMediaPlayer extends JPanel {
         mediaPlayer.setMarqueeTimeout(3500);
         mediaPlayer.setMarqueeLocation(50, 1000);
 
-        if (playbackPanel.type == 0) {
+        if (playbackPanel.type == SERVER) {
             for (User client : Main.connectedUsers) {
                 client.getMedia().setCurrentTime(0);
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
@@ -253,7 +255,7 @@ public class VLCJMediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
-            if (playbackPanel.type == 0) {
+            if (playbackPanel.type == SERVER) {
                 Main.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
             } else {

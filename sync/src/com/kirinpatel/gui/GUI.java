@@ -8,9 +8,11 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
+
 public class GUI extends JFrame {
 
-    private final int type;
+    private final PlaybackPanel.PANEL_TYPE type;
     public static PlaybackPanel playbackPanel;
     public static ControlPanel controlPanel;
 
@@ -19,8 +21,8 @@ public class GUI extends JFrame {
      *
      * @param type Type
      */
-    public GUI(int type) {
-        super(type == 0 ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
+    public GUI(PlaybackPanel.PANEL_TYPE type) {
+        super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
 
         setSize(new Dimension(940, 360));
@@ -37,7 +39,7 @@ public class GUI extends JFrame {
         add(controlPanel, BorderLayout.EAST);
         setJMenuBar(new MenuBar(playbackPanel));
 
-        setVisible(type == 1);
+        setVisible(type == CLIENT);
     }
 
     /**
@@ -64,7 +66,7 @@ public class GUI extends JFrame {
         public void componentHidden(ComponentEvent e) {
             PlaybackPanel.mediaPlayer.release();
             dispose();
-            if (type == 0) Server.stop();
+            if (type == SERVER) Server.stop();
             else Client.stop();
         }
     }

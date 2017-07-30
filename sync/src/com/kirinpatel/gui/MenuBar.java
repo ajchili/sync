@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
+
 class MenuBar extends JMenuBar {
 
     MenuBar(PlaybackPanel playbackPanel) {
@@ -25,7 +27,7 @@ class MenuBar extends JMenuBar {
             file.addActionListener(e -> {
                 new MediaSelectorGUI();
             });
-            if (playbackPanel.type == 0) {
+            if (playbackPanel.type == SERVER) {
                 sync.add(file);
                 sync.add(new JSeparator());
             }
@@ -38,7 +40,7 @@ class MenuBar extends JMenuBar {
                 Toolkit.getDefaultToolkit()
                         .getSystemClipboard()
                         .setContents(
-                                new StringSelection(playbackPanel.type == 0
+                                new StringSelection(playbackPanel.type == SERVER
                                         ? Server.ipAddress
                                         : Client.ipAddress),
                                 null);
@@ -51,7 +53,7 @@ class MenuBar extends JMenuBar {
              */
             JMenuItem close = new JMenuItem("Close sync");
             close.addActionListener(e -> {
-                if (playbackPanel.type == 0) {
+                if (playbackPanel.type == SERVER) {
                     Server.stop();
                 } else {
                     Client.stop();

@@ -4,11 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+
 public class PlaybackPanel extends JPanel {
 
     public static VLCJMediaPlayer mediaPlayer;
     public static JButton pauseMedia;
-    final int type;
+    final PANEL_TYPE type;
     JLabel mediaPositionLabel;
     JSlider mediaPosition;
     JSlider mediaVolume;
@@ -20,7 +22,22 @@ public class PlaybackPanel extends JPanel {
     private long lastClick = 0;
     private FullscreenListener fullscreenListener;
 
-    PlaybackPanel(int type) {
+    public enum PANEL_TYPE {
+        SERVER(0),
+        CLIENT(1);
+
+        private int panelType;
+
+        PANEL_TYPE(int panelType) {
+            this.panelType = panelType;
+        }
+
+        public int getPanelType() {
+            return panelType;
+        }
+    }
+
+    PlaybackPanel(PANEL_TYPE type) {
         super(new BorderLayout());
         this.type = type;
 
@@ -132,7 +149,7 @@ public class PlaybackPanel extends JPanel {
         pauseMedia = new JButton("");
         pauseMedia.setContentAreaFilled(false);
         pauseMedia.setInputMap(0, null);
-        pauseMedia.setEnabled(type == 0);
+        pauseMedia.setEnabled(type == SERVER);
         pauseMedia.setBackground(background);
         pauseMedia.setForeground(foreground);
         pauseMedia.setOpaque(true);
@@ -227,26 +244,33 @@ public class PlaybackPanel extends JPanel {
             switch(e.getID()) {
                 case KeyEvent.KEY_PRESSED:
                     switch(e.getKeyCode()) {
+                        // ESC
                         case 27:
                             if (playbackPanel.isFullscreen) {
                                 playbackPanel.closeFullscreen();
                             }
                             break;
+                        // Space bar
                         case 32:
                             if (playbackPanel.isFullscreen && PlaybackPanel.pauseMedia.isEnabled()) {
-                                if (PlaybackPanel.mediaPlayer.getMedia().isPaused()) PlaybackPanel.mediaPlayer.play();
-                                else PlaybackPanel.mediaPlayer.pause();
+                                if (PlaybackPanel.mediaPlayer.getMedia().isPaused()) {
+                                    PlaybackPanel.mediaPlayer.play();
+                                } else {
+                                    PlaybackPanel.mediaPlayer.pause();
+                                }
                             }
                             break;
+                        // F11
                         case 122:
-                            if (playbackPanel.isFullscreen) playbackPanel.closeFullscreen();
-                            else  playbackPanel.initFullscreen();
+                            if (playbackPanel.isFullscreen) {
+                                playbackPanel.closeFullscreen();
+                            } else  {
+                                playbackPanel.initFullscreen();
+                            }
                             break;
                         default:
                             break;
                     }
-                    break;
-                case KeyEvent.KEY_RELEASED:
                     break;
                 default:
                     break;

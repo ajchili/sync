@@ -13,10 +13,27 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.nio.file.Paths;
 
+import static com.kirinpatel.gui.MediaSelectorGUI.MEDIA_TYPE.*;
+
 /**
  * The MediaSelectorGUI will display a gui to the user when prompted and allow for on start media selection to occur.
  */
 public class MediaSelectorGUI extends JFrame {
+
+    public enum MEDIA_TYPE {
+        OFFLINE(0),
+        ONLINE(1);
+
+        private int mediaType;
+
+        MEDIA_TYPE(int mediaType) {
+            this.mediaType = mediaType;
+        }
+
+        public int getMediaType() {
+            return mediaType;
+        }
+    }
 
     /*
         This variable is used to prevent multiple MediaSelectorGUIs from being opened.
@@ -63,10 +80,10 @@ public class MediaSelectorGUI extends JFrame {
 
         JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
         JButton onlineMedia = new JButton("Set Media URL");
-        onlineMedia.addActionListener(new MediaButtonEvent(0));
+        onlineMedia.addActionListener(new MediaButtonEvent(ONLINE));
         buttonPanel.add(onlineMedia);
         JButton offlineMedia = new JButton("Set Media File");
-        offlineMedia.addActionListener(new MediaButtonEvent(1));
+        offlineMedia.addActionListener(new MediaButtonEvent(OFFLINE));
         buttonPanel.add(offlineMedia);
         add(buttonPanel, BorderLayout.CENTER);
 
@@ -79,7 +96,7 @@ public class MediaSelectorGUI extends JFrame {
      */
     class MediaButtonEvent implements ActionListener {
 
-        private int type;
+        private MEDIA_TYPE type;
 
         /**
          * Main constructor that will establish the ActionListener with the
@@ -87,7 +104,7 @@ public class MediaSelectorGUI extends JFrame {
          *
          * @param type Type
          */
-        MediaButtonEvent(int type) {
+        MediaButtonEvent(MEDIA_TYPE type) {
             this.type = type;
         }
 
@@ -101,7 +118,7 @@ public class MediaSelectorGUI extends JFrame {
             setVisible(false);
 
             switch(type) {
-                case 0:
+                case ONLINE:
                     String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
                     if (mediaURL != null && !mediaURL.isEmpty()) {
                         if (mediaURL.startsWith("http")) {
@@ -117,7 +134,7 @@ public class MediaSelectorGUI extends JFrame {
                         }
                     }
                     break;
-                case 1:
+                case OFFLINE:
                     File mediaFile = FileSelector.getFile(null);
                     if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
                         PlaybackPanel.mediaPlayer.setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
