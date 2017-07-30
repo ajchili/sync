@@ -38,23 +38,25 @@ public class ControlPanel extends JPanel {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                User host = Main.connectedUsers.get(0);
-                User user = Main.connectedUsers.get(index);
+                if (index < Main.connectedUsers.size()) {
+                    User host = Main.connectedUsers.get(0);
+                    User user = Main.connectedUsers.get(index);
 
-                if (host != null && !host.equals(user) && Main.showUserTimes) {
-                    long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
+                    if (host != null && !host.equals(user) && Main.showUserTimes) {
+                        long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
-                    if (host.getMedia().getCurrentTime() - Main.deSyncTime > currentUserTime) {
-                        setBackground(Color.RED);
-                    } else if (host.getMedia().getCurrentTime() - Main.deSyncWarningTime > currentUserTime) {
-                        setBackground(Color.YELLOW);
+                        if (host.getMedia().getCurrentTime() - Main.deSyncTime > currentUserTime) {
+                            setBackground(Color.RED);
+                        } else if (host.getMedia().getCurrentTime() - Main.deSyncWarningTime > currentUserTime) {
+                            setBackground(Color.YELLOW);
+                        }
                     }
-                }
 
-                if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
-                    isUserDisplayShown = true;
-                    chatWindow.requestFocus();
-                    new ClientInfoGUI(index);
+                    if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
+                        isUserDisplayShown = true;
+                        chatWindow.requestFocus();
+                        new ClientInfoGUI(index);
+                    }
                 }
 
                 return c;
