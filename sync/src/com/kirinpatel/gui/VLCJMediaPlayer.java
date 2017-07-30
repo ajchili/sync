@@ -161,8 +161,8 @@ public class VLCJMediaPlayer extends JPanel {
     }
 
     public void setMedia(Media media) {
+        isFile = false;
         VLCJMediaPlayer.media = media;
-        VLCJMediaPlayer.media.setURL(VLCJMediaPlayer.media.getURL());
         VLCJMediaPlayer.media.setFilePath(Paths.get("null"));
         mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getURL());
         mediaPlayer.parseMedia();
@@ -170,25 +170,20 @@ public class VLCJMediaPlayer extends JPanel {
     }
 
     void setMediaSource(Media media) {
-        if (!media.getURL().equals(VLCJMediaPlayer.media.getURL()) && media.getFilePath().equals("null")) {
-            isFile = false;
+        if (!media.getURL().equals(VLCJMediaPlayer.media.getURL())|| !media.getFilePath().equals(VLCJMediaPlayer.media.getFilePath())) {
             VLCJMediaPlayer.media.setURL(media.getURL().startsWith("_")
                     ? "http://" + Server.ipAddress + ":8080/" + media.getURL().substring(1)
                     : media.getURL());
-            VLCJMediaPlayer.media.setFilePath(Paths.get("null"));
-            mediaPlayer.prepareMedia(media.getURL());
+            isFile = !media.getFilePath().equals("null");
+            if (isFile) {
+                VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
+                mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getFilePath());
+            } else {
+                mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getURL());
+            }
             mediaPlayer.parseMedia();
             initControls();
-        } else if (!media.getFilePath().equals(VLCJMediaPlayer.media.getFilePath()) && playbackPanel.type == 0) {
-            isFile = true;
-            VLCJMediaPlayer.media.setURL(media.getURL().startsWith("_")
-                    ? "http://" + Server.ipAddress + ":8080/" + media.getURL().substring(1)
-                    : media.getURL());
-            VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
-            mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getFilePath());
         }
-        mediaPlayer.parseMedia();
-        initControls();
     }
 
     void setVolume(int volume) {
@@ -274,7 +269,7 @@ public class VLCJMediaPlayer extends JPanel {
         public void mediaChanged(MediaPlayer mediaPlayer,
                                  libvlc_media_t libvlc_media_t,
                                  String s) {
-            if (!isFile) media.setURL(s);
+            if (!isFile) VLCJMediaPlayer.media.setURL(s);
         }
 
         @Override
@@ -289,8 +284,8 @@ public class VLCJMediaPlayer extends JPanel {
 
         @Override
         public void playing(MediaPlayer mediaPlayer) {
-            media.setPaused(false);
-            media.setLength(mediaPlayer.getLength());
+            VLCJMediaPlayer.media.setPaused(false);
+            VLCJMediaPlayer.media.setLength(mediaPlayer.getLength());
             PlaybackPanel.pauseMedia.setText("||");
 
             mediaPlayer.setMarqueeText("Playing");
@@ -299,8 +294,8 @@ public class VLCJMediaPlayer extends JPanel {
 
         @Override
         public void paused(MediaPlayer mediaPlayer) {
-            media.setPaused(true);
-            media.setLength(mediaPlayer.getLength());
+            VLCJMediaPlayer.media.setPaused(true);
+            VLCJMediaPlayer.media.setLength(mediaPlayer.getLength());
             PlaybackPanel.pauseMedia.setText(">");
 
             mediaPlayer.setMarqueeText("Paused");
@@ -326,15 +321,15 @@ public class VLCJMediaPlayer extends JPanel {
         public void finished(MediaPlayer mediaPlayer) {
             playbackPanel.mediaPosition.setValue(0);
             PlaybackPanel.pauseMedia.setText(">");
-            media.setPaused(true);
+            VLCJMediaPlayer.media.setPaused(true);
         }
 
         @Override
         public void timeChanged(MediaPlayer mediaPlayer, long l) {
             if (!isScrubbing) {
-                media.setCurrentTime(l);
-                playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(media.getLength()));
-                playbackPanel.mediaPosition.setValue((int) (media.getCurrentTime() * 1000 / media.getLength()));
+                VLCJMediaPlayer.media.setCurrentTime(l);
+                playbackPanel.mediaPositionLabel.setText(formatTime(l) + " / " + formatTime(VLCJMediaPlayer.media.getLength()));
+                playbackPanel.mediaPosition.setValue((int) (VLCJMediaPlayer.media.getCurrentTime() * 1000 / VLCJMediaPlayer.media.getLength()));
             }
         }
 
@@ -365,7 +360,7 @@ public class VLCJMediaPlayer extends JPanel {
 
         @Override
         public void lengthChanged(MediaPlayer mediaPlayer, long l) {
-            media.setLength(l);
+            VLCJMediaPlayer.media.setLength(l);
         }
 
         @Override
@@ -460,7 +455,7 @@ public class VLCJMediaPlayer extends JPanel {
 
         @Override
         public void newMedia(MediaPlayer mediaPlayer) {
-            media.setCurrentTime(0);
+            VLCJMediaPlayer.media.setCurrentTime(0);
         }
 
         @Override

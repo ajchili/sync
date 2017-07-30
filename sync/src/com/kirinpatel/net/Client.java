@@ -54,6 +54,7 @@ public class Client {
         private ObjectOutputStream output;
         private boolean isConnected = false;
         private long lastSentTime = 0;
+        private long lastSentState = 0;
 
         public void run() {
             isRunning = true;
@@ -77,31 +78,40 @@ public class Client {
                                 GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
                                 break;
                             case MEDIA:
-                                // TODO: make this readable/conform to style standards
                                 Media media = (Media) message.getMessage();
-                                media.setCurrentTime(media.getCurrentTime() + user.getPing());
-                                long timeDifference = PlaybackPanel.mediaPlayer.getMedia().getCurrentTime() - media.getCurrentTime();
-                                if (!PlaybackPanel.mediaPlayer.getMedia().getURL().equals(media.getURL())) {
+                                if (!media.getURL().equals("") && !PlaybackPanel.mediaPlayer.getMedia().getURL().equals(media.getURL())) {
                                     lastSentTime = 0;
-                                    user.setMedia(media);
                                     PlaybackPanel.mediaPlayer.setMedia(media);
                                     if (!media.isPaused()) {
                                         PlaybackPanel.mediaPlayer.play();
                                     }
+                                }
+                                sendMedia();
+                                break;
+                            case MEDIA_TIME:
+                                long time = (long) message.getMessage();
+                                PlaybackPanel.mediaPlayer.seekTo(time);
+                                break;
+                            case MEDIA_RATE:
+                                float rate = (float) message.getMessage();
+                                if (!PlaybackPanel.mediaPlayer.getMedia().isPaused()) {
+                                    PlaybackPanel.mediaPlayer.setRate(rate);
+                                    new Thread(() -> {
+                                        try {
+                                            Thread.sleep(200);
+                                            PlaybackPanel.mediaPlayer.setRate(1.0f);
+                                        } catch(InterruptedException e) {
+                                            Thread.currentThread().interrupt();
+                                        }
+                                    });
+                                }
+                                break;
+                            case MEDIA_STATE:
+                                boolean isServerPaused = (boolean) message.getMessage();
+                                if (isServerPaused) {
+                                    PlaybackPanel.mediaPlayer.pause();
                                 } else {
-                                    if (media.isPaused()) {
-                                        PlaybackPanel.mediaPlayer.pause();
-                                    } else {
-                                        PlaybackPanel.mediaPlayer.play();
-                                    }
-                                    if (media.getRate() != 1.0f) {
-                                        PlaybackPanel.mediaPlayer.setRate(media.getRate());
-                                    }
-                                    if (Math.abs(timeDifference) > 2000) {
-                                        PlaybackPanel.mediaPlayer.seekTo(media.getCurrentTime());
-                                    } else if (Math.abs(timeDifference) > 1000) {
-                                        PlaybackPanel.mediaPlayer.setRate((timeDifference + 1000) * 1.0f / 1000);
-                                    }
+                                    PlaybackPanel.mediaPlayer.play();
                                 }
                                 break;
                             case MESSAGES:
@@ -119,14 +129,12 @@ public class Client {
                     sendMessages();
                 }
 
-                if (PlaybackPanel.mediaPlayer.getMedia().isPaused()) {
-                    if (lastSentTime < (System.currentTimeMillis() - 500)) {
-                        sendMedia();
-                    }
-                } else {
-                    if (lastSentTime < (PlaybackPanel.mediaPlayer.getMedia().getCurrentTime() - 500)) {
-                        sendMedia();
-                    }
+                if (System.currentTimeMillis() > lastSentTime + 250) {
+                    sendMediaTime();
+                }
+
+                if (System.currentTimeMillis() > lastSentState + 500) {
+                    sendMediaState();
                 }
             }
 
@@ -211,24 +219,44 @@ public class Client {
             }
         }
 
-        private synchronized void sendMedia() {
-            try {
-                lastSentTime = PlaybackPanel.mediaPlayer.getMedia().getCurrentTime();
-                user.setMedia(PlaybackPanel.mediaPlayer.getMedia());
-                output.reset();
-                output.writeObject(new Message(MEDIA, user.getMedia()));
-                output.flush();
-            } catch(IOException e) {
-                disconnectFromServer();
-            }
-        }
-
         private synchronized void sendMessages() {
             try {
                 output.reset();
                 output.writeObject(new Message(CLIENT_MESSAGES, messages));
                 output.flush();
                 messages.clear();
+            } catch(IOException e) {
+                disconnectFromServer();
+            }
+        }
+
+        private synchronized void sendMedia() {
+            try {
+                output.flush();
+                output.writeObject(new Message(MEDIA, PlaybackPanel.mediaPlayer.getMedia()));
+                output.flush();
+            } catch(IOException e) {
+                disconnectFromServer();
+            }
+        }
+
+        private synchronized void sendMediaTime() {
+            try {
+                lastSentTime = System.currentTimeMillis();
+                output.reset();
+                output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.mediaPlayer.getMedia().getCurrentTime()));
+                output.flush();
+            } catch(IOException e) {
+                disconnectFromServer();
+            }
+        }
+
+        private synchronized void sendMediaState() {
+            try {
+                lastSentState = System.currentTimeMillis();
+                output.reset();
+                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.mediaPlayer.getMedia().isPaused()));
+                output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
             }
