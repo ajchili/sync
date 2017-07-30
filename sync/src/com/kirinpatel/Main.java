@@ -20,7 +20,7 @@ import java.util.Scanner;
 public class Main extends JFrame {
 
     private final static int VERSION = 1;
-    private final static int BUILD = 5;
+    private final static int BUILD = 6;
     private final static int REVISION = 0;
 
     // Global variables
