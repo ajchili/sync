@@ -19,6 +19,9 @@ public class Message implements Serializable {
         CLIENT_NAME(10),
         CONNECTED_CLIENTS(11),
         MEDIA(20),
+        MEDIA_TIME(21),
+        MEDIA_RATE(22),
+        MEDIA_STATE(23),
         MESSAGES(30),
         CLIENT_MESSAGES(31);
 
