@@ -1,6 +1,5 @@
 package com.kirinpatel.net;
 
-import com.kirinpatel.net.Server;
 import com.kirinpatel.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
