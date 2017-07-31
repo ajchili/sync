@@ -81,79 +81,79 @@ public class VLCJMediaPlayer extends JPanel {
      * Initialize media controls or reset them after media is changed.
      */
     private void initControls() {
-        try {
-            if (PlaybackPanel.getInstance().type == SERVER) {
-                for (User client : Main.connectedUsers) {
-                    client.getMedia().setCurrentTime(0);
-                    ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
-                }
+        if (PlaybackPanel.getInstance().type == SERVER) {
+            for (User client : Main.connectedUsers) {
+                client.getMedia().setCurrentTime(0);
+                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+            }
 
-                PlaybackPanel.pauseMedia.addActionListener(e -> {
+            PlaybackPanel.pauseMedia.addActionListener(e -> {
+                try {
                     if (media.isPaused()) {
                         mediaPlayer.play();
                     } else {
                         mediaPlayer.pause();
                     }
-                });
-
-                PlaybackPanel.getInstance().mediaPosition.addMouseListener(new MouseListener() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-
+                } catch (Error error) {
+                    // Stop if Invalid memory access occurs
+                    if (PlaybackPanel.getInstance().type == SERVER) {
+                        new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
+                                        "Forcefully closing sync, please restart sync."),
+                                "Media was unable to be set.");
+                        Server.stop();
+                    } else {
+                        new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
+                                        "Forcefully closing sync, please restart sync."),
+                                "Media was unable to be set.");
+                        Client.stop();
                     }
+                }
+            });
 
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        isScrubbing = true;
-                    }
+            PlaybackPanel.getInstance().mediaPosition.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
 
-                    @Override
-                    public void mouseReleased(MouseEvent e) {
-                        isScrubbing = false;
-                    }
+                }
 
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    isScrubbing = true;
+                }
 
-                    }
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    isScrubbing = false;
+                }
 
-                    @Override
-                    public void mouseExited(MouseEvent e) {
+                @Override
+                public void mouseEntered(MouseEvent e) {
 
-                    }
-                });
+                }
 
-                PlaybackPanel.getInstance().mediaPosition.addChangeListener(e -> {
-                    if (isScrubbing) {
-                        int position = PlaybackPanel.getInstance().mediaPosition.getValue();
-                        mediaPlayer.setTime(position * media.getLength() / 1000);
-                    }
-                });
-            }
+                @Override
+                public void mouseExited(MouseEvent e) {
 
-            PlaybackPanel.pauseMedia.setText(">");
-            PlaybackPanel.getInstance().mediaPosition.setMaximum(1000);
-            mediaPlayer.setMarqueeSize(60);
-            mediaPlayer.setMarqueeOpacity(200);
-            mediaPlayer.setMarqueeColour(Color.white);
-            mediaPlayer.setMarqueeTimeout(3500);
-            mediaPlayer.setMarqueeLocation(50, 1000);
+                }
+            });
 
-            media.setPaused(true);
-        } catch (Error e) {
-            // Stop if Invalid memory access occurs
-            if (PlaybackPanel.getInstance().type == SERVER) {
-                new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
-                                "Forcefully closing sync, please restart sync."),
-                        "Media was unable to be set.");
-                Server.stop();
-            } else {
-                new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
-                                "Forcefully closing sync client, please restart sync."),
-                        "Media was unable to be set.");
-                Client.stop();
-            }
+            PlaybackPanel.getInstance().mediaPosition.addChangeListener(e -> {
+                if (isScrubbing) {
+                    int position = PlaybackPanel.getInstance().mediaPosition.getValue();
+                    mediaPlayer.setTime(position * media.getLength() / 1000);
+                }
+            });
         }
+
+        PlaybackPanel.pauseMedia.setText(">");
+        PlaybackPanel.getInstance().mediaPosition.setMaximum(1000);
+        mediaPlayer.setMarqueeSize(60);
+        mediaPlayer.setMarqueeOpacity(200);
+        mediaPlayer.setMarqueeColour(Color.white);
+        mediaPlayer.setMarqueeTimeout(3500);
+        mediaPlayer.setMarqueeLocation(50, 1000);
+
+        media.setPaused(true);
     }
 
     public void play() {
@@ -316,11 +316,12 @@ public class VLCJMediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
-            if (PlaybackPanel.getInstance().type == SERVER) {
-                Main.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
-                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
-            } else {
-                Client.user.getMedia().setCurrentTime(media.getCurrentTime());
+            if (Main.connectedUsers.size() > 0) {
+                if (PlaybackPanel.getInstance().type == SERVER) {
+                    Main.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
+                } else {
+                    Client.user.getMedia().setCurrentTime(media.getCurrentTime());
+                }
                 ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
             }
         }
