@@ -29,8 +29,8 @@ public class Client {
 
     public Client(String ipAddress) {
         Client.ipAddress = ipAddress;
+        Main.connectedUsers.clear();
         Client.user = new User(System.getProperty("user.name"));
-
         clientThread = new ClientThread();
         new Thread(clientThread).start();
     }

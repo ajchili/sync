@@ -38,10 +38,9 @@ public class Server {
 
     public Server() {
         gui = new GUI(SERVER);
-
+        Main.connectedUsers.clear();
         Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
         ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
-
         server = new ServerThread();
         new Thread(server).start();
     }
