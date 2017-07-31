@@ -42,8 +42,3 @@ a Java based multi-client video and audio syncing application
 	
 ## what to do if you run into issues
 If you for any reason run into issues while using sync _(it is possible to as the application is ever changing)_, submit an issue [here](https://github.com/ajchili/sync/issues) and provide as much detail as possible as to the issue
-
-* Please view [this](https://github.com/ajchili/sync/issues/14#issuecomment-318862941) issue if:
-	* The media has _wonky_ colors
-	* A server does not start and no error message is provided
-	* You are unable to join a server
