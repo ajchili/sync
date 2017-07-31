@@ -13,7 +13,6 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
 public class GUI extends JFrame {
 
     private final PlaybackPanel.PANEL_TYPE type;
-    private final PlaybackPanel playbackPanel;
 
     /**
      * Primary constructor that will create the GUI of sync.
@@ -31,11 +30,13 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         addComponentListener(new ResizeListener());
 
-        playbackPanel = new PlaybackPanel(type);
-        add(playbackPanel, BorderLayout.CENTER);
-        ControlPanel.setInstance(this, type).resizePanel(getHeight());
+        // TODO: Implements singleton classes so that server/client instances can be created repeatedly
+        PlaybackPanel.setInstance(type);
+        add(PlaybackPanel.getINSTANCE(), BorderLayout.CENTER);
+        ControlPanel.setInstance(this);
+        ControlPanel.getInstance().resizePanel(getHeight());
         add(ControlPanel.getInstance(), BorderLayout.EAST);
-        setJMenuBar(new MenuBar(playbackPanel));
+        setJMenuBar(new MenuBar(PlaybackPanel.getINSTANCE()));
 
         setVisible(type == CLIENT);
     }
@@ -62,7 +63,7 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            PlaybackPanel.mediaPlayer.release();
+            PlaybackPanel.getINSTANCE().getMediaPlayer().release();
             dispose();
             if (type == SERVER) Server.stop();
             else Client.stop();

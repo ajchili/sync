@@ -122,9 +122,9 @@ public class MediaSelectorGUI extends JFrame {
                     String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
                     if (mediaURL != null && !mediaURL.isEmpty()) {
                         if (mediaURL.startsWith("http")) {
-                            PlaybackPanel.mediaPlayer.setMediaSource(new Media(mediaURL));
+                            PlaybackPanel.getINSTANCE().getMediaPlayer().setMediaSource(new Media(mediaURL));
                         } else {
-                            PlaybackPanel.mediaPlayer.setMediaSource(new Media("http://" + mediaURL));
+                            PlaybackPanel.getINSTANCE().getMediaPlayer().setMediaSource(new Media("http://" + mediaURL));
                         }
                     } else {
                         if (mediaURL != null) {
@@ -137,7 +137,7 @@ public class MediaSelectorGUI extends JFrame {
                 case OFFLINE:
                     File mediaFile = FileSelector.getFile(null);
                     if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                        PlaybackPanel.mediaPlayer.setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
+                        PlaybackPanel.getINSTANCE().getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
                     } else {
                         if (mediaFile != null) {
                             UIMessage.showMessageDialog(

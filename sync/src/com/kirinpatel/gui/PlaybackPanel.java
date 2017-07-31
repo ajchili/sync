@@ -1,26 +1,31 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.net.Media;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class PlaybackPanel extends JPanel {
 
-    public static VLCJMediaPlayer mediaPlayer;
-    public static JButton pauseMedia;
+    private static VLCJMediaPlayer mediaPlayer;
+    static JButton pauseMedia;
     final PANEL_TYPE type;
     JLabel mediaPositionLabel;
     JSlider mediaPosition;
     JSlider mediaVolume;
-    public boolean isFullscreen = false;
+    private boolean isFullscreen = false;
     private JPanel controlPanel;
     private JFrame fullscreen;
     private JPanel fullscreenPanel;
     private boolean showBar = false;
     private long lastClick = 0;
     private FullscreenListener fullscreenListener;
+    private static PlaybackPanel INSTANCE;
+    private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
 
     public enum PANEL_TYPE {
         SERVER(0),
@@ -37,24 +42,39 @@ public class PlaybackPanel extends JPanel {
         }
     }
 
-    PlaybackPanel(PANEL_TYPE type) {
+    static PlaybackPanel setInstance(PANEL_TYPE type) {
+        if (isInstanceSet.compareAndSet(false, true)) {
+            INSTANCE = new PlaybackPanel(type);
+            return INSTANCE;
+        }
+        return null;
+    }
+
+    public static PlaybackPanel getINSTANCE() {
+        if (isInstanceSet.get()) {
+            return INSTANCE;
+        }
+        throw new IllegalStateException("Control panel has not been set!");
+    }
+
+    private PlaybackPanel(PANEL_TYPE type) {
         super(new BorderLayout());
         this.type = type;
-
-        fullscreenListener = new FullscreenListener();
 
         initMediaPlayer();
     }
 
     private void initMediaPlayer() {
-        mediaPlayer = new VLCJMediaPlayer(this);
+        fullscreenListener = new FullscreenListener();
+
+        mediaPlayer = new VLCJMediaPlayer();
         add(mediaPlayer, BorderLayout.CENTER);
         mediaPlayer.addMouseListener(fullscreenListener);
 
         initControls();
     }
 
-    public void initFullscreen() {
+    void initFullscreen() {
         removeAll();
 
         isFullscreen = true;
@@ -125,7 +145,7 @@ public class PlaybackPanel extends JPanel {
         fullscreen.setVisible(true);
     }
 
-    public void closeFullscreen() {
+    private void closeFullscreen() {
         isFullscreen = false;
         fullscreenPanel.removeAll();
         fullscreen.dispose();
@@ -189,6 +209,14 @@ public class PlaybackPanel extends JPanel {
 
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyDispatcher(this));
+    }
+
+    public Media getMedia(){
+        return mediaPlayer.getMedia();
+    }
+
+    public VLCJMediaPlayer getMediaPlayer() {
+        return mediaPlayer;
     }
 
     class FullscreenListener implements MouseListener {

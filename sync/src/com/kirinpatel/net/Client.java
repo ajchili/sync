@@ -25,7 +25,7 @@ public class Client {
     private static boolean isRunning = false;
     private static boolean isServerClosed = false;
     private Socket socket;
-    private static GUI gui;
+    public static GUI gui;
 
     public Client(String ipAddress) {
         Client.ipAddress = ipAddress;
@@ -77,26 +77,26 @@ public class Client {
                                 break;
                             case MEDIA_URL:
                                 String mediaURL = (String) message.getMessage();
-                                if (!mediaURL.equals("") && !PlaybackPanel.mediaPlayer.getMedia().getURL().equals(mediaURL)) {
+                                if (!mediaURL.equals("") && !PlaybackPanel.getINSTANCE().getMedia().getURL().equals(mediaURL)) {
                                     lastSentTime = 0;
-                                    PlaybackPanel.mediaPlayer.setMedia(new Media(mediaURL));
+                                    PlaybackPanel.getINSTANCE().getMediaPlayer().setMedia(new Media(mediaURL));
                                 }
                                 sendMediaURL();
                                 break;
                             case MEDIA_TIME:
                                 long time = (long) message.getMessage();
-                                if (!PlaybackPanel.mediaPlayer.isPaused()) {
-                                    PlaybackPanel.mediaPlayer.seekTo(time);
+                                if (!PlaybackPanel.getINSTANCE().getMedia().isPaused()) {
+                                    PlaybackPanel.getINSTANCE().getMediaPlayer().seekTo(time);
                                 }
                                 break;
                             case MEDIA_RATE:
                                 float rate = (float) message.getMessage();
-                                if (!PlaybackPanel.mediaPlayer.isPaused()) {
-                                    PlaybackPanel.mediaPlayer.setRate(rate);
+                                if (!PlaybackPanel.getINSTANCE().getMedia().isPaused()) {
+                                    PlaybackPanel.getINSTANCE().getMediaPlayer().setRate(rate);
                                     new Thread(() -> {
                                         try {
                                             Thread.sleep(200);
-                                            PlaybackPanel.mediaPlayer.setRate(1.0f);
+                                            PlaybackPanel.getINSTANCE().getMediaPlayer().setRate(1.0f);
                                         } catch(InterruptedException e) {
                                             Thread.currentThread().interrupt();
                                         }
@@ -105,11 +105,11 @@ public class Client {
                                 break;
                             case MEDIA_STATE:
                                 boolean isServerPaused = (boolean) message.getMessage();
-                                if (isServerPaused != PlaybackPanel.mediaPlayer.isPaused()) {
+                                if (isServerPaused != PlaybackPanel.getINSTANCE().getMediaPlayer().isPaused()) {
                                     if (isServerPaused) {
-                                        PlaybackPanel.mediaPlayer.pause();
+                                        PlaybackPanel.getINSTANCE().getMediaPlayer().pause();
                                     } else {
-                                        PlaybackPanel.mediaPlayer.play();
+                                        PlaybackPanel.getINSTANCE().getMediaPlayer().play();
                                     }
                                 }
                                 break;
@@ -138,7 +138,6 @@ public class Client {
             }
 
             disconnectFromServer();
-            new Main();
         }
 
         void stop() {
@@ -227,7 +226,7 @@ public class Client {
         private synchronized void sendMediaURL() {
             try {
                 output.flush();
-                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.mediaPlayer.getMedia().getURL()));
+                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.getINSTANCE().getMedia().getURL()));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
@@ -238,7 +237,7 @@ public class Client {
             try {
                 lastSentTime = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.mediaPlayer.getMedia().getCurrentTime()));
+                output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.getINSTANCE().getMedia().getCurrentTime()));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
@@ -249,7 +248,7 @@ public class Client {
             try {
                 lastSentState = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.mediaPlayer.getMedia().isPaused()));
+                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.getINSTANCE().getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();

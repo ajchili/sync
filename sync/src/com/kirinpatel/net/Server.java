@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 public class Server {
 
     public static String ipAddress = "";
-    private static GUI gui;
+    public static GUI gui;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
     private final static ArrayList<String> messages = new ArrayList<>();
@@ -224,12 +224,12 @@ public class Server {
                                 break;
                             case MEDIA_TIME:
                                 user.getMedia().setCurrentTime((long) message.getMessage());
-                                if (PlaybackPanel.mediaPlayer.getMedia().getCurrentTime() != -1) {
+                                if (PlaybackPanel.getINSTANCE().getMedia().getCurrentTime() != -1) {
                                     sendMediaTime();
                                 }
                                 break;
                             case MEDIA_STATE:
-                                if (PlaybackPanel.mediaPlayer.getMedia().isPaused() != (boolean) message.getMessage()) {
+                                if (PlaybackPanel.getINSTANCE().getMedia().isPaused() != (boolean) message.getMessage()) {
                                     sendMediaState();
                                 }
                                 break;
@@ -256,11 +256,11 @@ public class Server {
 
                 if (System.currentTimeMillis() > lastMediaUpdate + 5000
                         || (user != null
-                        && !user.getMedia().getURL().equals(PlaybackPanel.mediaPlayer.getMedia().getURL()))) {
+                        && !user.getMedia().getURL().equals(PlaybackPanel.getINSTANCE().getMedia().getURL()))) {
                     sendMediaURL();
                 }
 
-                if (user != null &&PlaybackPanel.mediaPlayer.getMedia().isPaused() != user.getMedia().isPaused()) {
+                if (user != null &&PlaybackPanel.getINSTANCE().getMedia().isPaused() != user.getMedia().isPaused()) {
                     sendMediaState();
                 }
 
@@ -300,8 +300,9 @@ public class Server {
                 output.writeObject(new Message(CLOSING, ""));
                 output.flush();
             } catch(IOException e) {
-                // TODO(ajchili): catch this better
+                // Do nothing if sending closing message fails
             } finally {
+                Main.connectedUsers.remove(user);
                 isClientConnected = false;
             }
         }
@@ -348,7 +349,7 @@ public class Server {
             try {
                 lastMediaUpdate = System.currentTimeMillis();
                 output.flush();
-                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.mediaPlayer.getMedia().getURL()));
+                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.getINSTANCE().getMedia().getURL()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
@@ -356,11 +357,11 @@ public class Server {
         }
 
         private synchronized void sendMediaTime() {
-            long timeDifference = Math.abs(PlaybackPanel.mediaPlayer.getMedia().getCurrentTime()
+            long timeDifference = Math.abs(PlaybackPanel.getINSTANCE().getMedia().getCurrentTime()
                     - user.getMedia().getCurrentTime()) + (user.getPing() * 2);
             if (timeDifference > 2000) {
                 try {
-                    output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.mediaPlayer.getMedia().getCurrentTime()));
+                    output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.getINSTANCE().getMedia().getCurrentTime()));
                     output.flush();
                 } catch(IOException e) {
                     disconnectClientFromServer();
@@ -378,8 +379,8 @@ public class Server {
 
         private synchronized void sendMediaState() {
             try {
-                user.getMedia().setPaused(PlaybackPanel.mediaPlayer.getMedia().isPaused());
-                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.mediaPlayer.getMedia().isPaused()));
+                user.getMedia().setPaused(PlaybackPanel.getINSTANCE().getMedia().isPaused());
+                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.getINSTANCE().getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();

@@ -4,14 +4,12 @@ import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
-import com.sun.istack.internal.NotNull;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -30,9 +28,9 @@ public class ControlPanel extends JPanel {
     static boolean isUserDisplayShown = false;
     int width = 300;
 
-    static ControlPanel setInstance(GUI gui, PlaybackPanel.PANEL_TYPE type) {
+    static ControlPanel setInstance(GUI gui) {
         if (isInstanceSet.compareAndSet(false, true)) {
-           INSTANCE = new ControlPanel(gui, type);
+           INSTANCE = new ControlPanel(gui);
            return INSTANCE;
         }
         return null;
@@ -45,7 +43,7 @@ public class ControlPanel extends JPanel {
         throw new IllegalStateException("Control panel has not been set!");
     }
 
-    private ControlPanel(GUI gui, PlaybackPanel.PANEL_TYPE type) {
+    private ControlPanel(GUI gui) {
         super(new GridLayout(2, 1));
         this.gui = gui;
 
@@ -72,7 +70,7 @@ public class ControlPanel extends JPanel {
                         }
                     }
 
-                    if (!isUserDisplayShown && type == SERVER && isSelected && cellHasFocus && index > 0) {
+                    if (!isUserDisplayShown && PlaybackPanel.getINSTANCE().type == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
                         chatWindow.requestFocus();
                         new ClientInfoGUI(user);
@@ -103,11 +101,11 @@ public class ControlPanel extends JPanel {
         JPanel messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
         chatField.setToolTipText("Message Box");
-        chatField.addActionListener(new ControlPanel.SendMessageListener(type));
+        chatField.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(chatField, BorderLayout.CENTER);
         JButton send = new JButton("Send");
         send.setInputMap(WHEN_FOCUSED, null);
-        send.addActionListener(new ControlPanel.SendMessageListener(type));
+        send.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
         add(chatPanel);
@@ -166,16 +164,10 @@ public class ControlPanel extends JPanel {
 
     class SendMessageListener implements ActionListener {
 
-        private final PlaybackPanel.PANEL_TYPE type;
-
-        SendMessageListener(PlaybackPanel.PANEL_TYPE type) {
-            this.type = type;
-        }
-
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                if (type == SERVER) {
+                if (PlaybackPanel.getINSTANCE().type == SERVER) {
                     Server.sendMessage(Main.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {
