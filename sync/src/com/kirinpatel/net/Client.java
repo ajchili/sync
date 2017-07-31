@@ -4,6 +4,7 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.Main;
+import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Message;
@@ -72,7 +73,7 @@ public class Client {
                                 break;
                             case CONNECTED_CLIENTS:
                                 Main.connectedUsers = (ArrayList<User>) message.getMessage();
-                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
                                 break;
                             case MEDIA_URL:
                                 String mediaURL = (String) message.getMessage();
@@ -113,7 +114,7 @@ public class Client {
                                 }
                                 break;
                             case MESSAGES:
-                                GUI.controlPanel.addMessages((ArrayList<String>) message.getMessage());
+                                ControlPanel.getInstance().addMessages((ArrayList<String>) message.getMessage());
                                 break;
                             default:
                                 break;

@@ -13,8 +13,7 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
 public class GUI extends JFrame {
 
     private final PlaybackPanel.PANEL_TYPE type;
-    public static PlaybackPanel playbackPanel;
-    public static ControlPanel controlPanel;
+    private final PlaybackPanel playbackPanel;
 
     /**
      * Primary constructor that will create the GUI of sync.
@@ -34,9 +33,8 @@ public class GUI extends JFrame {
 
         playbackPanel = new PlaybackPanel(type);
         add(playbackPanel, BorderLayout.CENTER);
-        controlPanel = new ControlPanel(this, type);
-        controlPanel.resizePanel(getHeight());
-        add(controlPanel, BorderLayout.EAST);
+        ControlPanel.setInstance(this, type).resizePanel(getHeight());
+        add(ControlPanel.getInstance(), BorderLayout.EAST);
         setJMenuBar(new MenuBar(playbackPanel));
 
         setVisible(type == CLIENT);
@@ -49,7 +47,7 @@ public class GUI extends JFrame {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            controlPanel.resizePanel(getHeight());
+            ControlPanel.getInstance().resizePanel(getHeight());
         }
 
         @Override

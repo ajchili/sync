@@ -94,7 +94,7 @@ class MenuBar extends JMenuBar {
                 controlPanelSizeSlider.setMinorTickSpacing(50);
                 controlPanelSizeSlider.setToolTipText("Size: " + controlPanelSizeSlider.getValue());
                 controlPanelSizeSlider.addChangeListener(e -> {
-                        ControlPanel.width = controlPanelSizeSlider.getValue();
+                        ControlPanel.getInstance().width = controlPanelSizeSlider.getValue();
                         controlPanelSizeSlider.setToolTipText("Size: " + controlPanelSizeSlider.getValue());
                     });
                 controlPanelSizePanel.add(new JLabel("Size: ", JLabel.LEFT), BorderLayout.WEST);
@@ -105,8 +105,8 @@ class MenuBar extends JMenuBar {
                 JRadioButtonMenuItem rightControlPanel = new JRadioButtonMenuItem("Display on Right");
                 rightControlPanel.addActionListener(e -> {
                     if (playbackPanel.getParent().getComponents().length == 2) {
-                        playbackPanel.getParent().remove(GUI.controlPanel);
-                        playbackPanel.getParent().add(GUI.controlPanel, BorderLayout.EAST);
+                        playbackPanel.getParent().remove(ControlPanel.getInstance());
+                        playbackPanel.getParent().add(ControlPanel.getInstance(), BorderLayout.EAST);
                         playbackPanel.getParent().revalidate();
                         playbackPanel.getParent().repaint();
                     }
@@ -116,8 +116,8 @@ class MenuBar extends JMenuBar {
                 JRadioButtonMenuItem leftControlPanel = new JRadioButtonMenuItem("Display on Left");
                 leftControlPanel.addActionListener(e -> {
                     if (playbackPanel.getParent().getComponents().length == 2) {
-                        playbackPanel.getParent().remove(GUI.controlPanel);
-                        playbackPanel.getParent().add(GUI.controlPanel, BorderLayout.WEST);
+                        playbackPanel.getParent().remove(ControlPanel.getInstance());
+                        playbackPanel.getParent().add(ControlPanel.getInstance(), BorderLayout.WEST);
                         playbackPanel.getParent().revalidate();
                         playbackPanel.getParent().repaint();
                     }
@@ -175,7 +175,7 @@ class MenuBar extends JMenuBar {
                 ButtonGroup showControlPanelButtons = new ButtonGroup();
                 JRadioButtonMenuItem showControlPanel = new JRadioButtonMenuItem("Show");
                 showControlPanel.addActionListener(e -> {
-                    playbackPanel.getParent().add(GUI.controlPanel, rightControlPanel.isSelected() ? BorderLayout.EAST : BorderLayout.WEST);
+                    playbackPanel.getParent().add(ControlPanel.getInstance(), rightControlPanel.isSelected() ? BorderLayout.EAST : BorderLayout.WEST);
                     playbackPanel.getParent().revalidate();
                     playbackPanel.getParent().repaint();
                 });
@@ -183,7 +183,7 @@ class MenuBar extends JMenuBar {
                 controlPanel.add(showControlPanel);
                 JRadioButtonMenuItem hideControlPanel = new JRadioButtonMenuItem("Hide");
                 hideControlPanel.addActionListener(e -> {
-                    playbackPanel.getParent().remove(GUI.controlPanel);
+                    playbackPanel.getParent().remove(ControlPanel.getInstance());
                     playbackPanel.getParent().revalidate();
                     playbackPanel.getParent().repaint();
                 });

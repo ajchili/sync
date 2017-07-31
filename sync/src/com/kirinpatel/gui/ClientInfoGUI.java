@@ -1,6 +1,5 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
 
@@ -9,15 +8,15 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-public class ClientInfoGUI extends JFrame {
+class ClientInfoGUI extends JFrame {
 
     private final User user;
-    private JLabel ping;
-    private JLabel mediaTime;
-    private JLabel mediaState;
-    private UpdateUIThread updateUIThread;
+    private final JLabel ping;
+    private final JLabel mediaTime;
+    private final JLabel mediaState;
+    private final UpdateUIThread updateUIThread;
 
-    public ClientInfoGUI(User user) {
+    ClientInfoGUI(User user) {
         super("Client info");
 
         this.user = user;
@@ -39,6 +38,7 @@ public class ClientInfoGUI extends JFrame {
                 + (user.getMedia().isPaused() ? "Paused" : "Playing"));
         add(mediaState);
         JButton disconnectUser = new JButton("Kick Client");
+        updateUIThread = new UpdateUIThread();
         disconnectUser.addActionListener(e -> {
             Server.kickUser(user);
             ControlPanel.isUserDisplayShown = false;
@@ -48,7 +48,6 @@ public class ClientInfoGUI extends JFrame {
         add(disconnectUser);
         pack();
 
-        updateUIThread = new UpdateUIThread();
         new Thread(updateUIThread).start();
 
         setVisible(true);
@@ -100,7 +99,7 @@ public class ClientInfoGUI extends JFrame {
             }
         }
 
-        public void stop() {
+        void stop() {
             isRunning = false;
         }
     }

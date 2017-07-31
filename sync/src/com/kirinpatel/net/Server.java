@@ -5,6 +5,7 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.Main;
+import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.MediaSelectorGUI;
 import com.kirinpatel.gui.PlaybackPanel;
@@ -28,18 +29,18 @@ public class Server {
     private static GUI gui;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
-    private static ArrayList<String> messages = new ArrayList<>();
+    private final static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean closeServer = false;
 
-    static int SYNC_PORT = 8000;
-    public static int TOMCAT_PORT = 8080;
+    private final static int SYNC_PORT = 8000;
+    final static int TOMCAT_PORT = 8080;
 
     public Server() {
         gui = new GUI(SERVER);
 
         Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
-        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+        ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
 
         server = new ServerThread();
         new Thread(server).start();
@@ -59,12 +60,12 @@ public class Server {
 
     public static void sendMessage(String message) {
         messages.add(message);
-        GUI.controlPanel.setMessages(messages);
+        ControlPanel.getInstance().setMessages(messages);
     }
 
     public static void kickUser(User user) {
         Main.connectedUsers.remove(user);
-        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+        ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
     }
 
     /**
@@ -205,17 +206,17 @@ public class Server {
                         switch(message.getType()) {
                             case DISCONNECTING:
                                 Main.connectedUsers.remove(user);
-                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
                                 isClientConnected = false;
                                 break;
                             case PING:
                                 user.setPing(System.currentTimeMillis() - lastPingCheck);
-                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
                                 break;
                             case CLIENT_NAME:
                                 user = new User(message.getMessage().toString());
                                 Main.connectedUsers.add(user);
-                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
                                 hasConnected = true;
                                 break;
                             case MEDIA_URL:

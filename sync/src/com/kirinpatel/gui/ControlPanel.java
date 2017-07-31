@@ -4,31 +4,49 @@ import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
+import com.sun.istack.internal.NotNull;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class ControlPanel extends JPanel {
 
-    private JList connectedClients;
-    private JScrollPane connectedClientsScroll;
-    private JPanel chatPanel;
-    private JTextArea chatWindow;
-    private JScrollPane chatWindowScroll;
-    private JTextField chatField;
+    private final JList connectedClients;
+    private final JScrollPane connectedClientsScroll;
+    private final JPanel chatPanel;
+    private final JTextArea chatWindow;
+    private final JTextField chatField;
+    private static ControlPanel INSTANCE;
+    private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
     private GUI gui;
-    public static boolean isUserDisplayShown = false;
-    public static int width = 300;
+    static boolean isUserDisplayShown = false;
+    int width = 300;
 
-    public ControlPanel(GUI gui, PlaybackPanel.PANEL_TYPE type) {
+    static ControlPanel setInstance(GUI gui, PlaybackPanel.PANEL_TYPE type) {
+        if (isInstanceSet.compareAndSet(false, true)) {
+           INSTANCE = new ControlPanel(gui, type);
+           return INSTANCE;
+        }
+        return null;
+    }
+
+    public static ControlPanel getInstance() {
+        if (isInstanceSet.get()) {
+            return INSTANCE;
+        }
+        throw new IllegalStateException("Control panel has not been set!");
+    }
+
+    private ControlPanel(GUI gui, PlaybackPanel.PANEL_TYPE type) {
         super(new GridLayout(2, 1));
-
         this.gui = gui;
 
         connectedClients = new JList();
@@ -79,7 +97,7 @@ public class ControlPanel extends JPanel {
          */
         DefaultCaret caret = (DefaultCaret)chatWindow.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        chatWindowScroll = new JScrollPane(chatWindow);
+        JScrollPane chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
         JPanel messagePanel = new JPanel(new BorderLayout());
@@ -148,7 +166,7 @@ public class ControlPanel extends JPanel {
 
     class SendMessageListener implements ActionListener {
 
-        private PlaybackPanel.PANEL_TYPE type;
+        private final PlaybackPanel.PANEL_TYPE type;
 
         SendMessageListener(PlaybackPanel.PANEL_TYPE type) {
             this.type = type;

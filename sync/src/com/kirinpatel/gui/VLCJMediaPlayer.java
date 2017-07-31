@@ -135,7 +135,7 @@ public class VLCJMediaPlayer extends JPanel {
         if (playbackPanel.type == SERVER) {
             for (User client : Main.connectedUsers) {
                 client.getMedia().setCurrentTime(0);
-                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
             }
         }
 
@@ -257,10 +257,10 @@ public class VLCJMediaPlayer extends JPanel {
             repaint();
             if (playbackPanel.type == SERVER) {
                 Main.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
-                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
             } else {
                 Client.user.getMedia().setCurrentTime(media.getCurrentTime());
-                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
             }
         }
     }
