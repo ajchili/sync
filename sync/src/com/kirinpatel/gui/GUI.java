@@ -30,7 +30,6 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         addComponentListener(new ResizeListener());
 
-        // TODO: Implements singleton classes so that server/client instances can be created repeatedly
         PlaybackPanel.setInstance(type);
         add(PlaybackPanel.getInstance(), BorderLayout.CENTER);
         ControlPanel.setInstance(this);
