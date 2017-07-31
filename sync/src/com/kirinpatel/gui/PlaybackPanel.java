@@ -50,7 +50,7 @@ public class PlaybackPanel extends JPanel {
         return null;
     }
 
-    public static PlaybackPanel getINSTANCE() {
+    public static PlaybackPanel getInstance() {
         if (isInstanceSet.get()) {
             return INSTANCE;
         }

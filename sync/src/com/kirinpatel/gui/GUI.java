@@ -32,11 +32,11 @@ public class GUI extends JFrame {
 
         // TODO: Implements singleton classes so that server/client instances can be created repeatedly
         PlaybackPanel.setInstance(type);
-        add(PlaybackPanel.getINSTANCE(), BorderLayout.CENTER);
+        add(PlaybackPanel.getInstance(), BorderLayout.CENTER);
         ControlPanel.setInstance(this);
         ControlPanel.getInstance().resizePanel(getHeight());
         add(ControlPanel.getInstance(), BorderLayout.EAST);
-        setJMenuBar(new MenuBar(PlaybackPanel.getINSTANCE()));
+        setJMenuBar(new MenuBar(PlaybackPanel.getInstance()));
 
         setVisible(type == CLIENT);
     }
@@ -63,7 +63,7 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            PlaybackPanel.getINSTANCE().getMediaPlayer().release();
+            PlaybackPanel.getInstance().getMediaPlayer().release();
             dispose();
             if (type == SERVER) Server.stop();
             else Client.stop();
