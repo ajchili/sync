@@ -186,7 +186,7 @@ public class Main extends JFrame {
         }
     }
 
-    static boolean verifyDependencies() {
+    private static boolean verifyDependencies() {
         if (!new NativeDiscovery().discover()) {
             UIMessage.showErrorDialog(new IllegalAccessException("Unable to load VLCJ." +
                     "\nPlease ensure that both VLC and Java are installed and use the same bit mode (32 or 64 bit)."),

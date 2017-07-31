@@ -8,8 +8,6 @@ import javax.swing.*;
 
 /**
  * Messager class for building messages and handling the calling GUI.
- *
- * @author Kirin Patel
  */
 public class UIMessage {
     private final GUI gui;
