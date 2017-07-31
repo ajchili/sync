@@ -41,8 +41,8 @@ public class ControlPanel extends JPanel {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
                 if (index < Main.connectedUsers.size()) {
-                    User host = Main.connectedUsers.get(0);
-                    User user = Main.connectedUsers.get(index);
+                    final User host = Main.connectedUsers.get(0);
+                    final User user = Main.connectedUsers.get(index);
 
                     if (host != null && !host.equals(user) && Main.showUserTimes) {
                         long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
@@ -57,7 +57,7 @@ public class ControlPanel extends JPanel {
                     if (!isUserDisplayShown && type == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
                         chatWindow.requestFocus();
-                        new ClientInfoGUI(index);
+                        new ClientInfoGUI(user);
                     }
                 }
 

@@ -62,7 +62,7 @@ public class Server {
         GUI.controlPanel.setMessages(messages);
     }
 
-    public static void kickUser(int user) {
+    public static void kickUser(User user) {
         Main.connectedUsers.remove(user);
         GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
     }
