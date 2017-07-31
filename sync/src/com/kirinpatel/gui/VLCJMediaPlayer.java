@@ -8,7 +8,6 @@ import com.kirinpatel.net.User;
 import com.kirinpatel.util.UIMessage;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
-import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 import uk.co.caprica.vlcj.player.Equalizer;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
@@ -49,7 +48,6 @@ public class VLCJMediaPlayer extends JPanel {
      * Constructor that will return a MediaPlayer.
      */
     VLCJMediaPlayer() {
-        new NativeDiscovery().discover();
         setBackground(Color.BLACK);
         setOpaque(true);
 

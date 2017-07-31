@@ -3,6 +3,7 @@ package com.kirinpatel;
 import com.kirinpatel.net.*;
 import com.kirinpatel.util.*;
 import jdk.nashorn.api.scripting.URLReader;
+import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +76,9 @@ public class Main extends JFrame {
             } catch(Exception e) {
                 UIMessage.showErrorDialog(e, "Unable to set look and feel of sync.");
             } finally {
-                main = new Main();
+                if (verifyDependencies()) {
+                    main = new Main();
+                }
             }
         } else {
             UIMessage.showMessageDialog(
@@ -181,6 +184,16 @@ public class Main extends JFrame {
                 e.printStackTrace();
             }
         }
+    }
+
+    static boolean verifyDependencies() {
+        if (!new NativeDiscovery().discover()) {
+            UIMessage.showErrorDialog(new IllegalAccessException("Unable to load VLCJ." +
+                    "\nPlease ensure that both VLC and Java are installed and use the same bit mode (32 or 64 bit)."),
+                    "Unable to launch sync.");
+            return false;
+        }
+        return true;
     }
 
     /**
