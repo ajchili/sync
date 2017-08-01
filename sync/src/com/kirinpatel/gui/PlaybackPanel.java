@@ -24,8 +24,6 @@ public class PlaybackPanel extends JPanel {
     private boolean showBar = false;
     private long lastClick = 0;
     private FullscreenListener fullscreenListener;
-    private static PlaybackPanel INSTANCE;
-    private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
 
     public enum PANEL_TYPE {
         SERVER(0),
@@ -42,20 +40,7 @@ public class PlaybackPanel extends JPanel {
         }
     }
 
-    static PlaybackPanel setInstance(PANEL_TYPE type) {
-        isInstanceSet.compareAndSet(false, true);
-        INSTANCE = new PlaybackPanel(type);
-        return INSTANCE;
-    }
-
-    public static PlaybackPanel getInstance() {
-        if (isInstanceSet.get()) {
-            return INSTANCE;
-        }
-        throw new IllegalStateException("Control panel has not been set!");
-    }
-
-    private PlaybackPanel(PANEL_TYPE type) {
+    PlaybackPanel(PANEL_TYPE type) {
         super(new BorderLayout());
         this.type = type;
 
