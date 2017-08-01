@@ -1,5 +1,5 @@
 # sync
-a Java based multi-client video and audio syncing application
+A Java based multi-client video and audio syncing application.
 	
 ## setup
 1. Check to see if Java is installed
