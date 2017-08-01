@@ -98,12 +98,10 @@ public class VLCJMediaPlayer extends JPanel {
                         new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
                                         "Forcefully closing sync, please restart sync."),
                                 "Media was unable to be set.");
-                        Server.stop();
                     } else {
                         new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
                                         "Forcefully closing sync, please restart sync."),
                                 "Media was unable to be set.");
-                        Client.stop();
                     }
                 }
             });
@@ -188,12 +186,10 @@ public class VLCJMediaPlayer extends JPanel {
                 new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to release media player.\n" +
                                 "Forcefully closing sync, please restart sync."),
                         "Media was unable to be set.");
-                Server.stop();
             } else {
                 new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to release media player.\n" +
                                 "Forcefully closing sync, please restart sync."),
                         "Media was unable to be set.");
-                Client.stop();
             }
         }
     }
