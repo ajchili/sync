@@ -1,5 +1,8 @@
 package com.kirinpatel;
 
+import com.google.common.collect.ImmutableList;
+import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE;
 import com.kirinpatel.net.*;
 import com.kirinpatel.util.*;
 import jdk.nashorn.api.scripting.URLReader;
@@ -12,10 +15,18 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
+
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
  * Main class that will run the application and also server as the launcher for the application and primary object for
@@ -54,10 +65,10 @@ public class Main extends JFrame {
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
         JButton hostServer = new JButton("Host");
-        hostServer.addActionListener(new LauncherButtonEvent(0));
+        hostServer.addActionListener(new LauncherButtonEvent(SERVER));
         buttonPanel.add(hostServer);
         JButton joinServer = new JButton("Join");
-        joinServer.addActionListener(new LauncherButtonEvent(1));
+        joinServer.addActionListener(new LauncherButtonEvent(CLIENT));
         buttonPanel.add(joinServer);
         add(buttonPanel, BorderLayout.CENTER);
 
@@ -130,9 +141,7 @@ public class Main extends JFrame {
         ipField = new JTextField();
         ipField.addActionListener(new IPAddressListener());
         ipPanel.add(ipField);
-        JComboBox ipBox;
-        if (getPreviousAddresses() != null) ipBox = new JComboBox(getPreviousAddresses().toArray());
-        else ipBox = new JComboBox();
+        JComboBox ipBox = new JComboBox(getPreviousAddresses().toArray());
         ipBox.setSelectedItem(null);
         ipBox.addItemListener(e -> {
             new Client(e.getItem().toString());
@@ -156,33 +165,18 @@ public class Main extends JFrame {
      * @param ipAddress Server IP address
      */
     public static void saveIPAddress(String ipAddress) {
-        if (getPreviousAddresses() != null) {
-            for (String ip : getPreviousAddresses()) {
-                if (ip.equals(ipAddress)) return;
-            }
+        if (getPreviousAddresses().contains(ipAddress)) {
+            return;
         }
-
-        File file = new File("launcherData.dat");
-        BufferedWriter writer;
-        if (!file.exists()) {
-            try {
-                writer = new BufferedWriter(new FileWriter(file));
-                writer.write(ipAddress);
-
-                writer.close();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                writer = new BufferedWriter(new FileWriter(file, true));
-                writer.append('\n');
-                writer.append(ipAddress);
-
-                writer.close();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
+        Path dataPath = Paths.get("launcherData.dat");
+        try {
+            Files.write(
+                    dataPath,
+                    Arrays.asList(ipAddress),
+                    UTF_8,
+                    Files.exists(dataPath) ? APPEND : CREATE);
+        } catch (IOException e) {
+            UIMessage.showErrorDialog(e, "Couldn't save IP address!");
         }
     }
 
@@ -201,23 +195,15 @@ public class Main extends JFrame {
      *
      * @return ArrayList of previous server IP addresses
      */
-    private static ArrayList<String> getPreviousAddresses() {
-        Path filePath = Paths.get("launcherData.dat");
-        if (Files.exists(filePath)) {
-            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-                String ipAddress;
-                ArrayList<String> ipAddresses = new ArrayList<>();
-
-                while ((ipAddress = reader.readLine()) != null) {
-                    ipAddresses.add(ipAddress);
-                }
-
-                return ipAddresses;
-            } catch (IOException e) {
-                UIMessage.showErrorDialog(e, "Unable to load previous servers");
-            }
+    private static ImmutableList<String> getPreviousAddresses() {
+        Path dataPath = Paths.get("launcherData.dat");
+        try {
+            return Files.exists(dataPath) ? ImmutableList.copyOf(Files.readAllLines(dataPath)) : ImmutableList.of();
         }
-        return null;
+        catch (IOException e) {
+            UIMessage.showErrorDialog(e, "Unable to load previous servers");
+            return ImmutableList.of();
+        }
     }
 
     private static boolean isUpdated() {
@@ -268,7 +254,7 @@ public class Main extends JFrame {
      */
     class LauncherButtonEvent implements ActionListener {
 
-        private int type;
+        private PANEL_TYPE type;
 
         /**
          * Main constructor that will establish the ActionListener with the
@@ -276,7 +262,7 @@ public class Main extends JFrame {
          *
          * @param type Type
          */
-        LauncherButtonEvent(int type) {
+        LauncherButtonEvent(PANEL_TYPE type) {
             this.type = type;
         }
 
@@ -290,11 +276,11 @@ public class Main extends JFrame {
             setVisible(false);
 
             switch(type) {
-                case 0:
+                case SERVER:
                     new Server();
                     dispose();
                     break;
-                case 1:
+                case CLIENT:
                     getIPAddress();
                     break;
             }

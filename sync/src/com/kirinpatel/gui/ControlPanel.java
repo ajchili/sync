@@ -31,8 +31,6 @@ public class ControlPanel extends JPanel {
     static void setInstance(GUI gui) {
         if (isInstanceSet.compareAndSet(false, true)) {
            INSTANCE = new ControlPanel(gui);
-        } else {
-            throw new IllegalStateException("Control panel can only be created once!");
         }
     }
 
