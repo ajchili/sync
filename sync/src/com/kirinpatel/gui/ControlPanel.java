@@ -28,12 +28,12 @@ public class ControlPanel extends JPanel {
     static boolean isUserDisplayShown = false;
     int width = 300;
 
-    static ControlPanel setInstance(GUI gui) {
+    static void setInstance(GUI gui) {
         if (isInstanceSet.compareAndSet(false, true)) {
            INSTANCE = new ControlPanel(gui);
-           return INSTANCE;
+        } else {
+            throw new IllegalStateException("Control panel can only be created once!");
         }
-        return null;
     }
 
     public static ControlPanel getInstance() {
