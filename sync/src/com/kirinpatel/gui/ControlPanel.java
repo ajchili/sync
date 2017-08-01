@@ -70,7 +70,7 @@ public class ControlPanel extends JPanel {
                         }
                     }
 
-                    if (!isUserDisplayShown && PlaybackPanel.getInstance().type == SERVER && isSelected && cellHasFocus && index > 0) {
+                    if (!isUserDisplayShown && GUI.playbackPanel.type == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
                         chatWindow.requestFocus();
                         new ClientInfoGUI(user);
@@ -167,7 +167,7 @@ public class ControlPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                if (PlaybackPanel.getInstance().type == SERVER) {
+                if (GUI.playbackPanel.type == SERVER) {
                     Server.sendMessage(Main.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {

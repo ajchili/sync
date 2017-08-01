@@ -224,12 +224,12 @@ public class Server {
                                 break;
                             case MEDIA_TIME:
                                 user.getMedia().setCurrentTime((long) message.getMessage());
-                                if (PlaybackPanel.getInstance().getMedia().getCurrentTime() != -1) {
+                                if (GUI.playbackPanel.getMedia().getCurrentTime() != -1) {
                                     sendMediaTime();
                                 }
                                 break;
                             case MEDIA_STATE:
-                                if (PlaybackPanel.getInstance().getMedia().isPaused() != (boolean) message.getMessage()) {
+                                if (GUI.playbackPanel.getMedia().isPaused() != (boolean) message.getMessage()) {
                                     sendMediaState();
                                 }
                                 break;
@@ -256,11 +256,11 @@ public class Server {
 
                 if (System.currentTimeMillis() > lastMediaUpdate + 5000
                         || (user != null
-                        && !user.getMedia().getURL().equals(PlaybackPanel.getInstance().getMedia().getURL()))) {
+                        && !user.getMedia().getURL().equals(GUI.playbackPanel.getMedia().getURL()))) {
                     sendMediaURL();
                 }
 
-                if (user != null &&PlaybackPanel.getInstance().getMedia().isPaused() != user.getMedia().isPaused()) {
+                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused()) {
                     sendMediaState();
                 }
 
@@ -349,7 +349,7 @@ public class Server {
             try {
                 lastMediaUpdate = System.currentTimeMillis();
                 output.flush();
-                output.writeObject(new Message(MEDIA_URL, PlaybackPanel.getInstance().getMedia().getURL()));
+                output.writeObject(new Message(MEDIA_URL, GUI.playbackPanel.getMedia().getURL()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
@@ -357,11 +357,11 @@ public class Server {
         }
 
         private synchronized void sendMediaTime() {
-            long timeDifference = Math.abs(PlaybackPanel.getInstance().getMedia().getCurrentTime()
+            long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
                     - user.getMedia().getCurrentTime() + user.getPing());
             if (timeDifference > 5000) {
                 try {
-                    output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.getInstance().getMedia().getCurrentTime()));
+                    output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
                     output.flush();
                 } catch(IOException e) {
                     disconnectClientFromServer();
@@ -379,8 +379,8 @@ public class Server {
 
         private synchronized void sendMediaState() {
             try {
-                user.getMedia().setPaused(PlaybackPanel.getInstance().getMedia().isPaused());
-                output.writeObject(new Message(MEDIA_STATE, PlaybackPanel.getInstance().getMedia().isPaused()));
+                user.getMedia().setPaused(GUI.playbackPanel.getMedia().isPaused());
+                output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
