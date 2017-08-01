@@ -358,15 +358,15 @@ public class Server {
 
         private synchronized void sendMediaTime() {
             long timeDifference = Math.abs(PlaybackPanel.getInstance().getMedia().getCurrentTime()
-                    - user.getMedia().getCurrentTime()) + (user.getPing() * 2);
-            if (timeDifference > 2000) {
+                    - user.getMedia().getCurrentTime() + user.getPing());
+            if (timeDifference > 5000) {
                 try {
                     output.writeObject(new Message(MEDIA_TIME, PlaybackPanel.getInstance().getMedia().getCurrentTime()));
                     output.flush();
                 } catch(IOException e) {
                     disconnectClientFromServer();
                 }
-            } else if (timeDifference > 750) {
+            } else if (timeDifference > 1000) {
                 try {
                     float rate = (timeDifference + 1000 + user.getPing()) * 1.0f / 1000;
                     output.writeObject(new Message(MEDIA_RATE, rate >= 0.75f ? rate : 0.75f));

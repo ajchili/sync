@@ -130,7 +130,7 @@ class MenuBar extends JMenuBar {
                 JMenu mediaTimeIndicators = new JMenu("Playback Time Indicator");
                 JPanel warningTimePanel = new JPanel(new BorderLayout());
                 warningTimePanel.add(new JLabel("Warning Time: ", JLabel.LEFT), BorderLayout.WEST);
-                JSlider warningSlider = new JSlider(250, 1999, 1000);
+                JSlider warningSlider = new JSlider(250, 4999, 1000);
                 warningSlider.setPaintTicks(true);
                 warningSlider.setMajorTickSpacing(100);
                 warningSlider.setMinorTickSpacing(50);
@@ -143,7 +143,7 @@ class MenuBar extends JMenuBar {
                 mediaTimeIndicators.add(warningTimePanel);
                 JPanel desyncTimePanel = new JPanel(new BorderLayout());
                 desyncTimePanel.add(new JLabel("DeSync Time: ", JLabel.LEFT), BorderLayout.WEST);
-                JSlider desyncSlider = new JSlider(2000, 10000, 2000);
+                JSlider desyncSlider = new JSlider(5000, 10000, 5000);
                 desyncSlider.setPaintTicks(true);
                 desyncSlider.setMajorTickSpacing(500);
                 desyncSlider.setMinorTickSpacing(250);
