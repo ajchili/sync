@@ -31,23 +31,23 @@ class AudioSettingsGUI extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        for (int i = 32; i <= 16384; i *= 2) {
-            // Calculate the 0-9 index from the above i
-            final int index = (int) (Math.log(i/32)/Math.log(2));
+        for (int i = 0; i < 10; i++) {
+            final int hzBand = 32 * (int) Math.pow(2, i);
 
             JPanel panel = new JPanel(new BorderLayout());
             JLabel label = new JLabel(
-                    i < 1000
-                    ? Integer.toString(i)
-                    : Integer.toString(i / 1000) + 'K',
+                    hzBand < 1000
+                    ? Integer.toString(hzBand)
+                    : Integer.toString(hzBand / 1000) + 'K',
                     SwingConstants.CENTER);
             panel.add(label, BorderLayout.NORTH);
             JSlider slider = new JSlider(1, -20, 20, 0);
-            slider.setValue((int) equalizer.getAmp(index));
+            slider.setValue((int) equalizer.getAmp(i));
             slider.setPaintTicks(true);
             slider.setPaintLabels(true);
             slider.setMajorTickSpacing(4);
             slider.setMinorTickSpacing(1);
+            final int index = i;
             slider.addChangeListener(e -> setBandValue(index, ((JSlider) e.getSource()).getValue()));
             panel.add(slider, BorderLayout.CENTER);
             add(panel);
