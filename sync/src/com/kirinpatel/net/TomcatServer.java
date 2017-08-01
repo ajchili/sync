@@ -13,10 +13,10 @@ import java.nio.file.Paths;
 
 import static com.kirinpatel.net.Server.TOMCAT_PORT;
 
-public class TomcatServer {
+class TomcatServer {
     private Tomcat tomcat;
 
-    public TomcatServer() throws IOException {
+    TomcatServer() throws IOException {
         Path mediaPath = Paths.get("tomcat/webapps/media");
         if (!Files.exists(mediaPath)) {
             if(!Files.exists(Files.createDirectories(mediaPath))) {
@@ -47,7 +47,7 @@ public class TomcatServer {
         ctx.addWelcomeFile("index.html");
     }
 
-    public void start() {
+    void start() {
         try {
             tomcat.start();
         } catch(LifecycleException e) {
@@ -58,7 +58,7 @@ public class TomcatServer {
         tomcat.getServer().await();
     }
 
-    public void stop() {
+    void stop() {
         try {
             tomcat.getServer().stop();
             tomcat.getServer().destroy();
