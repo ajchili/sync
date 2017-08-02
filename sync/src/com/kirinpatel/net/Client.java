@@ -3,10 +3,9 @@ package com.kirinpatel.net;
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
 import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
-import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 
@@ -29,7 +28,7 @@ public class Client {
 
     public Client(String ipAddress) {
         Client.ipAddress = ipAddress;
-        Main.connectedUsers.clear();
+        Launcher.connectedUsers.clear();
         Client.user = new User(System.getProperty("user.name"));
         clientThread = new ClientThread();
         new Thread(clientThread).start();
@@ -72,8 +71,8 @@ public class Client {
                                 sendPing();
                                 break;
                             case CONNECTED_CLIENTS:
-                                Main.connectedUsers = (ArrayList<User>) message.getMessage();
-                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                Launcher.connectedUsers = (ArrayList<User>) message.getMessage();
+                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
                                 break;
                             case MEDIA_URL:
                                 String mediaURL = (String) message.getMessage();
@@ -160,7 +159,7 @@ public class Client {
             }
 
             gui = new GUI(CLIENT);
-            Main.saveIPAddress(ipAddress);
+            Launcher.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
         }
@@ -183,7 +182,7 @@ public class Client {
             } catch(IOException e) {
                 Client.stop();
             } finally {
-                new Main();
+                Launcher.getInstance().setVisible(true);
             }
         }
 

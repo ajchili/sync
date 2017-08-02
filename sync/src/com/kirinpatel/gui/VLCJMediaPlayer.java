@@ -1,6 +1,6 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Media;
 import com.kirinpatel.net.Server;
@@ -80,9 +80,9 @@ public class VLCJMediaPlayer extends JPanel {
      */
     private void initControls() {
         if (GUI.playbackPanel.type == SERVER) {
-            for (User client : Main.connectedUsers) {
+            for (User client : Launcher.connectedUsers) {
                 client.getMedia().setCurrentTime(0);
-                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
             }
 
             PlaybackPanel.pauseMedia.addActionListener(e -> {
@@ -311,13 +311,13 @@ public class VLCJMediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
-            if (Main.connectedUsers.size() > 0) {
+            if (Launcher.connectedUsers.size() > 0) {
                 if (GUI.playbackPanel.type == SERVER) {
-                    Main.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
+                    Launcher.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
                 } else {
                     Client.user.getMedia().setCurrentTime(media.getCurrentTime());
                 }
-                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
             }
         }
     }

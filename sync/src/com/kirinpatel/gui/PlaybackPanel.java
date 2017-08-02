@@ -5,7 +5,6 @@ import com.kirinpatel.net.Media;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 

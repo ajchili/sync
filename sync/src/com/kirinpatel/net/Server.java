@@ -4,11 +4,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
 import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.MediaSelectorGUI;
-import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.*;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
@@ -38,9 +37,9 @@ public class Server {
 
     public Server() {
         gui = new GUI(SERVER);
-        Main.connectedUsers.clear();
-        Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
-        ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+        Launcher.connectedUsers.clear();
+        Launcher.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
+        ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
         server = new ServerThread();
         new Thread(server).start();
     }
@@ -49,7 +48,7 @@ public class Server {
         if (gui.isVisible()){
             gui.hide();
         }
-        if (Main.connectedUsers.size() == 1) {
+        if (Launcher.connectedUsers.size() == 1) {
             server.stop();
         }
         else {
@@ -63,8 +62,8 @@ public class Server {
     }
 
     public static void kickUser(User user) {
-        Main.connectedUsers.remove(user);
-        ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+        Launcher.connectedUsers.remove(user);
+        ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
     }
 
     /**
@@ -164,7 +163,8 @@ public class Server {
             if (tomcatServer != null) {
                 tomcatServer.stop();
             }
-            new Main();
+
+            Launcher.getInstance().setVisible(true);
         }
     }
 
@@ -196,7 +196,7 @@ public class Server {
                     break;
                 }
 
-                if (hasConnected && !Main.connectedUsers.contains(user)) {
+                if (hasConnected && !Launcher.connectedUsers.contains(user)) {
                     disconnectClientFromServer();
                 }
 
@@ -205,18 +205,18 @@ public class Server {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
                             case DISCONNECTING:
-                                Main.connectedUsers.remove(user);
-                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                Launcher.connectedUsers.remove(user);
+                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
                                 isClientConnected = false;
                                 break;
                             case PING:
                                 user.setPing(System.currentTimeMillis() - lastPingCheck);
-                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
                                 break;
                             case CLIENT_NAME:
                                 user = new User(message.getMessage().toString());
-                                Main.connectedUsers.add(user);
-                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                Launcher.connectedUsers.add(user);
+                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
                                 hasConnected = true;
                                 break;
                             case MEDIA_URL:
@@ -272,7 +272,7 @@ public class Server {
             try {
                 socket.close();
             } catch(IOException e) {
-                Main.connectedUsers.remove(user);
+                Launcher.connectedUsers.remove(user);
                 stop();
             }
         }
@@ -302,7 +302,7 @@ public class Server {
             } catch(IOException e) {
                 // Do nothing if sending closing message fails
             } finally {
-                Main.connectedUsers.remove(user);
+                Launcher.connectedUsers.remove(user);
                 isClientConnected = false;
             }
         }
@@ -321,7 +321,7 @@ public class Server {
             try {
                 lastClientUpdate = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(CONNECTED_CLIENTS, Main.connectedUsers));
+                output.writeObject(new Message(CONNECTED_CLIENTS, Launcher.connectedUsers));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();

@@ -1,6 +1,6 @@
 package com.kirinpatel.util;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
 import com.kirinpatel.gui.GUI;
 
 import javax.swing.*;
@@ -25,7 +25,7 @@ public class UIMessage {
     public void showErrorDialogAndExit(Exception error, String title) {
         showErrorDialog(error, title);
         gui.hide();
-        new Main();
+        Launcher.getInstance().dispose();
     }
 
     /**

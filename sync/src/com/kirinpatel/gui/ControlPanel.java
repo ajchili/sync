@@ -1,6 +1,6 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
@@ -54,16 +54,16 @@ public class ControlPanel extends JPanel {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                if (index < Main.connectedUsers.size()) {
-                    final User host = Main.connectedUsers.get(0);
-                    final User user = Main.connectedUsers.get(index);
+                if (index < Launcher.connectedUsers.size()) {
+                    final User host = Launcher.connectedUsers.get(0);
+                    final User user = Launcher.connectedUsers.get(index);
 
-                    if (host != null && !host.equals(user) && Main.showUserTimes) {
+                    if (host != null && !host.equals(user) && Launcher.showUserTimes) {
                         long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
-                        if (host.getMedia().getCurrentTime() - Main.deSyncTime > currentUserTime) {
+                        if (host.getMedia().getCurrentTime() - Launcher.deSyncTime > currentUserTime) {
                             setBackground(Color.RED);
-                        } else if (host.getMedia().getCurrentTime() - Main.deSyncWarningTime > currentUserTime) {
+                        } else if (host.getMedia().getCurrentTime() - Launcher.deSyncWarningTime > currentUserTime) {
                             setBackground(Color.YELLOW);
                         }
                     }
@@ -122,7 +122,7 @@ public class ControlPanel extends JPanel {
         for (User user : users) {
             String displayedText = user.toString();
 
-            if (Main.showUserTimes) {
+            if (Launcher.showUserTimes) {
                 displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
             }
 
@@ -166,7 +166,7 @@ public class ControlPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
                 if (GUI.playbackPanel.type == SERVER) {
-                    Server.sendMessage(Main.connectedUsers.get(0) + ": " + chatField.getText());
+                    Server.sendMessage(Launcher.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {
                     Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());
