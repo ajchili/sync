@@ -70,6 +70,7 @@ public class Client {
                                 sendPing();
                                 break;
                             case CONNECTED_CLIENTS:
+                                Launcher.getInstance().getConnectedUsers().clear();
                                 Launcher.getInstance().getConnectedUsers().addAll((ArrayList<User>) message.getMessage());
                                 ControlPanel.getInstance().updateConnectedClients();
                                 break;

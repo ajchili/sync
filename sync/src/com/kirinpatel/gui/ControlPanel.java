@@ -120,6 +120,7 @@ public class ControlPanel extends JPanel {
 
     public void updateConnectedClients() {
         DefaultListModel listModel = new DefaultListModel();
+        User host = Launcher.getInstance().getConnectedUsers().get(0);
         for (User user : Launcher.getInstance().getConnectedUsers()) {
             String displayedText = user.toString();
 
@@ -127,7 +128,7 @@ public class ControlPanel extends JPanel {
                 displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
             }
 
-            if (!user.equals(Launcher.getInstance().getConnectedUsers().get(0))) {
+            if (!user.equals(host)) {
                 displayedText += " (" + user.getPing() + " ms)";
             }
 
