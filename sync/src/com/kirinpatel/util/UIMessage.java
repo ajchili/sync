@@ -7,7 +7,7 @@ import javax.swing.*;
 
 
 /**
- * Messager class for building messages and handling the calling GUI.
+ * Messenger class for building messages and handling the calling GUI.
  */
 public class UIMessage {
     private final GUI gui;

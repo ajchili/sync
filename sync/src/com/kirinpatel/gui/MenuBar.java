@@ -3,6 +3,7 @@ package com.kirinpatel.gui;
 import com.kirinpatel.Launcher;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
+import com.kirinpatel.sync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +19,7 @@ class MenuBar extends JMenuBar {
         /*
           Application section
          */
-        JMenu sync = new JMenu("sync");
+        JMenu menu = new JMenu("sync");
 
             /*
               Media section
@@ -28,8 +29,8 @@ class MenuBar extends JMenuBar {
                 new MediaSelectorGUI();
             });
             if (playbackPanel.type == SERVER) {
-                sync.add(file);
-                sync.add(new JSeparator());
+                menu.add(file);
+                menu.add(new JSeparator());
             }
 
             /*
@@ -45,8 +46,8 @@ class MenuBar extends JMenuBar {
                                         : Client.ipAddress),
                                 null);
             });
-            sync.add(share);
-            sync.add(new JSeparator());
+            menu.add(share);
+            menu.add(new JSeparator());
 
             /*
               Close section
@@ -59,9 +60,9 @@ class MenuBar extends JMenuBar {
                     Client.stop();
                 }
             });
-            sync.add(close);
+            menu.add(close);
 
-        add(sync);
+        add(menu);
 
         /*
           Settings section
@@ -136,7 +137,7 @@ class MenuBar extends JMenuBar {
                 warningSlider.setMinorTickSpacing(50);
                 warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
                 warningSlider.addChangeListener(e -> {
-                    Launcher.deSyncWarningTime = warningSlider.getValue();
+                    sync.deSyncWarningTime = warningSlider.getValue();
                     warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
                 });
                 warningTimePanel.add(warningSlider, BorderLayout.CENTER);
@@ -149,7 +150,7 @@ class MenuBar extends JMenuBar {
                 desyncSlider.setMinorTickSpacing(250);
                 desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
                 desyncSlider.addChangeListener(e -> {
-                    Launcher.deSyncWarningTime = desyncSlider.getValue();
+                    sync.deSyncTime = desyncSlider.getValue();
                     desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
                 });
                 desyncTimePanel.add(desyncSlider, BorderLayout.CENTER);
@@ -159,12 +160,12 @@ class MenuBar extends JMenuBar {
                 ButtonGroup mediaTimeButtons = new ButtonGroup();
                 JRadioButtonMenuItem showMediaTime = new JRadioButtonMenuItem("Show");
                 showMediaTime.addActionListener(e -> {
-                    Launcher.showUserTimes = true;
+                    Launcher.getInstance().setShowUserTimes(true);
                 });
                 mediaTime.add(showMediaTime);
                 JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
                 hideMediaTime.addActionListener(e -> {
-                    Launcher.showUserTimes = false;
+                    Launcher.getInstance().setShowUserTimes(false);
                 });
                 hideMediaTime.setSelected(true);
                 mediaTime.add(hideMediaTime);

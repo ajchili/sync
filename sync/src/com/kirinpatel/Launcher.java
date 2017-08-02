@@ -22,7 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,21 +32,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;
 
-public class Launcher extends JFrame {
+public final class Launcher extends JFrame {
 
-    private final static int VERSION = 1;
-    private final static int BUILD = 6;
-    private final static int REVISION = 0;
-
-    // Global variables
-    public static boolean showUserTimes = false;
-    public static ArrayList<User> connectedUsers = new ArrayList<>();
-    public static long deSyncWarningTime = 1000;
-    public static long deSyncTime = 2000;
-
+    private static boolean showUserTimes = false;
+    private static ArrayList<User> connectedUsers = new ArrayList<>();
     private static JFrame frame;
     private static JTextField ipField;
-
     private static Launcher INSTANCE;
     private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
 
@@ -77,11 +68,8 @@ public class Launcher extends JFrame {
         throw new IllegalStateException("Control panel has not been set!");
     }
 
-    Launcher() {
+    private Launcher() {
         super("sync");
-
-        connectedUsers.clear();
-        showUserTimes = false;
 
         setSize(new Dimension(200, 100));
         setResizable(false);
@@ -101,6 +89,23 @@ public class Launcher extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Displays the launcher JFrame.
+     */
+    public void open() {
+        Launcher.getInstance().setVisible(true);
+
+        connectedUsers.clear();
+        showUserTimes = false;
+    }
+
+    /**
+     * Hides the launcher JFrame.
+     */
+    public void close() {
+        Launcher.getInstance().setVisible(false);
+    }
+
     private static boolean verifyDependencies() {
         if (!new NativeDiscovery().discover()) {
             UIMessage.showErrorDialog(new IllegalAccessException("Unable to load VLCJ." +
@@ -114,22 +119,26 @@ public class Launcher extends JFrame {
     private static boolean isUpdated() {
         try {
             Scanner s = new Scanner(new URLReader(new URL("https://github.com/ajchili/sync/releases")));
-            String version = "";
+            int[] version = new int[3];
             while(s.hasNext()) {
                 String line = s.nextLine();
                 if (line.contains("tag-reference")) {
                     s.nextLine();
-                    version = s.nextLine();
-                    version = version.substring(version.indexOf("tree/") + 5, version.indexOf("tree/") + 10);
+                    String release;
+                    release = s.nextLine();
+                    release = release.substring(release.indexOf("tree/") + 5, release.indexOf("tree/") + 10);
+                    version = new int[]{
+                            Integer.parseInt(release.substring(0, release.indexOf('.'))),
+                            Integer.parseInt(release.substring(release.indexOf('.') + 1, release.lastIndexOf('.'))),
+                            Integer.parseInt(release.substring(release.lastIndexOf('.') + 1))
+                    };
                     break;
                 }
             }
 
-            int v = Integer.parseInt(version.substring(0, version.indexOf('.')));
-            int b = Integer.parseInt(version.substring(version.indexOf('.') + 1, version.lastIndexOf('.')));
-            int r = Integer.parseInt(version.substring(version.lastIndexOf('.') + 1));
-
-            return !(VERSION != v || BUILD < b || REVISION < r && BUILD == b);
+            return !(sync.VERSION != version[0]
+                    || sync.BUILD < version[1]
+                    || sync.REVISION < version[2] && sync.BUILD == version[1]);
         } catch(MalformedURLException e) {
             UIMessage.showErrorDialog(e, "Unable to verify version");
             return false;
@@ -165,7 +174,7 @@ public class Launcher extends JFrame {
             @Override
             public void componentHidden(ComponentEvent e) {
                 frame.dispose();
-                Launcher.getInstance().setVisible(false);
+                Launcher.getInstance().close();
             }
         });
         frame.setLocationRelativeTo(null);
@@ -184,7 +193,7 @@ public class Launcher extends JFrame {
         ipBox.addItemListener(e -> {
             new Client(e.getItem().toString());
             frame.dispose();
-            Launcher.getInstance().setVisible(false);
+            Launcher.getInstance().close();
         });
         ipPanel.add(ipBox);
 
@@ -210,7 +219,7 @@ public class Launcher extends JFrame {
         try {
             Files.write(
                     dataPath,
-                    Arrays.asList(ipAddress),
+                    Collections.singletonList(ipAddress),
                     UTF_8,
                     Files.exists(dataPath) ? APPEND : CREATE);
         } catch (IOException e) {
@@ -232,6 +241,18 @@ public class Launcher extends JFrame {
             UIMessage.showErrorDialog(e, "Unable to load previous servers");
             return ImmutableList.of();
         }
+    }
+
+    public void setShowUserTimes(boolean showUserTimes) {
+        Launcher.showUserTimes = showUserTimes;
+    }
+
+    public boolean showUserTimes() {
+        return showUserTimes;
+    }
+
+    public ArrayList<User> getConnectedUsers() {
+        return connectedUsers;
     }
 
     /**
@@ -264,7 +285,7 @@ public class Launcher extends JFrame {
             switch(type) {
                 case SERVER:
                     new Server();
-                    Launcher.getInstance().setVisible(false);
+                    Launcher.getInstance().close();
                     break;
                 case CLIENT:
                     getIPAddress();
@@ -283,7 +304,7 @@ public class Launcher extends JFrame {
             if (!ipField.getText().isEmpty()) {
                 new Client(ipField.getText());
                 frame.dispose();
-                Launcher.getInstance().setVisible(false);
+                Launcher.getInstance().close();
             } else {
                 UIMessage.showMessageDialog(
                         "No IP address provided! An IP address must be provided!",

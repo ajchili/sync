@@ -80,9 +80,9 @@ public class VLCJMediaPlayer extends JPanel {
      */
     private void initControls() {
         if (GUI.playbackPanel.type == SERVER) {
-            for (User client : Launcher.connectedUsers) {
+            for (User client : Launcher.getInstance().getConnectedUsers()) {
                 client.getMedia().setCurrentTime(0);
-                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients();
             }
 
             PlaybackPanel.pauseMedia.addActionListener(e -> {
@@ -311,13 +311,13 @@ public class VLCJMediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
-            if (Launcher.connectedUsers.size() > 0) {
+            if (Launcher.getInstance().getConnectedUsers().size() > 0) {
                 if (GUI.playbackPanel.type == SERVER) {
-                    Launcher.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
+                    Launcher.getInstance().getConnectedUsers().get(0).getMedia().setCurrentTime(media.getCurrentTime());
                 } else {
                     Client.user.getMedia().setCurrentTime(media.getCurrentTime());
                 }
-                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+                ControlPanel.getInstance().updateConnectedClients();
             }
         }
     }

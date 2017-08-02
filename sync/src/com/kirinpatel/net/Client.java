@@ -28,7 +28,6 @@ public class Client {
 
     public Client(String ipAddress) {
         Client.ipAddress = ipAddress;
-        Launcher.connectedUsers.clear();
         Client.user = new User(System.getProperty("user.name"));
         clientThread = new ClientThread();
         new Thread(clientThread).start();
@@ -71,8 +70,8 @@ public class Client {
                                 sendPing();
                                 break;
                             case CONNECTED_CLIENTS:
-                                Launcher.connectedUsers = (ArrayList<User>) message.getMessage();
-                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+                                Launcher.getInstance().getConnectedUsers().addAll((ArrayList<User>) message.getMessage());
+                                ControlPanel.getInstance().updateConnectedClients();
                                 break;
                             case MEDIA_URL:
                                 String mediaURL = (String) message.getMessage();
@@ -182,7 +181,7 @@ public class Client {
             } catch(IOException e) {
                 Client.stop();
             } finally {
-                Launcher.getInstance().setVisible(true);
+                Launcher.getInstance().open();
             }
         }
 

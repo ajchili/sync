@@ -37,9 +37,8 @@ public class Server {
 
     public Server() {
         gui = new GUI(SERVER);
-        Launcher.connectedUsers.clear();
-        Launcher.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
-        ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+        Launcher.getInstance().getConnectedUsers().add(new User(System.getProperty("user.name") + " (host)"));
+        ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
         new Thread(server).start();
     }
@@ -48,7 +47,7 @@ public class Server {
         if (gui.isVisible()){
             gui.hide();
         }
-        if (Launcher.connectedUsers.size() == 1) {
+        if (Launcher.getInstance().getConnectedUsers().size() == 1) {
             server.stop();
         }
         else {
@@ -62,8 +61,8 @@ public class Server {
     }
 
     public static void kickUser(User user) {
-        Launcher.connectedUsers.remove(user);
-        ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+        Launcher.getInstance().getConnectedUsers().remove(user);
+        ControlPanel.getInstance().updateConnectedClients();
     }
 
     /**
@@ -164,7 +163,7 @@ public class Server {
                 tomcatServer.stop();
             }
 
-            Launcher.getInstance().setVisible(true);
+            Launcher.getInstance().open();
         }
     }
 
@@ -196,7 +195,7 @@ public class Server {
                     break;
                 }
 
-                if (hasConnected && !Launcher.connectedUsers.contains(user)) {
+                if (hasConnected && !Launcher.getInstance().getConnectedUsers().contains(user)) {
                     disconnectClientFromServer();
                 }
 
@@ -205,18 +204,18 @@ public class Server {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
                             case DISCONNECTING:
-                                Launcher.connectedUsers.remove(user);
-                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+                                Launcher.getInstance().getConnectedUsers().remove(user);
+                                ControlPanel.getInstance().updateConnectedClients();
                                 isClientConnected = false;
                                 break;
                             case PING:
                                 user.setPing(System.currentTimeMillis() - lastPingCheck);
-                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients();
                                 break;
                             case CLIENT_NAME:
                                 user = new User(message.getMessage().toString());
-                                Launcher.connectedUsers.add(user);
-                                ControlPanel.getInstance().updateConnectedClients(Launcher.connectedUsers);
+                                Launcher.getInstance().getConnectedUsers().add(user);
+                                ControlPanel.getInstance().updateConnectedClients();
                                 hasConnected = true;
                                 break;
                             case MEDIA_URL:
@@ -272,7 +271,7 @@ public class Server {
             try {
                 socket.close();
             } catch(IOException e) {
-                Launcher.connectedUsers.remove(user);
+                Launcher.getInstance().getConnectedUsers().remove(user);
                 stop();
             }
         }
@@ -302,7 +301,7 @@ public class Server {
             } catch(IOException e) {
                 // Do nothing if sending closing message fails
             } finally {
-                Launcher.connectedUsers.remove(user);
+                Launcher.getInstance().getConnectedUsers().remove(user);
                 isClientConnected = false;
             }
         }
@@ -321,7 +320,7 @@ public class Server {
             try {
                 lastClientUpdate = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(CONNECTED_CLIENTS, Launcher.connectedUsers));
+                output.writeObject(new Message(CONNECTED_CLIENTS, Launcher.getInstance().getConnectedUsers()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
