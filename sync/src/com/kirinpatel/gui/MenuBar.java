@@ -159,14 +159,10 @@ class MenuBar extends JMenuBar {
                 mediaTime.add(new JSeparator());
                 ButtonGroup mediaTimeButtons = new ButtonGroup();
                 JRadioButtonMenuItem showMediaTime = new JRadioButtonMenuItem("Show");
-                showMediaTime.addActionListener(e -> {
-                    Launcher.getInstance().setShowUserTimes(true);
-                });
+                showMediaTime.addActionListener(e -> sync.showUserTimes = true);
                 mediaTime.add(showMediaTime);
                 JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
-                hideMediaTime.addActionListener(e -> {
-                    Launcher.getInstance().setShowUserTimes(false);
-                });
+                hideMediaTime.addActionListener(e -> sync.showUserTimes = false);
                 hideMediaTime.setSelected(true);
                 mediaTime.add(hideMediaTime);
                 mediaTimeButtons.add(showMediaTime);

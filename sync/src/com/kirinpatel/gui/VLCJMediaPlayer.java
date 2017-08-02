@@ -5,6 +5,7 @@ import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Media;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
+import com.kirinpatel.sync;
 import com.kirinpatel.util.UIMessage;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
@@ -80,7 +81,7 @@ public class VLCJMediaPlayer extends JPanel {
      */
     private void initControls() {
         if (GUI.playbackPanel.type == SERVER) {
-            for (User client : Launcher.getInstance().getConnectedUsers()) {
+            for (User client : sync.connectedUsers) {
                 client.getMedia().setCurrentTime(0);
                 ControlPanel.getInstance().updateConnectedClients();
             }
@@ -311,9 +312,9 @@ public class VLCJMediaPlayer extends JPanel {
             AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             scale = scaleOp.filter(image, after);
             repaint();
-            if (Launcher.getInstance().getConnectedUsers().size() > 0) {
+            if (sync.connectedUsers.size() > 0) {
                 if (GUI.playbackPanel.type == SERVER) {
-                    Launcher.getInstance().getConnectedUsers().get(0).getMedia().setCurrentTime(media.getCurrentTime());
+                    sync.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
                 } else {
                     Client.user.getMedia().setCurrentTime(media.getCurrentTime());
                 }

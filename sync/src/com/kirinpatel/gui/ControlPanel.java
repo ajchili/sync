@@ -1,6 +1,5 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Launcher;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
@@ -55,11 +54,11 @@ public class ControlPanel extends JPanel {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                if (index < Launcher.getInstance().getConnectedUsers().size()) {
-                    final User host = Launcher.getInstance().getConnectedUsers().get(0);
-                    final User user = Launcher.getInstance().getConnectedUsers().get(index);
+                if (index < sync.connectedUsers.size()) {
+                    final User host = sync.connectedUsers.get(0);
+                    final User user = sync.connectedUsers.get(index);
 
-                    if (host != null && !host.equals(user) && Launcher.getInstance().showUserTimes()) {
+                    if (host != null && !host.equals(user) && sync.showUserTimes) {
                         long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
                         if (host.getMedia().getCurrentTime() - sync.deSyncTime > currentUserTime) {
@@ -120,11 +119,11 @@ public class ControlPanel extends JPanel {
 
     public void updateConnectedClients() {
         DefaultListModel listModel = new DefaultListModel();
-        User host = Launcher.getInstance().getConnectedUsers().get(0);
-        for (User user : Launcher.getInstance().getConnectedUsers()) {
+        User host = sync.connectedUsers.get(0);
+        for (User user : sync.connectedUsers) {
             String displayedText = user.toString();
 
-            if (Launcher.getInstance().showUserTimes()) {
+            if (sync.showUserTimes) {
                 displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
             }
 
@@ -168,7 +167,7 @@ public class ControlPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
                 if (GUI.playbackPanel.type == SERVER) {
-                    Server.sendMessage(Launcher.getInstance().getConnectedUsers().get(0) + ": " + chatField.getText());
+                    Server.sendMessage(sync.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {
                     Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());
