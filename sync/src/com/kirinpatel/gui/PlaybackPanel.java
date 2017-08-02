@@ -1,21 +1,23 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.util.KeyDispatcher;
-import com.kirinpatel.vlc.MediaPlayer;
+import com.kirinpatel.net.Media;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class PlaybackPanel extends JPanel {
 
-    public static MediaPlayer mediaPlayer;
-    public static JButton pauseMedia;
-    public final int type;
-    public JLabel mediaPositionLabel;
-    public JSlider mediaPosition;
-    public JSlider mediaVolume;
-    public boolean isFullscreen = false;
+    private VLCJMediaPlayer mediaPlayer;
+    static JButton pauseMedia;
+    final PANEL_TYPE type;
+    JLabel mediaPositionLabel;
+    JSlider mediaPosition;
+    JSlider mediaVolume;
+    private boolean isFullscreen = false;
     private JPanel controlPanel;
     private JFrame fullscreen;
     private JPanel fullscreenPanel;
@@ -23,24 +25,39 @@ public class PlaybackPanel extends JPanel {
     private long lastClick = 0;
     private FullscreenListener fullscreenListener;
 
-    PlaybackPanel(int type) {
+    public enum PANEL_TYPE {
+        SERVER(0),
+        CLIENT(1);
+
+        private int panelType;
+
+        PANEL_TYPE(int panelType) {
+            this.panelType = panelType;
+        }
+
+        public int getPanelType() {
+            return panelType;
+        }
+    }
+
+    PlaybackPanel(PANEL_TYPE type) {
         super(new BorderLayout());
         this.type = type;
-
-        fullscreenListener = new FullscreenListener();
 
         initMediaPlayer();
     }
 
     private void initMediaPlayer() {
-        mediaPlayer = new MediaPlayer(this);
+        fullscreenListener = new FullscreenListener();
+
+        mediaPlayer = new VLCJMediaPlayer();
         add(mediaPlayer, BorderLayout.CENTER);
         mediaPlayer.addMouseListener(fullscreenListener);
 
         initControls();
     }
 
-    public void initFullscreen() {
+    void initFullscreen() {
         removeAll();
 
         isFullscreen = true;
@@ -58,7 +75,9 @@ public class PlaybackPanel extends JPanel {
                 if (e.getY() >= Toolkit.getDefaultToolkit().getScreenSize().getHeight() - 50) {
                     showBar = true;
                     controlPanel.setVisible(true);
-                    if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
+                    if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
+                        repaint();
+                    }
                 } else {
                     new Thread(() -> {
                         try {
@@ -67,9 +86,12 @@ public class PlaybackPanel extends JPanel {
 
                             if (!showBar && isFullscreen) {
                                 controlPanel.setVisible(false);
-                                if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) repaint();
+                                if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
+                                    repaint();
+                                }
                             }
                         } catch(InterruptedException e1) {
+                            Thread.currentThread().interrupt();
                             e1.printStackTrace();
                         }
                     }).start();
@@ -106,7 +128,7 @@ public class PlaybackPanel extends JPanel {
         fullscreen.setVisible(true);
     }
 
-    public void closeFullscreen() {
+    private void closeFullscreen() {
         isFullscreen = false;
         fullscreenPanel.removeAll();
         fullscreen.dispose();
@@ -114,7 +136,7 @@ public class PlaybackPanel extends JPanel {
         add(mediaPlayer, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
         controlPanel.setVisible(true);
-        if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+        if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
             mediaPlayer.repaint();
             controlPanel.repaint();
             repaint();
@@ -130,7 +152,7 @@ public class PlaybackPanel extends JPanel {
         pauseMedia = new JButton("");
         pauseMedia.setContentAreaFilled(false);
         pauseMedia.setInputMap(0, null);
-        pauseMedia.setEnabled(type == 0);
+        pauseMedia.setEnabled(type == SERVER);
         pauseMedia.setBackground(background);
         pauseMedia.setForeground(foreground);
         pauseMedia.setOpaque(true);
@@ -172,6 +194,14 @@ public class PlaybackPanel extends JPanel {
         manager.addKeyEventDispatcher(new KeyDispatcher(this));
     }
 
+    public Media getMedia() {
+        return mediaPlayer.getMedia();
+    }
+
+    public VLCJMediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
     class FullscreenListener implements MouseListener {
 
         @Override
@@ -196,7 +226,7 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+            if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
                 mediaPlayer.revalidate();
                 mediaPlayer.repaint();
             }
@@ -204,10 +234,60 @@ public class PlaybackPanel extends JPanel {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            if (!mediaPlayer.getMediaURL().isEmpty() && !mediaPlayer.isPaused()) {
+            if (!mediaPlayer.getMedia().getURL().isEmpty() && !mediaPlayer.getMedia().isPaused()) {
                 mediaPlayer.revalidate();
                 mediaPlayer.repaint();
             }
+        }
+    }
+
+
+    class KeyDispatcher implements KeyEventDispatcher {
+
+        private final PlaybackPanel playbackPanel;
+
+        KeyDispatcher(PlaybackPanel playbackPanel) {
+            this.playbackPanel = playbackPanel;
+        }
+
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent e) {
+            switch(e.getID()) {
+                case KeyEvent.KEY_PRESSED:
+                    switch(e.getKeyCode()) {
+                        // ESC
+                        case 27:
+                            if (playbackPanel.isFullscreen) {
+                                playbackPanel.closeFullscreen();
+                            }
+                            break;
+                        // Space bar
+                        case 32:
+                            if (playbackPanel.isFullscreen && PlaybackPanel.pauseMedia.isEnabled()) {
+                                if (mediaPlayer.isPaused()) {
+                                    mediaPlayer.play();
+                                } else {
+                                    mediaPlayer.pause();
+                                }
+                            }
+                            break;
+                        // F11
+                        case 122:
+                            if (playbackPanel.isFullscreen) {
+                                playbackPanel.closeFullscreen();
+                            } else  {
+                                playbackPanel.initFullscreen();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            return false;
         }
     }
 }

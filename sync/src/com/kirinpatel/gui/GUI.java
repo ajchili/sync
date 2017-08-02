@@ -2,27 +2,30 @@ package com.kirinpatel.gui;
 
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.Client;
-import com.kirinpatel.util.Debug;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
+
 public class GUI extends JFrame {
 
-    private final int type;
+    private final PlaybackPanel.PANEL_TYPE type;
     public static PlaybackPanel playbackPanel;
-    public static ControlPanel controlPanel;
 
-    public GUI(int type) {
-        super(type == 0 ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
+    /**
+     * Primary constructor that will create the GUI of sync.
+     *
+     * @param type Type
+     */
+    public GUI(PlaybackPanel.PANEL_TYPE type) {
+        super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
 
-        Debug.Log("Starting server gui...", 3);
-
-        setSize(new Dimension(840, 360));
-        setMinimumSize(new Dimension(840, 360));
+        setSize(new Dimension(940, 360));
+        setMinimumSize(new Dimension(940, 360));
         setLayout(new BorderLayout());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -30,21 +33,22 @@ public class GUI extends JFrame {
 
         playbackPanel = new PlaybackPanel(type);
         add(playbackPanel, BorderLayout.CENTER);
-        controlPanel = new ControlPanel(type);
-        controlPanel.resizePanel(getHeight());
-        add(controlPanel, BorderLayout.EAST);
+        ControlPanel.setInstance(this);
+        ControlPanel.getInstance().resizePanel(getHeight());
+        add(ControlPanel.getInstance(), BorderLayout.EAST);
         setJMenuBar(new MenuBar(playbackPanel));
 
-        setVisible(true);
-
-        Debug.Log(type == 0 ? "Server gui displayed." : "Client gui displayed.", 3);
+        setVisible(type == CLIENT);
     }
 
+    /**
+     * This inner class will handle all resizing and closing of the GUI class.
+     */
     class ResizeListener implements ComponentListener {
 
         @Override
         public void componentResized(ComponentEvent e) {
-            controlPanel.resizePanel(getHeight());
+            ControlPanel.getInstance().resizePanel(getHeight());
         }
 
         @Override
@@ -59,11 +63,9 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            Debug.Log(type == 0 ? "Closing server gui..." : "Closing client gui...", 3);
-            PlaybackPanel.mediaPlayer.release();
+            playbackPanel.getMediaPlayer().release();
             dispose();
-            Debug.Log(type == 0 ? "Server gui closed." : "Client gui closed.", 3);
-            if (type == 0) Server.stop();
+            if (type == SERVER) Server.stop();
             else Client.stop();
         }
     }

@@ -1,30 +1,36 @@
-package com.kirinpatel.tomcat;
+package com.kirinpatel.net;
 
-import com.kirinpatel.util.Debug;
 import com.kirinpatel.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class TomcatServer {
+import static com.kirinpatel.net.Server.TOMCAT_PORT;
 
+class TomcatServer {
     private Tomcat tomcat;
 
-    public TomcatServer() {
-        File mediaPath = new File("tomcat/webapps/media");
-        if (!mediaPath.getAbsoluteFile().exists()) {
-            Debug.Log("Creating Tomcat file structure...", 1);
-            mediaPath.mkdirs();
-            Debug.Log("Tomcat file structure created.", 1);
-            new UIMessage("Tomcat directory created!", "A new folder has been added for offline media.\nPlease open \"" + mediaPath.getAbsolutePath() + "\"\nand add any media files that you would like to use for sync.", 0);
+    TomcatServer() throws IOException {
+        Path mediaPath = Paths.get("tomcat/webapps/media");
+        if (!Files.exists(mediaPath)) {
+            if(!Files.exists(Files.createDirectories(mediaPath))) {
+                throw new IOException("Couldn't make tomcat directory at: " + mediaPath.toAbsolutePath());
+            } else {
+                UIMessage.showMessageDialog(
+                        "A new folder has been added for offline media.\nPlease open \""
+                                + mediaPath.toAbsolutePath()
+                                + "\"\nand add any media files that you would like to use for sync.",
+                        "Tomcat directory created!");
+            }
         }
-
-        Debug.Log("Starting Tomcat server...", 4);
         tomcat = new Tomcat();
-        tomcat.setPort(8080);
+        tomcat.setPort(TOMCAT_PORT);
         tomcat.setBaseDir("./tomcat");
 
         Context ctx = tomcat.addContext("","./media");
@@ -41,26 +47,23 @@ public class TomcatServer {
         ctx.addWelcomeFile("index.html");
     }
 
-    public void start() {
+    void start() {
         try {
             tomcat.start();
-            Debug.Log("Tomcat server started.", 4);
         } catch(LifecycleException e) {
-            Debug.Log("Unable to start tomcat started.", 5);
-            System.exit(0);
+            // If this fails, close the server
+            Server.stop();
+            return;
         }
         tomcat.getServer().await();
     }
 
-    public void stop() {
+    void stop() {
         try {
-            Debug.Log("Stopping Tomcat server...", 4);
             tomcat.getServer().stop();
             tomcat.getServer().destroy();
-            Debug.Log("Tomcat server stopped.", 4);
         } catch(LifecycleException e) {
-            Debug.Log("Error stopping Tomcat server...", 2);
-        } finally {
+            // If this fails, close the server
             System.exit(0);
         }
     }

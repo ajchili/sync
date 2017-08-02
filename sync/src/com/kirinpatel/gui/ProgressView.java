@@ -3,10 +3,20 @@ package com.kirinpatel.gui;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The ProgressView class is used to display a UI element to visualize the speed at which a file is being moved to
+ * the Tomcat media directory.
+ */
 public class ProgressView extends JFrame {
 
     private JProgressBar progressBar;
 
+    /**
+     * Main constructor that will create the ProgressView.
+     *
+     * @param title Title
+     * @param message Message to be displayed
+     */
     public ProgressView(String title, String message) {
         super(title);
 
@@ -24,10 +34,12 @@ public class ProgressView extends JFrame {
         setVisible(true);
     }
 
-    public void setProgress(int progress) {
-        progressBar.setValue(progress);
-    }
-
+    /**
+     * Sets progress of ProgressView.
+     *
+     * @param value Current value
+     * @param max Max value
+     */
     public void setProgress(long value, long max) {
         progressBar.setValue((int) ((value * 100) / max));
     }

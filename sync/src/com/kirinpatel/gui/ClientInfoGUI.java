@@ -1,44 +1,53 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Main;
 import com.kirinpatel.net.Server;
+import com.kirinpatel.net.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-public class ClientInfoGUI extends JFrame {
+class ClientInfoGUI extends JFrame {
 
-    private int index;
-    private JLabel ping;
-    private UpdateUIThread updateUIThread;
+    private final User user;
+    private final JLabel ping;
+    private final JLabel mediaTime;
+    private final JLabel mediaState;
+    private final UpdateUIThread updateUIThread;
 
-    public ClientInfoGUI(int index) {
+    ClientInfoGUI(User user) {
         super("Client info");
 
-        this.index = index;
-
+        this.user = user;
         setResizable(false);
-        setLayout(new GridLayout(4, 1));
+        setLayout(new GridLayout(6, 1));
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         addComponentListener(new ClientInfoComponentListener());
         setLocationRelativeTo(null);
 
-        add(new JLabel("Username: " + Main.connectedUsers.get(index).getUsername()));
-        add(new JLabel("UserID: " + Main.connectedUsers.get(index).getUserID()));
-        ping = new JLabel("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
+        add(new JLabel("Username: " + user.getUsername()));
+        add(new JLabel("UserID: " + user.getUserID()));
+        ping = new JLabel("Ping: " + user.getPing() + " ms");
         add(ping);
+        mediaTime = new JLabel("Playback Time: "
+                + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime())
+                + ":" + user.getMedia().getCurrentTime() % 1000);
+        add(mediaTime);
+        mediaState = new JLabel("Playback State: "
+                + (user.getMedia().isPaused() ? "Paused" : "Playing"));
+        add(mediaState);
         JButton disconnectUser = new JButton("Kick Client");
+        updateUIThread = new UpdateUIThread();
         disconnectUser.addActionListener(e -> {
-            Server.kickUser(index);
+            Server.kickUser(user);
             ControlPanel.isUserDisplayShown = false;
+            updateUIThread.stop();
             dispose();
         });
         add(disconnectUser);
         pack();
 
-        updateUIThread = new UpdateUIThread();
         new Thread(updateUIThread).start();
 
         setVisible(true);
@@ -77,15 +86,20 @@ public class ClientInfoGUI extends JFrame {
         public void run() {
             while(isRunning) {
                 try {
-                    Thread.sleep(500);
-                    if (index <= Main.connectedUsers.size()) ping.setText("Ping: " + Main.connectedUsers.get(index).getPing() + " ms");
+                    Thread.sleep(250);
+                    ping.setText("Ping: " + user.getPing() + " ms");
+                    mediaTime.setText("Playback Time: "
+                            + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime())
+                            + ":" + user.getMedia().getCurrentTime() % 1000);
+                    mediaState.setText("Playback State: "
+                            + (user.getMedia().isPaused() ? "Paused" : "Playing"));
                 } catch(InterruptedException e) {
-                    e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
         }
 
-        public void stop() {
+        void stop() {
             isRunning = false;
         }
     }

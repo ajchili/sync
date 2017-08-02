@@ -1,31 +1,51 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.kirinpatel.util;
+
+import com.kirinpatel.Main;
+import com.kirinpatel.gui.GUI;
 
 import javax.swing.*;
 
+
 /**
- * Message JOptionPanes that will be displayed to user for message and error
- * events.
- *
- * @author Kirin Patel
+ * Messager class for building messages and handling the calling GUI.
  */
 public class UIMessage {
+    private final GUI gui;
 
-    private final int[] TYPE = {JOptionPane.INFORMATION_MESSAGE, JOptionPane.ERROR_MESSAGE};
+    public UIMessage(GUI gui) {
+        this.gui = gui;
+    }
 
     /**
-     * Display message dialog with given title, message, and dialog type.
+     * Display a message based on the error with a title. The window is then closed and the opening menu is shown.
      *
-     * @param title   Title
-     * @param message Message
-     * @param type    Message type
+     * @param error
+     * @param title
      */
-    public UIMessage(String title, String message, int type) {
-        JOptionPane.showMessageDialog(null, message, title, this.TYPE[type]);
+    public void showErrorDialogAndExit(Exception error, String title) {
+        showErrorDialog(error, title);
+        gui.hide();
+        new Main();
+    }
+
+    /**
+     * Display a message based on the error with a title.
+     *
+     * @param error
+     * @param title
+     */
+    public static void showErrorDialog(Exception error, String title) {
+        JOptionPane.showMessageDialog(null, error.getMessage(), title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Display a message
+     *
+     * @param message
+     * @param title
+     */
+    public static void showMessageDialog(String message, String title) {
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**

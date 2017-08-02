@@ -27,17 +27,18 @@ public class FileSelector {
     /**
      * Credit: https://www.mkyong.com/java/how-to-move-file-to-another-directory-in-java/
      *
-     * @param selectedFile
-     * @return
+     * @param selectedFile Selected media file
+     * @return Media file that is in Tomcat directory
      */
     private static File moveFile(File selectedFile) {
         File newFile = new File("tomcat/webapps/media/" + selectedFile.getName());
 
-        ProgressView progressView = new ProgressView("Moving media", "Please wait while your media is moved to the proper folder.");
+        ProgressView progressView =
+                new ProgressView("Moving media"
+                        ,"Please wait while your media is moved to the proper folder.");
         new Thread(() -> {
-            try {
-                InputStream inStream = new FileInputStream(selectedFile);
-                OutputStream outStream = new FileOutputStream(newFile);
+            try (InputStream inStream = new FileInputStream(selectedFile);
+                OutputStream outStream = new FileOutputStream(newFile)) {
 
                 byte[] buffer = new byte[1024];
                 int length;
@@ -45,9 +46,6 @@ public class FileSelector {
                 while ((length = inStream.read(buffer)) > 0) {
                     outStream.write(buffer, 0, length);
                 }
-
-                inStream.close();
-                outStream.close();
 
             } catch(IOException e) {
                 e.printStackTrace();
@@ -62,14 +60,21 @@ public class FileSelector {
                 time = System.currentTimeMillis();
                 progressView.setProgress(newFile.length(), selectedFile.length());
                 if (timeout + (1000 * 300) < time) {
-                    new UIMessage("Unable to move media", "Your media was unable to be moved.\nPlease try to manually move your media to the Tomcat directory.", 1);
+                    UIMessage.showMessageDialog(
+                            "Your media was unable to be moved." +
+                                    "\nPlease try to manually move your media to the Tomcat directory.",
+                            "Unable to move media");
                     break;
                 }
             }
 
             progressView.dispose();
             Server.setEnabled(true);
-            if (timeout + (1000 * 300) > time) new UIMessage("Your media is ready", "Your media has been moved to the\nTomcat folder and is ready for playback.", 0);
+            if (timeout + (1000 * 300) > time) {
+                UIMessage.showMessageDialog(
+                        "Your media has been moved to the\nTomcat folder and is ready for playback.",
+                        "Your media is ready");
+            }
         }).start();
 
         return newFile;

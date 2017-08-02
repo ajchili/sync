@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="weupnp" type="repository">
+    <properties maven-id="org.bitlet:weupnp:0.1.2" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/bitlet/weupnp/0.1.2/weupnp-0.1.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

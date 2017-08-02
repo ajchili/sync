@@ -3,30 +3,47 @@ package com.kirinpatel.gui;
 import com.kirinpatel.Main;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.util.Debug;
-import com.kirinpatel.util.User;
-import com.kirinpatel.vlc.MediaPlayer;
+import com.kirinpatel.net.User;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class ControlPanel extends JPanel {
 
-    private JList connectedClients;
-    private JScrollPane connectedClientsScroll;
-    private JPanel chatPanel;
-    private JTextArea chatWindow;
-    private JScrollPane chatWindowScroll;
-    private JTextField chatField;
-    public static boolean isUserDisplayShown = false;
+    private final JList connectedClients;
+    private final JScrollPane connectedClientsScroll;
+    private final JPanel chatPanel;
+    private final JTextArea chatWindow;
+    private final JTextField chatField;
+    private static ControlPanel INSTANCE;
+    private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
+    private GUI gui;
+    static boolean isUserDisplayShown = false;
+    int width = 300;
 
-    public ControlPanel(int type) {
+    static void setInstance(GUI gui) {
+        if (isInstanceSet.compareAndSet(false, true)) {
+           INSTANCE = new ControlPanel(gui);
+        }
+    }
+
+    public static ControlPanel getInstance() {
+        if (isInstanceSet.get()) {
+            return INSTANCE;
+        }
+        throw new IllegalStateException("Control panel has not been set!");
+    }
+
+    private ControlPanel(GUI gui) {
         super(new GridLayout(2, 1));
-
-        Debug.Log("Creating ControlPanel...", 3);
+        this.gui = gui;
 
         connectedClients = new JList();
         connectedClients.setToolTipText("Connected Clients");
@@ -37,18 +54,25 @@ public class ControlPanel extends JPanel {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                User host = Main.connectedUsers.get(0);
-                User user = Main.connectedUsers.get(index);
+                if (index < Main.connectedUsers.size()) {
+                    final User host = Main.connectedUsers.get(0);
+                    final User user = Main.connectedUsers.get(index);
 
-                if (host != null && !host.equals(user) && Main.showUserTimes) {
-                    if (host.getTime() - Debug.deSyncTime > user.getTime()) setBackground(Color.RED);
-                    else if (host.getTime() - Debug.deSyncWarningTime > user.getTime()) setBackground(Color.YELLOW);
-                }
+                    if (host != null && !host.equals(user) && Main.showUserTimes) {
+                        long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
-                if (!isUserDisplayShown && type == 0 && isSelected && cellHasFocus && index > 0) {
-                    isUserDisplayShown = true;
-                    chatWindow.requestFocus();
-                    new ClientInfoGUI(index);
+                        if (host.getMedia().getCurrentTime() - Main.deSyncTime > currentUserTime) {
+                            setBackground(Color.RED);
+                        } else if (host.getMedia().getCurrentTime() - Main.deSyncWarningTime > currentUserTime) {
+                            setBackground(Color.YELLOW);
+                        }
+                    }
+
+                    if (!isUserDisplayShown && GUI.playbackPanel.type == SERVER && isSelected && cellHasFocus && index > 0) {
+                        isUserDisplayShown = true;
+                        chatWindow.requestFocus();
+                        new ClientInfoGUI(user);
+                    }
                 }
 
                 return c;
@@ -64,34 +88,49 @@ public class ControlPanel extends JPanel {
         chatWindow.setLineWrap(true);
         chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
-        chatWindowScroll = new JScrollPane(chatWindow);
+        /*
+            Credit: https://stackoverflow.com/a/1627068
+         */
+        DefaultCaret caret = (DefaultCaret)chatWindow.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        JScrollPane chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
         JPanel messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
         chatField.setToolTipText("Message Box");
-        chatField.addActionListener(new ControlPanel.SendMessageListener(type));
+        chatField.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(chatField, BorderLayout.CENTER);
         JButton send = new JButton("Send");
-        send.setInputMap(0, null);
-        send.addActionListener(new ControlPanel.SendMessageListener(type));
+        send.setInputMap(WHEN_FOCUSED, null);
+        send.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(send, BorderLayout.EAST);
         chatPanel.add(messagePanel, BorderLayout.SOUTH);
         add(chatPanel);
-
-        Debug.Log("ControlPanel created.", 3);
     }
 
-    public void resizePanel(int height) {
-        connectedClientsScroll.setPreferredSize(new Dimension(200, height / 2));
-        chatPanel.setPreferredSize(new Dimension(200, height / 2));
+    void resizePanel(int height) {
+        gui.setMinimumSize(new Dimension(640 + width, 360));
+        connectedClientsScroll.setPreferredSize(new Dimension(width, height / 2));
+        chatPanel.setPreferredSize(new Dimension(width, height / 2));
+        revalidate();
+        repaint();
     }
 
     public void updateConnectedClients(ArrayList<User> users) {
         DefaultListModel listModel = new DefaultListModel();
         for (User user : users) {
-            if (Main.showUserTimes) listModel.addElement(user + " (" + MediaPlayer.formatTime(user.getTime()) + ')');
-            else listModel.addElement(user);
+            String displayedText = user.toString();
+
+            if (Main.showUserTimes) {
+                displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
+            }
+
+            if (!user.equals(users.get(0))) {
+                displayedText += " (" + user.getPing() + " ms)";
+            }
+
+            listModel.addElement(displayedText);
         }
         connectedClients.setModel(listModel);
     }
@@ -105,32 +144,28 @@ public class ControlPanel extends JPanel {
                 chatWindow.append(message);
             }
         }
-        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
     }
 
     public void addMessages(ArrayList<String> messages) {
         if (!chatWindow.getText().isEmpty()) {
             chatWindow.append("\n");
         }
+
         for (String message : messages) {
             chatWindow.append(message + '\n');
         }
-        chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
-        chatWindowScroll.getVerticalScrollBar().setValue(chatWindowScroll.getVerticalScrollBar().getMaximum());
+
+        if (chatWindow.getText().length() > 0) {
+            chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
+        }
     }
 
     class SendMessageListener implements ActionListener {
 
-        private int type;
-
-        public SendMessageListener(int type) {
-            this.type = type;
-        }
-
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                if (type == 0) {
+                if (GUI.playbackPanel.type == SERVER) {
                     Server.sendMessage(Main.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {

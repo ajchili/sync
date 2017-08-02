@@ -1,13 +1,24 @@
 package com.kirinpatel.net;
 
-import com.kirinpatel.Main;
-import com.kirinpatel.gui.GUI;
-import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.tomcat.TomcatServer;
-import com.kirinpatel.util.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
+import com.kirinpatel.Main;
+import com.kirinpatel.gui.ControlPanel;
+import com.kirinpatel.gui.GUI;
+import com.kirinpatel.gui.MediaSelectorGUI;
+import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.util.*;
+import org.bitlet.weupnp.GatewayDevice;
+import org.bitlet.weupnp.GatewayDiscover;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,155 +26,145 @@ import java.util.concurrent.Executors;
 public class Server {
 
     public static String ipAddress = "";
-    private static GUI gui;
-    private static ArrayList<String> messages = new ArrayList<>();
+    public static GUI gui;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
+    private final static ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean closeServer = false;
-    private boolean isBound = false;
+
+    private final static int SYNC_PORT = 8000;
+    final static int TOMCAT_PORT = 8080;
 
     public Server() {
-        Debug.Log("Starting server...", 1);
-        gui = new GUI(0);
-
+        gui = new GUI(SERVER);
+        Main.connectedUsers.clear();
         Main.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
-        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
-
+        ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
         server = new ServerThread();
         new Thread(server).start();
-        new Thread(() -> {
-            tomcatServer = new TomcatServer();
-            tomcatServer.start();
-        }).start();
-        new Thread(() -> {
-            try {
-                Thread.sleep(2500);
-                if(isRunning) {
-                    PortValidator.isAvailable(8000);
-                    PortValidator.isAvailable(8080);
-                }
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
     }
 
     public static void stop() {
-        Debug.Log("Stopping server...", 1);
+        if (gui.isVisible()){
+            gui.hide();
+        }
         if (Main.connectedUsers.size() == 1) {
             server.stop();
-        } else {
+        }
+        else {
             closeServer = true;
         }
     }
 
     public static void sendMessage(String message) {
         messages.add(message);
-        GUI.controlPanel.setMessages(messages);
+        ControlPanel.getInstance().setMessages(messages);
     }
 
-    public static void kickUser(int user) {
+    public static void kickUser(User user) {
         Main.connectedUsers.remove(user);
-        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+        ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
     }
 
+    /**
+     * Sets whether the server GUI will be usable or not.
+     *
+     * @param enabled Is usable
+     */
     public static void setEnabled(boolean enabled) {
         gui.setEnabled(enabled);
     }
 
     class ServerThread implements Runnable {
-
         private ExecutorService connectionExecutor;
+        private GatewayDevice device;
         private ServerSocket service;
         private Socket socket;
 
+        @Override
         public void run() {
-            isRunning = true;
-
-            connectionExecutor = Executors.newFixedThreadPool(10);
-
+            UIMessage messager = new UIMessage(gui);
             try {
-                service = new ServerSocket(8000);
-
-                Debug.Log("Server started.", 1);
-                gui.setTitle(gui.getTitle() + getIPAddress());
-                while(isRunning) {
-                    Debug.Log("Awaiting connection...", 4);
+                device = createGatewayDevice();
+                tomcatServer = new TomcatServer();
+                new Thread(() -> tomcatServer.start()).start();
+                connectionExecutor = Executors.newFixedThreadPool(10);
+                service = new ServerSocket(SYNC_PORT);
+                isRunning = true;
+                gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
+                gui.setVisible(true);
+                new MediaSelectorGUI();
+            } catch (IOException e) {
+                messager.showErrorDialogAndExit(e, "Couldn't open server");
+                return;
+            }
+            try {
+                while (isRunning) {
                     socket = service.accept();
-
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
-            } catch(BindException e) {
-                Debug.Log("Unable to start server, address already in use!", 5);
-                gui.dispose();
-                isBound = true;
-            } catch(SocketException e) {
-                Debug.Log("Closing unused socket...", 4);
-                Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
-                e.printStackTrace();
+                // Couldn't accept a client or on called on server close, just ignore exception.
             } finally {
                 connectionExecutor.shutdown();
-
                 while(!connectionExecutor.isTerminated()) {
-
-                }
-
-                Debug.Log("Server stopped.", 1);
-
-                if (isBound) {
-                    new UIMessage("Unable to start server!", "The address is in use by another application!", 1);
-                    Server.stop();
+                    sleep(Duration.ofSeconds(1));
                 }
             }
         }
 
-        public void stop() {
-            isRunning = false;
-
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    socket.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (service != null && !service.isClosed()) {
-                try {
-                    service.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            tomcatServer.stop();
-        }
-
-        /**
-         * Provides the public IP address of the server.
-         * Credit: https://stackoverflow.com/a/2939223
-         *
-         * @return Returns string value of public IP address
-         */
-        private String getIPAddress() {
-            Debug.Log("Obtaining server IP address...", 4);
-            String ip = "";
+        private GatewayDevice createGatewayDevice() throws IOException {
+            GatewayDiscover discover = new GatewayDiscover();
             try {
-                URL whatismyip = new URL("http://checkip.amazonaws.com");
-                BufferedReader in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
-
-                Debug.Log("Server IP address obtained.", 4);
-                ipAddress = in.readLine();
-                ip = " (" + ipAddress + ":8000)";
-            } catch(MalformedURLException e) {
-                e.printStackTrace();
-            } catch(IOException e) {
-                Debug.Log("Unable to obtain server IP address.", 5);
+                discover.discover();
+                GatewayDevice device = discover.getValidGateway();
+                checkNotNull(device);
+                boolean isSyncMapped = device.addPortMapping(
+                        SYNC_PORT,
+                        SYNC_PORT,
+                        device.getLocalAddress().getHostAddress(),
+                        "TCP",
+                        "sync");
+                boolean isTomcatMapped = device.addPortMapping(
+                        TOMCAT_PORT,
+                        TOMCAT_PORT,
+                        device.getLocalAddress().getHostAddress(),
+                        "TCP",
+                        "tomcat");
+                if (isSyncMapped && isTomcatMapped) {
+                    Server.ipAddress = device.getExternalIPAddress();
+                    return device;
+                }
+                throw new IOException("Couldn't map port " + SYNC_PORT + " or " + TOMCAT_PORT + " ensure UPnP is enabled");
+            } catch (SAXException | ParserConfigurationException e) {
+                throw new IOException(e);
             }
+        }
 
-            return ip;
+        void stop() {
+            isRunning = false;
+            sleep(Duration.ofSeconds(1));
+            try {
+                device.deletePortMapping(SYNC_PORT, "TCP");
+                device.deletePortMapping(TOMCAT_PORT, "TCP");
+            } catch (NullPointerException | IOException | SAXException e) {
+                // If this fails, nothing left to do
+            }
+            try {
+                socket.close();
+            } catch (IOException | NullPointerException e) {
+                // If this fails, nothing left to do
+            }
+            try {
+                service.close();
+            } catch (IOException | NullPointerException e) {
+                // If this fails, nothing left to do
+            }
+            if (tomcatServer != null) {
+                tomcatServer.stop();
+            }
+            new Main();
         }
     }
 
@@ -173,17 +174,14 @@ public class Server {
         private ObjectInputStream input;
         private ObjectOutputStream output;
         private User user;
-        private String client = "client";
         private boolean isClientConnected = false;
         private boolean hasConnected = false;
-        private String mediaURL = "";
-        private boolean isPaused = false;
         private ArrayList<String> messages = new ArrayList<>();
-        private long lastClientUpdate = System.currentTimeMillis() - 1000;
-        private long lastPingCheck = System.currentTimeMillis() - 1000;
-        private long time = 0;
+        private long lastPingCheck = 0;
+        private long lastClientUpdate = 0;
+        private long lastMediaUpdate = 0;
 
-        public ServerSocketTask(Socket socket) {
+        ServerSocketTask(Socket socket) {
             this.socket = socket;
         }
 
@@ -198,53 +196,49 @@ public class Server {
                     break;
                 }
 
-                if (hasConnected && !Main.connectedUsers.contains(user)) disconnectClientFromServer();
+                if (hasConnected && !Main.connectedUsers.contains(user)) {
+                    disconnectClientFromServer();
+                }
 
                 try {
                     if (socket.getInputStream().available() > 0) {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
-                            case 0:
-                                switch((int) message.getMessage()) {
-                                    case 0:
-                                        Main.connectedUsers.remove(user);
-                                        GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
-                                        isClientConnected = false;
-                                        Debug.Log('C' + client.substring(1) + " disconnected.".substring(1), 4);
-                                        break;
-                                    case 4:
-                                        user.setPing(System.currentTimeMillis() - lastPingCheck);
-                                        break;
-                                    default:
-                                        break;
-                                }
+                            case DISCONNECTING:
+                                Main.connectedUsers.remove(user);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                isClientConnected = false;
                                 break;
-                            case 10:
+                            case PING:
+                                user.setPing(System.currentTimeMillis() - lastPingCheck);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                break;
+                            case CLIENT_NAME:
                                 user = new User(message.getMessage().toString());
                                 Main.connectedUsers.add(user);
-                                client += " (" + user.getUsername() + ':' + user.getUserID() + ')';
-                                GUI.controlPanel.updateConnectedClients(Main.connectedUsers);
+                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
                                 hasConnected = true;
                                 break;
-                            case 21:
-                                if ((boolean) message.getMessage() != isPaused) sendVideoState();
+                            case MEDIA_URL:
+                                user.getMedia().setURL((String) message.getMessage());
                                 break;
-                            case 22:
-                                time = (long) message.getMessage();
-                                if (user != null) user.setTime(time);
-                                sendVideoRate();
+                            case MEDIA_TIME:
+                                user.getMedia().setCurrentTime((long) message.getMessage());
+                                if (GUI.playbackPanel.getMedia().getCurrentTime() != -1) {
+                                    sendMediaTime();
+                                }
                                 break;
-                            case 31:
+                            case MEDIA_STATE:
+                                if (GUI.playbackPanel.getMedia().isPaused() != (boolean) message.getMessage()) {
+                                    sendMediaState();
+                                }
+                                break;
+                            case CLIENT_MESSAGES:
                                 for (String m : (ArrayList<String>) message.getMessage()) {
                                     sendMessage(m);
                                 }
                                 break;
                             default:
-                                if (message.getMessage() != null) {
-                                    Debug.Log("Unregistered message - (" + message.getType() + " : " + message.getMessage().toString() + ").", 1);
-                                } else {
-                                    Debug.Log("Unregistered message - (" + message.getType() + ").", 2);
-                                }
                                 break;
                         }
                     }
@@ -252,59 +246,63 @@ public class Server {
                     disconnectClientFromServer();
                 }
 
-                if (System.currentTimeMillis() > lastPingCheck + 1000) sendPing();
+                if (System.currentTimeMillis() > lastPingCheck + 500) {
+                    sendPing();
+                }
 
-                if (System.currentTimeMillis() > lastClientUpdate + 1000) sendConnectedUsersToClient();
+                if (System.currentTimeMillis() > lastClientUpdate + 1500) {
+                    sendConnectedUsersToClient();
+                }
 
-                if (messages.size() < Server.messages.size()) sendMessagesToClient();
+                if (System.currentTimeMillis() > lastMediaUpdate + 5000
+                        || (user != null
+                        && !user.getMedia().getURL().equals(GUI.playbackPanel.getMedia().getURL()))) {
+                    sendMediaURL();
+                }
 
-                if (!mediaURL.equals(PlaybackPanel.mediaPlayer.getMediaURL())) sendMediaURL();
+                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused()) {
+                    sendMediaState();
+                }
 
-                if (isPaused != PlaybackPanel.mediaPlayer.isPaused()) sendVideoState();
+                if (messages.size() < Server.messages.size()) {
+                    sendMessagesToClient();
+                }
             }
 
             try {
-                Debug.Log("Closing socket...", 4);
                 socket.close();
-                Debug.Log("Socket closed.", 4);
             } catch(IOException e) {
                 Main.connectedUsers.remove(user);
                 stop();
             }
         }
 
-        public void stop() {
+        void stop() {
             disconnectClientFromServer();
-
             server.stop();
         }
 
         private synchronized void connectClientToServer() {
             try {
-                Debug.Log("Establishing connection to " + client + "...", 4);
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
-                isClientConnected = message.getType() == 0 && (int) message.getMessage() == 1;
+                isClientConnected = message.getType() == CONNECTING;
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(0, 2));
+                output.writeObject(new Message(CONNECTED, null));
                 output.flush();
-                Debug.Log("Established connection to " + client + '.', 4);
-                sendVideoState();
-                sendVideoTime();
-                sendConnectedUsersToClient();
             } catch(IOException | ClassNotFoundException e) {
-                Debug.Log("Unable to establish connection to " + client + '.', 5);
+                disconnectClientFromServer();
             }
         }
 
         private synchronized void disconnectClientFromServer() {
             try {
-                Debug.Log("Sending disconnect message to " + client + "...", 4);
-                output.writeObject(new Message(0, 3));
+                output.writeObject(new Message(CLOSING, ""));
                 output.flush();
-                Debug.Log("Disconnect message sent.", 4);
             } catch(IOException e) {
-                Debug.Log("Unable to properly disconnect with client.", 5);
+                // Do nothing if sending closing message fails
+            } finally {
+                Main.connectedUsers.remove(user);
                 isClientConnected = false;
             }
         }
@@ -312,10 +310,9 @@ public class Server {
         private synchronized void sendPing() {
             try {
                 lastPingCheck = System.currentTimeMillis();
-                output.writeObject(new Message(0, 4));
+                output.writeObject(new Message(PING, null));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to properly ping " + client + ".", 5);
                 disconnectClientFromServer();
             }
         }
@@ -324,10 +321,9 @@ public class Server {
             try {
                 lastClientUpdate = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(11, Main.connectedUsers));
+                output.writeObject(new Message(CONNECTED_CLIENTS, Main.connectedUsers));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to send connected clients list to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
@@ -342,64 +338,61 @@ public class Server {
                 messages.clear();
                 messages.addAll(messageCache);
                 output.flush();
-                output.writeObject(new Message(30, newMessages));
+                output.writeObject(new Message(MESSAGES, newMessages));
                 output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to send message log to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
 
         private synchronized void sendMediaURL() {
             try {
-                output.writeObject(new Message(20, PlaybackPanel.mediaPlayer.getMediaURL()));
+                lastMediaUpdate = System.currentTimeMillis();
                 output.flush();
-                mediaURL = PlaybackPanel.mediaPlayer.getMediaURL();
-                time = 0;
-                Main.connectedUsers.get(0).setTime(PlaybackPanel.mediaPlayer.getMediaTime());
+                output.writeObject(new Message(MEDIA_URL, GUI.playbackPanel.getMedia().getURL()));
+                output.flush();
             } catch(IOException e) {
-                Debug.Log("Unable to send media URL to " + client + '.', 5);
                 disconnectClientFromServer();
             }
         }
 
-        private synchronized void sendVideoState() {
-            try {
-                output.writeObject(new Message(21, PlaybackPanel.mediaPlayer.isPaused()));
-                output.flush();
-                isPaused = PlaybackPanel.mediaPlayer.isPaused();
-            } catch(IOException e) {
-                Debug.Log("Unable to send media state to " + client + '.', 5);
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendVideoTime() {
-            try {
-                output.reset();
-                output.writeObject(new Message(22, PlaybackPanel.mediaPlayer.getMediaTime()));
-                output.flush();
-            } catch(IOException e) {
-                Debug.Log("Unable to send current media time to " + client + '.', 5);
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendVideoRate() {
-            long timeDifference = PlaybackPanel.mediaPlayer.getMediaTime() - time;
-            if (Math.abs(timeDifference) > 2000) {
-                Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, sending current media time.", 4);
-                sendVideoTime();
-            } else if (Math.abs(timeDifference) > 1000) {
+        private synchronized void sendMediaTime() {
+            long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
+                    - user.getMedia().getCurrentTime() + user.getPing());
+            if (timeDifference > 5000) {
                 try {
-                    Debug.Log('C' + client.substring(1) + " is out of sync by " + timeDifference + " milliseconds, changing playback rate.", 4);
-                    output.writeObject(new Message(23, (timeDifference + 1000) * 1.0f / 1000));
+                    output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
                     output.flush();
                 } catch(IOException e) {
-                    Debug.Log("Unable to send rate to " + client + '.', 5);
+                    disconnectClientFromServer();
+                }
+            } else if (timeDifference > 1000) {
+                try {
+                    float rate = (timeDifference + 1000 + user.getPing()) * 1.0f / 1000;
+                    output.writeObject(new Message(MEDIA_RATE, rate >= 0.75f ? rate : 0.75f));
+                    output.flush();
+                } catch(IOException e) {
                     disconnectClientFromServer();
                 }
             }
         }
+
+        private synchronized void sendMediaState() {
+            try {
+                user.getMedia().setPaused(GUI.playbackPanel.getMedia().isPaused());
+                output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
+                output.flush();
+            } catch(IOException e) {
+                disconnectClientFromServer();
+            }
+        }
+    }
+
+    private void sleep(Duration time) {
+       try {
+           Thread.sleep(time.toMillis());
+       } catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+       }
     }
 }

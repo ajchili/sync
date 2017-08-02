@@ -1,13 +1,32 @@
 package com.kirinpatel;
 
+import com.google.common.collect.ImmutableList;
+import com.kirinpatel.gui.PlaybackPanel;
+import com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE;
 import com.kirinpatel.net.*;
 import com.kirinpatel.util.*;
+import jdk.nashorn.api.scripting.URLReader;
+import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
  * Main class that will run the application and also server as the launcher for the application and primary object for
@@ -15,15 +34,15 @@ import java.util.ArrayList;
  */
 public class Main extends JFrame {
 
+    private final static int VERSION = 1;
+    private final static int BUILD = 6;
+    private final static int REVISION = 0;
+
     // Global variables
-    public static int videoQuality = 100;
     public static boolean showUserTimes = false;
     public static ArrayList<User> connectedUsers = new ArrayList<>();
-    
-    /**
-     * Credit: http://alvinalexander.com/blog/post/java/how-determine-application-running-mac-os-x-osx-version
-     */
-    public static final boolean IS_MAC = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+    public static long deSyncWarningTime = 1000;
+    public static long deSyncTime = 2000;
 
     private static Main main;
     private static JFrame frame;
@@ -38,25 +57,22 @@ public class Main extends JFrame {
         connectedUsers.clear();
         showUserTimes = false;
 
-        Debug.Log("Starting sync launcher...", 3);
         setSize(new Dimension(200, 100));
-
         setResizable(false);
         setLayout(new BorderLayout());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
         JButton hostServer = new JButton("Host");
-        hostServer.addActionListener(new LauncherButtonEvent(0));
+        hostServer.addActionListener(new LauncherButtonEvent(SERVER));
         buttonPanel.add(hostServer);
         JButton joinServer = new JButton("Join");
-        joinServer.addActionListener(new LauncherButtonEvent(1));
+        joinServer.addActionListener(new LauncherButtonEvent(CLIENT));
         buttonPanel.add(joinServer);
         add(buttonPanel, BorderLayout.CENTER);
 
         setVisible(true);
-        Debug.Log("Sync launcher displayed.", 3);
     }
 
     /**
@@ -65,20 +81,20 @@ public class Main extends JFrame {
      * @param args Command line arguments
      */
     public static void main(String[] args) {
-        if (args.length > 0) {
-            Debug.debugLevel = Integer.parseInt(args[0]);
-        }
-
-        if (VersionChecker.isUpdated()) {
+        if (isUpdated()) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch (Exception e) {
-                Debug.Log("Unable to load \"Numbus\" UIManager!", 2);
+            } catch(Exception e) {
+                UIMessage.showErrorDialog(e, "Unable to set look and feel of sync.");
+            } finally {
+                if (verifyDependencies()) {
+                    main = new Main();
+                }
             }
-            main = new Main();
         } else {
-            Debug.Log("Outdated version of sync! Please update!", 2);
-            new UIMessage("Outdated version of sync", "You have an outdated version of sync, please update sync!", 1);
+            UIMessage.showMessageDialog(
+                    "You have an outdated version of sync, please update sync!",
+                    "Outdated version of sync.");
         }
     }
 
@@ -125,12 +141,12 @@ public class Main extends JFrame {
         ipField = new JTextField();
         ipField.addActionListener(new IPAddressListener());
         ipPanel.add(ipField);
-        JComboBox ipBox;
-        if (getPreviousAddresses() != null) ipBox = new JComboBox(getPreviousAddresses().toArray());
-        else ipBox = new JComboBox();
+        JComboBox ipBox = new JComboBox(getPreviousAddresses().toArray());
         ipBox.setSelectedItem(null);
         ipBox.addItemListener(e -> {
-            ipField.setText(e.getItem().toString());
+            new Client(e.getItem().toString());
+            frame.dispose();
+            main.dispose();
         });
         ipPanel.add(ipBox);
 
@@ -149,34 +165,29 @@ public class Main extends JFrame {
      * @param ipAddress Server IP address
      */
     public static void saveIPAddress(String ipAddress) {
-        if (getPreviousAddresses() != null) {
-            for (String ip : getPreviousAddresses()) {
-                if (ip.equals(ipAddress)) return;
-            }
+        if (getPreviousAddresses().contains(ipAddress)) {
+            return;
         }
-
-        File file = new File("launcherData.dat");
-        BufferedWriter writer;
-        if (!file.exists()) {
-            try {
-                writer = new BufferedWriter(new FileWriter(file));
-                writer.write(ipAddress);
-
-                writer.close();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            try {
-                writer = new BufferedWriter(new FileWriter(file, true));
-                writer.append('\n');
-                writer.append(ipAddress);
-
-                writer.close();
-            } catch(IOException e) {
-                e.printStackTrace();
-            }
+        Path dataPath = Paths.get("launcherData.dat");
+        try {
+            Files.write(
+                    dataPath,
+                    Arrays.asList(ipAddress),
+                    UTF_8,
+                    Files.exists(dataPath) ? APPEND : CREATE);
+        } catch (IOException e) {
+            UIMessage.showErrorDialog(e, "Couldn't save IP address!");
         }
+    }
+
+    private static boolean verifyDependencies() {
+        if (!new NativeDiscovery().discover()) {
+            UIMessage.showErrorDialog(new IllegalAccessException("Unable to load VLCJ." +
+                    "\nPlease ensure that both VLC and Java are installed and use the same bit mode (32 or 64 bit)."),
+                    "Unable to launch sync.");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -184,25 +195,57 @@ public class Main extends JFrame {
      *
      * @return ArrayList of previous server IP addresses
      */
-    private static ArrayList<String> getPreviousAddresses() {
-        File file = new File("launcherData.dat");
-        if (file.exists()) {
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-
-                String ipAddress;
-                ArrayList<String> ipAddresses = new ArrayList<>();
-
-                while ((ipAddress = reader.readLine()) != null) {
-                    ipAddresses.add(ipAddress);
-                }
-
-                return ipAddresses;
-            }catch(IOException e) {
-                e.printStackTrace();
-            }
+    private static ImmutableList<String> getPreviousAddresses() {
+        Path dataPath = Paths.get("launcherData.dat");
+        try {
+            return Files.exists(dataPath) ? ImmutableList.copyOf(Files.readAllLines(dataPath)) : ImmutableList.of();
         }
-        return null;
+        catch (IOException e) {
+            UIMessage.showErrorDialog(e, "Unable to load previous servers");
+            return ImmutableList.of();
+        }
+    }
+
+    private static boolean isUpdated() {
+        try {
+            Scanner s = new Scanner(new URLReader(new URL("https://github.com/ajchili/sync/releases")));
+            String version = "";
+            while (s.hasNext()) {
+                String line = s.nextLine();
+                if (line.contains("tag-reference")) {
+                    s.nextLine();
+                    version = s.nextLine();
+                    version = version.substring(version.indexOf("tree/") + 5, version.indexOf("tree/") + 10);
+                    break;
+                }
+            }
+
+            int v = 0;
+            int b = 0;
+            int r = 0;
+
+            for (int i = 0; i < 5; i += 2) {
+                int parsedInt = Integer.parseInt(version.substring(i, i + 1));
+                switch(i) {
+                    case 0:
+                        v = parsedInt;
+                        break;
+                    case 2:
+                        b = parsedInt;
+                        break;
+                    case 4:
+                        r = parsedInt;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return !(VERSION != v || BUILD < b || REVISION < r && BUILD == b);
+        } catch(MalformedURLException e) {
+            UIMessage.showErrorDialog(e, "Unable to verify version");
+            return false;
+        }
     }
 
     /**
@@ -211,7 +254,7 @@ public class Main extends JFrame {
      */
     class LauncherButtonEvent implements ActionListener {
 
-        private int type;
+        private PANEL_TYPE type;
 
         /**
          * Main constructor that will establish the ActionListener with the
@@ -219,7 +262,7 @@ public class Main extends JFrame {
          *
          * @param type Type
          */
-        public LauncherButtonEvent(int type) {
+        LauncherButtonEvent(PANEL_TYPE type) {
             this.type = type;
         }
 
@@ -233,11 +276,11 @@ public class Main extends JFrame {
             setVisible(false);
 
             switch(type) {
-                case 0:
+                case SERVER:
                     new Server();
                     dispose();
                     break;
-                case 1:
+                case CLIENT:
                     getIPAddress();
                     break;
             }
@@ -256,7 +299,9 @@ public class Main extends JFrame {
                 frame.dispose();
                 main.dispose();
             } else {
-                new UIMessage("Error with provided IP address!", "No IP address provided! An IP address must be provided!", 1);
+                UIMessage.showMessageDialog(
+                        "No IP address provided! An IP address must be provided!",
+                        "Error with provided IP address!");
             }
         }
     }
