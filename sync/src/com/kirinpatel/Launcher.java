@@ -132,8 +132,8 @@ public final class Launcher extends JFrame {
         IPAddressReceiver() {
             super("sync");
             setSize(new Dimension(300, 100));
-            setResizable(false);
-            setLayout(new BorderLayout());
+            setResizable(true);
+            setLayout(new GridLayout(3, 1));
             setDefaultCloseOperation(HIDE_ON_CLOSE);
             addComponentListener(new ComponentListener() {
                 @Override
@@ -161,7 +161,7 @@ public final class Launcher extends JFrame {
 
             JLabel label = new JLabel("Please enter or select the sync server you would like to join");
             label.setHorizontalAlignment(SwingConstants.CENTER);
-            add(label, BorderLayout.NORTH);
+            add(label);
 
             JPanel ipPanel = new JPanel(new GridLayout(1, 2));
 
@@ -177,11 +177,11 @@ public final class Launcher extends JFrame {
             });
             ipPanel.add(ipBox);
 
-            add(ipPanel, BorderLayout.CENTER);
+            add(ipPanel);
 
             JButton connect = new JButton("Connect");
             connect.addActionListener(new IPAddressListener());
-            add(connect, BorderLayout.SOUTH);
+            add(connect);
 
             setVisible(true);
         }
