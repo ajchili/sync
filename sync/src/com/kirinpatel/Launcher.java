@@ -132,7 +132,7 @@ public final class Launcher extends JFrame {
         IPAddressReceiver() {
             super("sync");
             setSize(new Dimension(300, 100));
-            setResizable(true);
+            setResizable(false);
             setLayout(new GridLayout(3, 1));
             setDefaultCloseOperation(HIDE_ON_CLOSE);
             addComponentListener(new ComponentListener() {
