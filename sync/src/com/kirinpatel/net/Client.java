@@ -3,10 +3,10 @@ package com.kirinpatel.net;
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
+import com.kirinpatel.Sync;
 import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
-import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 
@@ -22,16 +22,16 @@ public class Client {
     public static User user;
     private static ClientThread clientThread;
     private static ArrayList<String> messages = new ArrayList<>();
-    private static boolean isRunning = false;
-    private static boolean isServerClosed = false;
+    private boolean isRunning = false;
+    private boolean isServerClosed = false;
     private Socket socket;
     public static GUI gui;
 
     public Client(String ipAddress) {
         Client.ipAddress = ipAddress;
-        Main.connectedUsers.clear();
         Client.user = new User(System.getProperty("user.name"));
         clientThread = new ClientThread();
+        messages.clear();
         new Thread(clientThread).start();
     }
 
@@ -72,8 +72,9 @@ public class Client {
                                 sendPing();
                                 break;
                             case CONNECTED_CLIENTS:
-                                Main.connectedUsers = (ArrayList<User>) message.getMessage();
-                                ControlPanel.getInstance().updateConnectedClients(Main.connectedUsers);
+                                Sync.connectedUsers = (ArrayList<User>) message.getMessage();
+                                Sync.host = Sync.connectedUsers.get(0);
+                                ControlPanel.getInstance().updateConnectedClients();
                                 break;
                             case MEDIA_URL:
                                 String mediaURL = (String) message.getMessage();
@@ -160,7 +161,7 @@ public class Client {
             }
 
             gui = new GUI(CLIENT);
-            Main.saveIPAddress(ipAddress);
+            Launcher.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
         }
@@ -183,7 +184,7 @@ public class Client {
             } catch(IOException e) {
                 Client.stop();
             } finally {
-                new Main();
+                Launcher.INSTANCE.open();
             }
         }
 

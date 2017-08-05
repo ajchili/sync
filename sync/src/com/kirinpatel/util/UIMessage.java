@@ -1,13 +1,13 @@
 package com.kirinpatel.util;
 
-import com.kirinpatel.Main;
+import com.kirinpatel.Launcher;
 import com.kirinpatel.gui.GUI;
 
 import javax.swing.*;
 
 
 /**
- * Messager class for building messages and handling the calling GUI.
+ * Messenger class for building messages and handling the calling GUI.
  */
 public class UIMessage {
     private final GUI gui;
@@ -25,7 +25,7 @@ public class UIMessage {
     public void showErrorDialogAndExit(Exception error, String title) {
         showErrorDialog(error, title);
         gui.hide();
-        new Main();
+        Launcher.INSTANCE.dispose();
     }
 
     /**

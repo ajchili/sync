@@ -33,7 +33,6 @@ class AudioSettingsGUI extends JFrame {
 
         for (int i = 0; i < 10; i++) {
             final int hzBand = 32 * (int) Math.pow(2, i);
-
             JPanel panel = new JPanel(new BorderLayout());
             JLabel label = new JLabel(
                     hzBand < 1000
