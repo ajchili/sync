@@ -1,13 +1,13 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
+import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.net.Server;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
 
 class MenuBar extends JMenuBar {
 

@@ -1,4 +1,4 @@
-package com.kirinpatel.util;
+package com.kirinpatel.sync.util;
 
 import java.io.Serializable;
 

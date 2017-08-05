@@ -25,4 +25,12 @@ sync/\.idea/misc\.xml
 
 sync/\.idea/workspace\.xml
 
+sync/build.xml
+
+sync/sync.iml
+
+sync/\.idea
+
+META-INF
+
 equalizer\.dat

@@ -1,7 +1,7 @@
-package com.kirinpatel.util;
+package com.kirinpatel.sync.util;
 
-import com.kirinpatel.Launcher;
-import com.kirinpatel.gui.GUI;
+import com.kirinpatel.sync.Launcher;
+import com.kirinpatel.sync.gui.GUI;
 
 import javax.swing.*;
 
