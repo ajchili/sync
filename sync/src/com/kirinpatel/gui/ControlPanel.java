@@ -17,8 +17,8 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class ControlPanel extends JPanel {
 
-    static long deSyncWarningTime = 1000;
-    static long deSyncTime = 5000;
+    static long deSyncWarningTime = 1000L;
+    static long deSyncTime = 5000L;
     public static boolean showUserTimes = false;
     private final JList connectedClients;
     private final JScrollPane connectedClientsScroll;

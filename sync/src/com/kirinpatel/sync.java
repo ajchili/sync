@@ -29,15 +29,7 @@ public final class Sync {
                     | ClassNotFoundException e) {
                 UIMessage.showErrorDialog(e, "Unable to set look and feel of sync.");
             }
-            if (verifyDependencies()) {
-                new Launcher();
-            } else {
-                UIMessage.showErrorDialog(
-                        new IllegalAccessException("Unable to load VLCJ or Java." +
-                                "\nPlease ensure that both VLC and Java are installed and are the same " +
-                                "(32 or 64 bit depending on your system)."),
-                        "Unable to launch sync.");
-            }
+            verifyDependencies();
         } else {
             UIMessage.showMessageDialog(
                     "You have an outdated version of sync, please update sync!",
@@ -45,8 +37,16 @@ public final class Sync {
         }
     }
 
-    private static boolean verifyDependencies() {
-        return new NativeDiscovery().discover();
+    private static void verifyDependencies() {
+        if (!new NativeDiscovery().discover()) {
+            UIMessage.showErrorDialog(
+                    new IllegalStateException("Unable to load VLCJ or Java." +
+                            "\nPlease ensure that both VLC and Java are installed and are the same " +
+                            "(32 or 64 bit depending on your system)."),
+                    "Unable to launch sync.");
+        } else {
+            Launcher.INSTANCE.open();
+        }
     }
 
     private static boolean isUpdated() {

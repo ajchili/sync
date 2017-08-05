@@ -27,10 +27,10 @@ import static java.nio.file.StandardOpenOption.CREATE;
 
 public final class Launcher extends JFrame {
 
-    public static Launcher INSTANCE;
+    public static final Launcher INSTANCE = new Launcher();
 
-    public Launcher() {
-        super("sync");
+    public void open() {
+        setTitle("sync");
         setSize(new Dimension(200, 100));
         setResizable(false);
         setLayout(new BorderLayout());
@@ -47,11 +47,6 @@ public final class Launcher extends JFrame {
         add(buttonPanel, BorderLayout.CENTER);
 
         setVisible(true);
-        INSTANCE = this;
-    }
-
-    public void open() {
-        Launcher.INSTANCE.setVisible(true);
         Sync.connectedUsers.clear();
         ControlPanel.showUserTimes = false;
     }
@@ -78,7 +73,7 @@ public final class Launcher extends JFrame {
             return Files.exists(dataPath) ? ImmutableList.copyOf(Files.readAllLines(dataPath)) : ImmutableList.of();
         }
         catch (IOException e) {
-            UIMessage.showErrorDialog(e, "Unable to load previous servers");
+            UIMessage.showErrorDialog(e, "Unable to load previous servers!");
             return ImmutableList.of();
         }
     }
@@ -98,7 +93,7 @@ public final class Launcher extends JFrame {
             switch(type) {
                 case SERVER:
                     new Server();
-                    Launcher.INSTANCE.setVisible(false);
+                    setVisible(false);
                     break;
                 case CLIENT:
                     new IPAddressReceiver();
@@ -136,7 +131,7 @@ public final class Launcher extends JFrame {
                 @Override
                 public void componentHidden(ComponentEvent e) {
                     dispose();
-                    Launcher.INSTANCE.open();
+                    open();
                 }
             });
             setLocationRelativeTo(null);
@@ -155,7 +150,7 @@ public final class Launcher extends JFrame {
             ipBox.addItemListener(e -> {
                 new Client(e.getItem().toString());
                 dispose();
-                Launcher.INSTANCE.setVisible(false);
+                setVisible(false);
             });
             ipPanel.add(ipBox);
 
@@ -175,7 +170,7 @@ public final class Launcher extends JFrame {
                 if (!ipField.getText().isEmpty()) {
                     new Client(ipField.getText());
                     dispose();
-                    Launcher.INSTANCE.setVisible(false);
+                    setVisible(false);
                 } else {
                     UIMessage.showMessageDialog(
                             "No IP address provided! An IP address must be provided!",
