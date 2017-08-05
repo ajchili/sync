@@ -25,7 +25,7 @@ public class UIMessage {
     public void showErrorDialogAndExit(Exception error, String title) {
         showErrorDialog(error, title);
         gui.hide();
-        Launcher.getInstance().dispose();
+        Launcher.INSTANCE.dispose();
     }
 
     /**

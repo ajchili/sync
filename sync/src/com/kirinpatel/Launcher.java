@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.net.User;
 import com.kirinpatel.util.UIMessage;
 
 import javax.swing.*;
@@ -18,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
@@ -28,23 +26,9 @@ import static java.nio.file.StandardOpenOption.CREATE;
 
 public final class Launcher extends JFrame {
 
-    private static Launcher INSTANCE;
-    private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
+    public static Launcher INSTANCE;
 
-    static void setInstance() {
-        if (isInstanceSet.compareAndSet(false, true)) {
-            INSTANCE = new Launcher();
-        }
-    }
-
-    public static Launcher getInstance() {
-        if (isInstanceSet.get()) {
-            return INSTANCE;
-        }
-        throw new IllegalStateException("Control panel has not been set!");
-    }
-
-    private Launcher() {
+    public Launcher() {
         super("sync");
         setSize(new Dimension(200, 100));
         setResizable(false);
@@ -62,16 +46,13 @@ public final class Launcher extends JFrame {
         add(buttonPanel, BorderLayout.CENTER);
 
         setVisible(true);
+        INSTANCE = this;
     }
 
     public void open() {
-        Launcher.getInstance().setVisible(true);
-        sync.connectedUsers.clear();
-        sync.showUserTimes = false;
-    }
-
-    private void close() {
-        Launcher.getInstance().setVisible(false);
+        Launcher.INSTANCE.setVisible(true);
+        Sync.connectedUsers.clear();
+        Sync.showUserTimes = false;
     }
 
     public static void saveIPAddress(String ipAddress) {
@@ -116,7 +97,7 @@ public final class Launcher extends JFrame {
             switch(type) {
                 case SERVER:
                     new Server();
-                    Launcher.getInstance().close();
+                    Launcher.INSTANCE.setVisible(false);
                     break;
                 case CLIENT:
                     new IPAddressReceiver();
@@ -154,7 +135,7 @@ public final class Launcher extends JFrame {
                 @Override
                 public void componentHidden(ComponentEvent e) {
                     dispose();
-                    Launcher.getInstance().open();
+                    Launcher.INSTANCE.open();
                 }
             });
             setLocationRelativeTo(null);
@@ -173,7 +154,7 @@ public final class Launcher extends JFrame {
             ipBox.addItemListener(e -> {
                 new Client(e.getItem().toString());
                 dispose();
-                Launcher.getInstance().close();
+                Launcher.INSTANCE.setVisible(false);
             });
             ipPanel.add(ipBox);
 
@@ -193,7 +174,7 @@ public final class Launcher extends JFrame {
                 if (!ipField.getText().isEmpty()) {
                     new Client(ipField.getText());
                     dispose();
-                    Launcher.getInstance().close();
+                    Launcher.INSTANCE.setVisible(false);
                 } else {
                     UIMessage.showMessageDialog(
                             "No IP address provided! An IP address must be provided!",

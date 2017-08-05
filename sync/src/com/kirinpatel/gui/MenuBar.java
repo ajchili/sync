@@ -1,9 +1,7 @@
 package com.kirinpatel.gui;
 
-import com.kirinpatel.Launcher;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
-import com.kirinpatel.sync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -137,7 +135,7 @@ class MenuBar extends JMenuBar {
                 warningSlider.setMinorTickSpacing(50);
                 warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
                 warningSlider.addChangeListener(e -> {
-                    sync.deSyncWarningTime = warningSlider.getValue();
+                    ControlPanel.deSyncWarningTime = warningSlider.getValue();
                     warningSlider.setToolTipText("Display desync warning after " + warningSlider.getValue() / 1000.0f + " seconds");
                 });
                 warningTimePanel.add(warningSlider, BorderLayout.CENTER);
@@ -150,7 +148,7 @@ class MenuBar extends JMenuBar {
                 desyncSlider.setMinorTickSpacing(250);
                 desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
                 desyncSlider.addChangeListener(e -> {
-                    sync.deSyncTime = desyncSlider.getValue();
+                    ControlPanel.deSyncTime = desyncSlider.getValue();
                     desyncSlider.setToolTipText("Display desync after " + desyncSlider.getValue() / 1000.0f + " seconds");
                 });
                 desyncTimePanel.add(desyncSlider, BorderLayout.CENTER);
@@ -159,10 +157,10 @@ class MenuBar extends JMenuBar {
                 mediaTime.add(new JSeparator());
                 ButtonGroup mediaTimeButtons = new ButtonGroup();
                 JRadioButtonMenuItem showMediaTime = new JRadioButtonMenuItem("Show");
-                showMediaTime.addActionListener(e -> sync.showUserTimes = true);
+                showMediaTime.addActionListener(e -> ControlPanel.showUserTimes = true);
                 mediaTime.add(showMediaTime);
                 JRadioButtonMenuItem hideMediaTime = new JRadioButtonMenuItem("Hide");
-                hideMediaTime.addActionListener(e -> sync.showUserTimes = false);
+                hideMediaTime.addActionListener(e -> ControlPanel.showUserTimes = false);
                 hideMediaTime.setSelected(true);
                 mediaTime.add(hideMediaTime);
                 mediaTimeButtons.add(showMediaTime);

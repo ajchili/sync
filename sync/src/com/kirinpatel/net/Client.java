@@ -4,9 +4,9 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.Launcher;
+import com.kirinpatel.Sync;
 import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
-import com.kirinpatel.sync;
 import com.kirinpatel.util.Message;
 import com.kirinpatel.util.UIMessage;
 
@@ -72,7 +72,8 @@ public class Client {
                                 sendPing();
                                 break;
                             case CONNECTED_CLIENTS:
-                                sync.connectedUsers = (ArrayList<User>) message.getMessage();
+                                Sync.connectedUsers = (ArrayList<User>) message.getMessage();
+                                Sync.host = Sync.connectedUsers.get(0);
                                 ControlPanel.getInstance().updateConnectedClients();
                                 break;
                             case MEDIA_URL:
@@ -183,7 +184,7 @@ public class Client {
             } catch(IOException e) {
                 Client.stop();
             } finally {
-                Launcher.getInstance().open();
+                Launcher.INSTANCE.open();
             }
         }
 

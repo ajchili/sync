@@ -11,15 +11,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public final class sync {
+public final class Sync {
 
     private final static int VERSION = 1;
     private final static int BUILD = 6;
     private final static int REVISION = 0;
-    public static long deSyncWarningTime = 1000;
-    public static long deSyncTime = 5000;
-    public static boolean showUserTimes = false;
     public static ArrayList<User> connectedUsers = new ArrayList<>();
+    public static User host;
 
     public static void main(String[] args) {
         if (isUpdated()) {
@@ -29,7 +27,13 @@ public final class sync {
                 UIMessage.showErrorDialog(e, "Unable to set look and feel of sync.");
             } finally {
                 if (verifyDependencies()) {
-                    Launcher.setInstance();
+                    new Launcher();
+                } else {
+                    UIMessage.showErrorDialog(
+                            new IllegalAccessException("Unable to load VLCJ or Java." +
+                                    "\nPlease ensure that both VLC and Java are installed and are the same " +
+                                    "(32 or 64 bit depending on your system)."),
+                            "Unable to launch sync.");
                 }
             }
         } else {
@@ -40,13 +44,7 @@ public final class sync {
     }
 
     private static boolean verifyDependencies() {
-        if (!new NativeDiscovery().discover()) {
-            UIMessage.showErrorDialog(new IllegalAccessException("Unable to load VLCJ." +
-                            "\nPlease ensure that both VLC and Java are installed and use the same bit mode (32 or 64 bit)."),
-                    "Unable to launch sync.");
-            return false;
-        }
-        return true;
+        return new NativeDiscovery().discover();
     }
 
     private static boolean isUpdated() {
@@ -69,9 +67,9 @@ public final class sync {
                 }
             }
 
-            return !(sync.VERSION != version[0]
-                    || sync.BUILD < version[1]
-                    || sync.REVISION < version[2] && sync.BUILD == version[1]);
+            return !(Sync.VERSION != version[0]
+                    || Sync.BUILD < version[1]
+                    || Sync.REVISION < version[2] && Sync.BUILD == version[1]);
         } catch(MalformedURLException e) {
             UIMessage.showErrorDialog(e, "Unable to verify version");
             return false;

@@ -1,9 +1,9 @@
 package com.kirinpatel.gui;
 
+import com.kirinpatel.Sync;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
 import com.kirinpatel.net.User;
-import com.kirinpatel.sync;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -17,6 +17,9 @@ import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class ControlPanel extends JPanel {
 
+    static long deSyncWarningTime = 1000;
+    static long deSyncTime = 5000;
+    static boolean showUserTimes = false;
     private final JList connectedClients;
     private final JScrollPane connectedClientsScroll;
     private final JPanel chatPanel;
@@ -54,16 +57,16 @@ public class ControlPanel extends JPanel {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-                if (index < sync.connectedUsers.size()) {
-                    final User host = sync.connectedUsers.get(0);
-                    final User user = sync.connectedUsers.get(index);
+                if (index < Sync.connectedUsers.size()) {
+                    final User host = Sync.host;
+                    final User user = Sync.connectedUsers.get(index);
 
-                    if (host != null && !host.equals(user) && sync.showUserTimes) {
+                    if (host != null && !host.equals(user) && showUserTimes) {
                         long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
-                        if (host.getMedia().getCurrentTime() - sync.deSyncTime > currentUserTime) {
+                        if (host.getMedia().getCurrentTime() - deSyncTime > currentUserTime) {
                             setBackground(Color.RED);
-                        } else if (host.getMedia().getCurrentTime() - sync.deSyncWarningTime > currentUserTime) {
+                        } else if (host.getMedia().getCurrentTime() - deSyncWarningTime > currentUserTime) {
                             setBackground(Color.YELLOW);
                         }
                     }
@@ -119,11 +122,11 @@ public class ControlPanel extends JPanel {
 
     public void updateConnectedClients() {
         DefaultListModel listModel = new DefaultListModel();
-        User host = sync.connectedUsers.get(0);
-        for (User user : sync.connectedUsers) {
+        User host = Sync.host;
+        for (User user : Sync.connectedUsers) {
             String displayedText = user.toString();
 
-            if (sync.showUserTimes) {
+            if (showUserTimes) {
                 displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
             }
 
@@ -167,7 +170,7 @@ public class ControlPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
                 if (GUI.playbackPanel.type == SERVER) {
-                    Server.sendMessage(sync.connectedUsers.get(0) + ": " + chatField.getText());
+                    Server.sendMessage(Sync.connectedUsers.get(0) + ": " + chatField.getText());
                     chatField.setText("");
                 } else {
                     Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());

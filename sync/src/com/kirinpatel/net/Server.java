@@ -8,7 +8,7 @@ import com.kirinpatel.Launcher;
 import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.GUI;
 import com.kirinpatel.gui.MediaSelectorGUI;
-import com.kirinpatel.sync;
+import com.kirinpatel.Sync;
 import com.kirinpatel.util.*;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
@@ -29,7 +29,7 @@ public class Server {
     public static GUI gui;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
-    private final static ArrayList<String> messages = new ArrayList<>();
+    private static final ArrayList<String> messages = new ArrayList<>();
     private static boolean isRunning = false;
     private static boolean closeServer = false;
 
@@ -38,7 +38,8 @@ public class Server {
 
     public Server() {
         gui = new GUI(SERVER);
-        sync.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
+        Sync.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
+        Sync.host = Sync.connectedUsers.get(0);
         ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
         new Thread(server).start();
@@ -48,7 +49,7 @@ public class Server {
         if (gui.isVisible()){
             gui.hide();
         }
-        if (sync.connectedUsers.size() == 1) {
+        if (Sync.connectedUsers.size() == 1) {
             server.stop();
         }
         else {
@@ -62,7 +63,7 @@ public class Server {
     }
 
     public static void kickUser(User user) {
-        sync.connectedUsers.remove(user);
+        Sync.connectedUsers.remove(user);
         ControlPanel.getInstance().updateConnectedClients();
     }
 
@@ -164,7 +165,7 @@ public class Server {
                 tomcatServer.stop();
             }
 
-            Launcher.getInstance().open();
+            Launcher.INSTANCE.open();
         }
     }
 
@@ -196,7 +197,7 @@ public class Server {
                     break;
                 }
 
-                if (hasConnected && !sync.connectedUsers.contains(user)) {
+                if (hasConnected && !Sync.connectedUsers.contains(user)) {
                     disconnectClientFromServer();
                 }
 
@@ -205,7 +206,7 @@ public class Server {
                         Message message = (Message) input.readObject();
                         switch(message.getType()) {
                             case DISCONNECTING:
-                                sync.connectedUsers.remove(user);
+                                Sync.connectedUsers.remove(user);
                                 ControlPanel.getInstance().updateConnectedClients();
                                 isClientConnected = false;
                                 break;
@@ -215,7 +216,7 @@ public class Server {
                                 break;
                             case CLIENT_NAME:
                                 user = new User(message.getMessage().toString());
-                                sync.connectedUsers.add(user);
+                                Sync.connectedUsers.add(user);
                                 ControlPanel.getInstance().updateConnectedClients();
                                 hasConnected = true;
                                 break;
@@ -272,7 +273,7 @@ public class Server {
             try {
                 socket.close();
             } catch(IOException e) {
-                sync.connectedUsers.remove(user);
+                Sync.connectedUsers.remove(user);
                 stop();
             }
         }
@@ -302,7 +303,7 @@ public class Server {
             } catch(IOException e) {
                 // Do nothing if sending closing message fails
             } finally {
-                sync.connectedUsers.remove(user);
+                Sync.connectedUsers.remove(user);
                 isClientConnected = false;
             }
         }
@@ -321,7 +322,7 @@ public class Server {
             try {
                 lastClientUpdate = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(CONNECTED_CLIENTS, sync.connectedUsers));
+                output.writeObject(new Message(CONNECTED_CLIENTS, Sync.connectedUsers));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
