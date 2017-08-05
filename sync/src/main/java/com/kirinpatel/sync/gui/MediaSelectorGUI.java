@@ -1,8 +1,8 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.util.FileSelector;
-import com.kirinpatel.net.Media;
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.sync.util.FileSelector;
+import com.kirinpatel.sync.net.Media;
+import com.kirinpatel.sync.util.UIMessage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +13,7 @@ import java.awt.event.ComponentListener;
 import java.io.File;
 import java.nio.file.Paths;
 
-import static com.kirinpatel.gui.MediaSelectorGUI.MEDIA_TYPE.*;
+import static com.kirinpatel.sync.gui.MediaSelectorGUI.MEDIA_TYPE.*;
 
 /**
  * The MediaSelectorGUI will display a gui to the user when prompted and allow for on start media selection to occur.

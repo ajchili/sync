@@ -1,14 +1,14 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.net.Server;
-import com.kirinpatel.net.Client;
+import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.net.Client;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.*;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
 
 public class GUI extends JFrame {
 
@@ -36,7 +36,7 @@ public class GUI extends JFrame {
         ControlPanel.setInstance(this);
         ControlPanel.getInstance().resizePanel(getHeight());
         add(ControlPanel.getInstance(), BorderLayout.EAST);
-        setJMenuBar(new MenuBar(playbackPanel));
+        setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel));
 
         setVisible(type == CLIENT);
     }

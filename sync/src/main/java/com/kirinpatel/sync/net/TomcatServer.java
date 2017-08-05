@@ -1,6 +1,6 @@
-package com.kirinpatel.net;
+package com.kirinpatel.sync.net;
 
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.sync.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static com.kirinpatel.net.Server.TOMCAT_PORT;
 
 class TomcatServer {
     private Tomcat tomcat;
@@ -30,7 +28,7 @@ class TomcatServer {
             }
         }
         tomcat = new Tomcat();
-        tomcat.setPort(TOMCAT_PORT);
+        tomcat.setPort(Server.TOMCAT_PORT);
         tomcat.setBaseDir("./tomcat");
 
         Context ctx = tomcat.addContext("","./media");

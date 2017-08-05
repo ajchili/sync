@@ -1,11 +1,11 @@
-package com.kirinpatel;
+package com.kirinpatel.sync;
 
 import com.google.common.collect.ImmutableList;
-import com.kirinpatel.gui.ControlPanel;
-import com.kirinpatel.gui.PlaybackPanel;
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.sync.gui.ControlPanel;
+import com.kirinpatel.sync.gui.PlaybackPanel;
+import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.util.UIMessage;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,8 +19,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.CREATE;

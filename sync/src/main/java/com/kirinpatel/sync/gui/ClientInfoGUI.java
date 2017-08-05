@@ -1,7 +1,7 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.net.Server;
-import com.kirinpatel.net.User;
+import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.net.User;
 
 import javax.swing.*;
 import java.awt.*;

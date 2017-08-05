@@ -1,9 +1,9 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.Sync;
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Server;
-import com.kirinpatel.net.User;
+import com.kirinpatel.sync.Sync;
+import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.net.User;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class ControlPanel extends JPanel {
 

@@ -1,15 +1,16 @@
-package com.kirinpatel.net;
+package com.kirinpatel.sync.net;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
-import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
-import com.kirinpatel.Launcher;
-import com.kirinpatel.gui.ControlPanel;
-import com.kirinpatel.gui.GUI;
-import com.kirinpatel.gui.MediaSelectorGUI;
-import com.kirinpatel.Sync;
-import com.kirinpatel.util.*;
+import com.kirinpatel.sync.Launcher;
+import com.kirinpatel.sync.gui.ControlPanel;
+import com.kirinpatel.sync.gui.GUI;
+import com.kirinpatel.sync.gui.MediaSelectorGUI;
+import com.kirinpatel.sync.Sync;
+import com.kirinpatel.sync.util.Message;
+import com.kirinpatel.sync.util.UIMessage;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
 import org.xml.sax.SAXException;

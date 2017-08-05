@@ -1,14 +1,14 @@
-package com.kirinpatel.net;
+package com.kirinpatel.sync.net;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
-import static com.kirinpatel.util.Message.MESSAGE_TYPE.*;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
-import com.kirinpatel.Launcher;
-import com.kirinpatel.Sync;
-import com.kirinpatel.gui.ControlPanel;
-import com.kirinpatel.gui.GUI;
-import com.kirinpatel.util.Message;
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.sync.Launcher;
+import com.kirinpatel.sync.Sync;
+import com.kirinpatel.sync.gui.ControlPanel;
+import com.kirinpatel.sync.gui.GUI;
+import com.kirinpatel.sync.util.Message;
+import com.kirinpatel.sync.util.UIMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
