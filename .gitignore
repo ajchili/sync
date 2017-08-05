@@ -13,10 +13,6 @@ hs_err_pid*
 /sync/nbproject/private/
 /sync/build/
 
-\.idea/workspace\.xml
-
-\.idea/uiDesigner\.xml
-
 launcherData\.dat
 
 tomcat/webapps/media/*
@@ -32,5 +28,11 @@ sync/sync.iml
 sync/\.idea
 
 META-INF
+
+\.idea
+
+sync/target
+
+sync/tomcat
 
 equalizer\.dat
