@@ -1,6 +1,7 @@
 package com.kirinpatel;
 
 import com.google.common.collect.ImmutableList;
+import com.kirinpatel.gui.ControlPanel;
 import com.kirinpatel.gui.PlaybackPanel;
 import com.kirinpatel.net.Client;
 import com.kirinpatel.net.Server;
@@ -52,7 +53,7 @@ public final class Launcher extends JFrame {
     public void open() {
         Launcher.INSTANCE.setVisible(true);
         Sync.connectedUsers.clear();
-        Sync.showUserTimes = false;
+        ControlPanel.showUserTimes = false;
     }
 
     public static void saveIPAddress(String ipAddress) {

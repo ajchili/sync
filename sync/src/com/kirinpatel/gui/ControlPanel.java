@@ -19,7 +19,7 @@ public class ControlPanel extends JPanel {
 
     static long deSyncWarningTime = 1000;
     static long deSyncTime = 5000;
-    static boolean showUserTimes = false;
+    public static boolean showUserTimes = false;
     private final JList connectedClients;
     private final JScrollPane connectedClientsScroll;
     private final JPanel chatPanel;

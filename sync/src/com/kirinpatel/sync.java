@@ -23,18 +23,20 @@ public final class Sync {
         if (isUpdated()) {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch(Exception e) {
+            } catch(IllegalAccessException
+                    | InstantiationException
+                    | UnsupportedLookAndFeelException
+                    | ClassNotFoundException e) {
                 UIMessage.showErrorDialog(e, "Unable to set look and feel of sync.");
-            } finally {
-                if (verifyDependencies()) {
-                    new Launcher();
-                } else {
-                    UIMessage.showErrorDialog(
-                            new IllegalAccessException("Unable to load VLCJ or Java." +
-                                    "\nPlease ensure that both VLC and Java are installed and are the same " +
-                                    "(32 or 64 bit depending on your system)."),
-                            "Unable to launch sync.");
-                }
+            }
+            if (verifyDependencies()) {
+                new Launcher();
+            } else {
+                UIMessage.showErrorDialog(
+                        new IllegalAccessException("Unable to load VLCJ or Java." +
+                                "\nPlease ensure that both VLC and Java are installed and are the same " +
+                                "(32 or 64 bit depending on your system)."),
+                        "Unable to launch sync.");
             }
         } else {
             UIMessage.showMessageDialog(
