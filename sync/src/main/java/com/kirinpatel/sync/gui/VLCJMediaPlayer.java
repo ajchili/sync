@@ -1,11 +1,11 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.net.Client;
-import com.kirinpatel.net.Media;
-import com.kirinpatel.net.Server;
-import com.kirinpatel.net.User;
-import com.kirinpatel.Sync;
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.net.Media;
+import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.net.User;
+import com.kirinpatel.sync.Sync;
+import com.kirinpatel.sync.util.UIMessage;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.component.DirectMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.Equalizer;
@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 /**
  * Modified JPanel that will play media for the sync application.

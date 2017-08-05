@@ -1,6 +1,6 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.util.UIMessage;
+import com.kirinpatel.sync.util.UIMessage;
 import uk.co.caprica.vlcj.player.Equalizer;
 
 import javax.swing.*;

@@ -1,4 +1,4 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
 import javax.swing.*;
 import java.awt.*;

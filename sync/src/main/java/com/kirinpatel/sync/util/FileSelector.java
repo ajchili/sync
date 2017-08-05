@@ -1,7 +1,7 @@
-package com.kirinpatel.util;
+package com.kirinpatel.sync.util;
 
-import com.kirinpatel.gui.ProgressView;
-import com.kirinpatel.net.Server;
+import com.kirinpatel.sync.gui.ProgressView;
+import com.kirinpatel.sync.net.Server;
 
 import javax.swing.*;
 import java.awt.*;

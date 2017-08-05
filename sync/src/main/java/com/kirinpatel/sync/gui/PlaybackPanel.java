@@ -1,12 +1,12 @@
-package com.kirinpatel.gui;
+package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.net.Media;
+import com.kirinpatel.sync.net.Media;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-import static com.kirinpatel.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class PlaybackPanel extends JPanel {
 
