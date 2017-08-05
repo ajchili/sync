@@ -13,7 +13,7 @@ A Java based multi-client video and audio syncing application.
       * _Please note, the experimental branch is most likely broken and will contain unfinished features_
 4. Run sync
    * Server setup
-      * Please note that UPnP or port forwarding is required for sync to work past a local network
+      * Please note that UPnP is required for sync to work past a local network
          * You must enable UPnP in your router _(please look at the [Port Forward](https://portforward.com/router.htm) website if you do not know how to enable UPnP)_
       * It is recommended to:
          * Add sync to your firewall _(to ensure that Tomcat will run flawlessly, allow all Java entries to be permitted)_
