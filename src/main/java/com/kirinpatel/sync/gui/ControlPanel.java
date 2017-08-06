@@ -127,7 +127,7 @@ public class ControlPanel extends JPanel {
             String displayedText = user.toString();
 
             if (showUserTimes) {
-                displayedText += " (" + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime()) + ')';
+                displayedText += " (" + user.getMedia().getFormattedTime() + ')';
             }
 
             if (!user.equals(host)) {

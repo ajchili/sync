@@ -31,7 +31,7 @@ class ClientInfoGUI extends JFrame {
         ping = new JLabel("Ping: " + user.getPing() + " ms");
         add(ping);
         mediaTime = new JLabel("Playback Time: "
-                + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime())
+                + user.getMedia().getFormattedTime()
                 + ":" + user.getMedia().getCurrentTime() % 1000);
         add(mediaTime);
         mediaState = new JLabel("Playback State: "
@@ -89,7 +89,7 @@ class ClientInfoGUI extends JFrame {
                     Thread.sleep(250);
                     ping.setText("Ping: " + user.getPing() + " ms");
                     mediaTime.setText("Playback Time: "
-                            + VLCJMediaPlayer.formatTime(user.getMedia().getCurrentTime())
+                            + user.getMedia().getFormattedTime()
                             + ":" + user.getMedia().getCurrentTime() % 1000);
                     mediaState.setText("Playback State: "
                             + (user.getMedia().isPaused() ? "Paused" : "Playing"));
