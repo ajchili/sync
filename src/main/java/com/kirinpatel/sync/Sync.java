@@ -18,21 +18,15 @@ public final class Sync {
     public static User host;
 
     public static void main(String[] args) {
-        if (isUpdated()) {
-            try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } catch(IllegalAccessException
-                    | InstantiationException
-                    | UnsupportedLookAndFeelException
-                    | ClassNotFoundException e) {
-                UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
-            }
-            verifyDependencies();
-        } else {
-            UIMessage.showMessageDialog(
-                    "You have an outdated version of sync, please update sync!",
-                    "Outdated version of sync");
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch(IllegalAccessException
+                | InstantiationException
+                | UnsupportedLookAndFeelException
+                | ClassNotFoundException e) {
+            UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
         }
+        verifyDependencies();
     }
 
     private static void verifyDependencies() {
@@ -43,15 +37,16 @@ public final class Sync {
                             "(32 or 64 bit depending on your system)."),
                     "Unable to launch sync");
         } else {
+            checkVersion();
             Launcher.INSTANCE.open();
         }
     }
 
-    private static boolean isUpdated() {
+    private static void checkVersion() {
         String version = "";
         try {
             Scanner s = new Scanner(new URLReader(
-                    new URL("https://raw.githubusercontent.com/ajchili/sync/master/version.txt")));
+                    new URL("https://raw.githubusercontent.com/ajchili/sync/master/VERSION.txt")));
             while(s.hasNext()) {
                 version = s.nextLine();
             }
@@ -61,8 +56,12 @@ public final class Sync {
                     new IllegalStateException("The version file was unable to be verified, please check the Github\n" +
                             "page to verify that you have the most recent version of sync."),
                     "Unable to verify current version of sync");
-            return true;
         }
-        return VERSION.equals(version);
+
+        if (!version.equals(VERSION)) {
+            UIMessage.showMessageDialog(
+                    "You have an outdated version of sync, please update sync!",
+                    "Outdated version of sync");
+        }
     }
 }
