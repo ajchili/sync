@@ -70,10 +70,31 @@ public class Media implements Serializable {
         return isPaused;
     }
 
+    public String getFormattedTime() {
+        return formatTime(currentTime);
+    }
+
+    public String getFormattedLength() {
+        return formatTime(length);
+    }
 
     /**
-     * Encodes URL to be used for offline media playback.
+     * Credit: https://github.com/caprica/vlcj-player/blob/master/src/main/java/uk/co/caprica/vlcjplayer/time/Time.java
      *
+     * @param value Time
+     * @return Time in displayable string format
+     */
+    private String formatTime(long value) {
+        value /= 1000;
+        int hours = (int) value / 3600;
+        int remainder = (int) value - hours * 3600;
+        int minutes = remainder / 60;
+        remainder = remainder - minutes * 60;
+        int seconds = remainder;
+        return String.format("%d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    /**
      * Credit: https://www.urlencoder.org/
      *
      * @param url Un-encoded URL
