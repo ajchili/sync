@@ -9,8 +9,7 @@ A Java based multi-client video and audio syncing application.
 2. Download and install [VLC](http://www.videolan.org/vlc/index.html)
 3. Download [sync](https://www.github.com/ajchili/sync/releases)
    * The latest stable version can be found in the link above
-   * For development builds please either download the master branch or the experimental branch
-      * _Please note, the experimental branch is most likely broken and will contain unfinished features_
+   * For development builds please either download the master branch and view [CONTRIBUTING.md](https://github.com/ajchili/sync/blob/master/CONTRIBUTING.md)
 4. Run sync
    * Server setup
       * Please note that UPnP is required for sync to work past a local network
