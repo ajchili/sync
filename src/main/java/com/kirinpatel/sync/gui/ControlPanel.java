@@ -123,6 +123,7 @@ public class ControlPanel extends JPanel {
     void setWidth() {
         int height = getHeight();
         gui.setMinimumSize(new Dimension(640 + width, 360));
+        gui.setSize(new Dimension(640 + width, 360));
         connectedClientsScroll.setPreferredSize(new Dimension(width, height / 2));
         chatPanel.setPreferredSize(new Dimension(width, height / 2));
         revalidate();
