@@ -368,9 +368,9 @@ public class VLCJMediaPlayer extends JPanel {
         }
 
         @Override
-        public void timeChanged(MediaPlayer mediaPlayer, long l) {
+        public void timeChanged(MediaPlayer mediaPlayer, long length) {
             if (!isScrubbing) {
-                media.setCurrentTime(l);
+                media.setCurrentTime(length);
                 GUI.playbackPanel.mediaPositionLabel.setText(
                         media.getFormattedTime() + " / " + media.getFormattedLength());
                 GUI.playbackPanel.mediaPosition.setValue(
@@ -404,8 +404,8 @@ public class VLCJMediaPlayer extends JPanel {
         }
 
         @Override
-        public void lengthChanged(MediaPlayer mediaPlayer, long l) {
-            media.setLength(l);
+        public void lengthChanged(MediaPlayer mediaPlayer, long length) {
+            media.setLength(length);
         }
 
         @Override
