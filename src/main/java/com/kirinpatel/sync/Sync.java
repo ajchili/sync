@@ -46,7 +46,7 @@ public final class Sync {
         String version = "";
         try {
             Scanner s = new Scanner(new URLReader(
-                    new URL("https://raw.githubusercontent.com/ajchili/sync/master/VERSION.txt")));
+                    new URL("https://raw.githubusercontent.com/ajchili/sync/master/VERSION")));
             while(s.hasNext()) {
                 version = s.nextLine();
             }
