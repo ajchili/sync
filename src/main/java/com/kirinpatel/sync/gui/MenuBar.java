@@ -94,6 +94,7 @@ class MenuBar extends JMenuBar {
                 controlPanelSizeSlider.setToolTipText("Size: " + controlPanelSizeSlider.getValue());
                 controlPanelSizeSlider.addChangeListener(e -> {
                         ControlPanel.getInstance().width = controlPanelSizeSlider.getValue();
+                        ControlPanel.getInstance().setWidth();
                         controlPanelSizeSlider.setToolTipText("Size: " + controlPanelSizeSlider.getValue());
                     });
                 controlPanelSizePanel.add(new JLabel("Size: ", JLabel.LEFT), BorderLayout.WEST);
