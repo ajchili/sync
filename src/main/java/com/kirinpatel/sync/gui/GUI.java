@@ -63,10 +63,11 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            playbackPanel.getMediaPlayer().release();
-            dispose();
-            if (type == SERVER) Server.stop();
-            else Client.stop();
+            if (type == SERVER) {
+                Server.stop();
+            } else {
+                Client.stop();
+            }
         }
     }
 }

@@ -36,9 +36,8 @@ public class Client {
     }
 
     public static void stop() {
-        if (gui.isVisible()) {
-            gui.hide();
-        }
+        GUI.playbackPanel.getMediaPlayer().release();
+        gui.dispose();
         clientThread.stop();
     }
 

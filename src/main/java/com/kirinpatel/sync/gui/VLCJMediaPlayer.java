@@ -176,7 +176,7 @@ public class VLCJMediaPlayer extends JPanel {
         }
     }
 
-    void release() {
+    public void release() {
         try {
             mediaPlayer.stop();
             mediaPlayer.release();
