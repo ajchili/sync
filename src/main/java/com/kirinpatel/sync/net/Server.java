@@ -47,13 +47,11 @@ public class Server {
     }
 
     public static void stop() {
-        if (gui.isVisible()){
-            gui.hide();
-        }
+        GUI.playbackPanel.getMediaPlayer().release();
+        gui.dispose();
         if (Sync.connectedUsers.size() == 1) {
             server.stop();
-        }
-        else {
+        } else {
             closeServer = true;
         }
     }
@@ -85,7 +83,7 @@ public class Server {
 
         @Override
         public void run() {
-            UIMessage messager = new UIMessage(gui);
+            UIMessage message = new UIMessage(gui);
             try {
                 device = createGatewayDevice();
                 tomcatServer = new TomcatServer();
@@ -97,11 +95,11 @@ public class Server {
                 gui.setVisible(true);
                 new MediaSelectorGUI();
             } catch (IOException e) {
-                messager.showErrorDialogAndExit(e, "Couldn't open server");
+                message.showErrorDialogAndExit(e, "Couldn't open server");
                 return;
             }
             try {
-                while (isRunning) {
+                while (isRunning && gui.isVisible()) {
                     socket = service.accept();
                     connectionExecutor.execute(new ServerSocketTask(socket));
                 }
@@ -165,7 +163,6 @@ public class Server {
             if (tomcatServer != null) {
                 tomcatServer.stop();
             }
-
             Launcher.INSTANCE.open();
         }
     }

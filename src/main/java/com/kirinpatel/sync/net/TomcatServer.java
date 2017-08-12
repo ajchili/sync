@@ -61,7 +61,7 @@ class TomcatServer {
             tomcat.getServer().stop();
             tomcat.getServer().destroy();
         } catch(LifecycleException e) {
-            // If this fails, close the server
+            // If this fails, close sync
             System.exit(0);
         }
     }
