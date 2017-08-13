@@ -1,2 +1,9 @@
 ## how to contribute
-* To contribute to sync, fork the repository. Then, make the changes that you think would benefit the program and create a pull request. If the changes help in any way your code will be merged.
+1. Download/fork repository
+2. Mame changes or add a new features
+3. Test these changes or features
+	* To run sync, you must setup maven then run these three commands:
+		* `clean:clean`
+		* `assembly:assembly`
+		* `exec:java`
+4. Create a pull request, if the change will benefit sync, the code will be pulled
