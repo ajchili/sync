@@ -1,6 +1,6 @@
 ## how to contribute
 1. Download/fork repository
-2. Mame changes or add a new features
+2. Make changes or add a new features
 3. Test these changes or features
 	* To run sync, you must setup maven then run these three commands:
 		* `clean:clean`
