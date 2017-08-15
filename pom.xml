@@ -119,7 +119,6 @@
                             </archive>
                         </configuration>
                     </execution>
-
                 </executions>
             </plugin>
         </plugins>
