@@ -2,14 +2,12 @@ package com.kirinpatel.sync.net;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
-import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.GUI;
 import com.kirinpatel.sync.gui.MediaSelectorGUI;
 import com.kirinpatel.sync.Sync;
-import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
@@ -213,28 +211,42 @@ public class Server {
                                 ControlPanel.getInstance().updateConnectedClients();
                                 break;
                             case CLIENT_NAME:
-                                user = new User(message.getMessage().toString());
+                                user = new User(message.getBody().toString());
                                 Sync.connectedUsers.add(user);
                                 ControlPanel.getInstance().updateConnectedClients();
                                 hasConnected = true;
                                 break;
                             case MEDIA_URL:
-                                user.getMedia().setURL((String) message.getMessage());
+                                user.getMedia().setURL((String) message.getBody());
                                 break;
                             case MEDIA_TIME:
-                                user.getMedia().setCurrentTime((long) message.getMessage());
+                                user.getMedia().setCurrentTime((long) message.getBody());
                                 if (GUI.playbackPanel.getMedia().getCurrentTime() != -1) {
-                                    sendMediaTime();
+                                    long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
+                                            - user.getMedia().getCurrentTime() + user.getPing());
+                                    if (timeDifference > 5000) {
+                                        sendMessage(new Message.Builder(Message.MESSAGE_TYPE.MEDIA_TIME)
+                                                .body(GUI.playbackPanel.getMedia().getCurrentTime())
+                                                .build());
+                                    } else if (timeDifference > 1000) {
+                                        float rate = (timeDifference + 1000 + user.getPing()) * 1.0f / 1000;
+                                        sendMessage(new Message.Builder(Message.MESSAGE_TYPE.MEDIA_RATE)
+                                                .body(rate >= 0.75f ? rate : 0.75f)
+                                                .build());
+                                    }
                                 }
                                 break;
                             case MEDIA_STATE:
-                                if (GUI.playbackPanel.getMedia().isPaused() != (boolean) message.getMessage()) {
-                                    sendMediaState();
+                                if (GUI.playbackPanel.getMedia().isPaused() != (boolean) message.getBody()) {
+                                    user.getMedia().setPaused(GUI.playbackPanel.getMedia().isPaused());
+                                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.MEDIA_STATE)
+                                            .body(GUI.playbackPanel.getMedia().isPaused())
+                                            .build());
                                 }
                                 break;
-                            case CLIENT_MESSAGES:
-                                for (String m : (ArrayList<String>) message.getMessage()) {
-                                    sendMessage(m);
+                            case MESSAGES:
+                                for (String m : (ArrayList<String>) message.getBody()) {
+                                    Server.sendMessage(m);
                                 }
                                 break;
                             default:
@@ -246,25 +258,43 @@ public class Server {
                 }
 
                 if (System.currentTimeMillis() > lastPingCheck + 500) {
-                    sendPing();
+                    lastPingCheck = System.currentTimeMillis();
+                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.PING).build());
                 }
 
                 if (System.currentTimeMillis() > lastClientUpdate + 1500) {
-                    sendConnectedUsersToClient();
+                    lastClientUpdate = System.currentTimeMillis();
+                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.CONNECTED_CLIENTS)
+                            .body(Sync.connectedUsers)
+                            .build());
                 }
 
                 if (System.currentTimeMillis() > lastMediaUpdate + 5000
                         || (user != null
                         && !user.getMedia().getURL().equals(GUI.playbackPanel.getMedia().getURL()))) {
-                    sendMediaURL();
+                    lastMediaUpdate = System.currentTimeMillis();
+                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.MEDIA_URL)
+                            .body(GUI.playbackPanel.getMedia().getURL())
+                            .build());
                 }
 
                 if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused()) {
-                    sendMediaState();
+                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.MEDIA_STATE)
+                            .body(GUI.playbackPanel.getMedia().isPaused())
+                            .build());
                 }
 
                 if (messages.size() < Server.messages.size()) {
-                    sendMessagesToClient();
+                    ArrayList<String> newMessages = new ArrayList<>();
+                    ArrayList<String> messageCache = Server.messages;
+                    for (int i = messages.size(); i < messageCache.size(); i++) {
+                        newMessages.add(messageCache.get(i));
+                    }
+                    messages.clear();
+                    messages.addAll(messageCache);
+                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.MESSAGES)
+                            .body(newMessages)
+                            .build());
                 }
             }
 
@@ -285,9 +315,9 @@ public class Server {
             try {
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
-                isClientConnected = message.getType() == CONNECTING;
+                isClientConnected = message.getType() == Message.MESSAGE_TYPE.CONNECTING;
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(CONNECTED, null));
+                output.writeObject(new Message.Builder(Message.MESSAGE_TYPE.CONNECTED).build());
                 output.flush();
             } catch(IOException | ClassNotFoundException e) {
                 disconnectClientFromServer();
@@ -296,7 +326,7 @@ public class Server {
 
         private synchronized void disconnectClientFromServer() {
             try {
-                output.writeObject(new Message(CLOSING, ""));
+                output.writeObject(new Message.Builder(Message.MESSAGE_TYPE.CLOSING).build());
                 output.flush();
             } catch(IOException e) {
                 // Do nothing if sending closing message fails
@@ -306,80 +336,9 @@ public class Server {
             }
         }
 
-        private synchronized void sendPing() {
+        private synchronized void sendMessage(Message message) {
             try {
-                lastPingCheck = System.currentTimeMillis();
-                output.writeObject(new Message(PING, null));
-                output.flush();
-            } catch(IOException e) {
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendConnectedUsersToClient() {
-            try {
-                lastClientUpdate = System.currentTimeMillis();
-                output.reset();
-                output.writeObject(new Message(CONNECTED_CLIENTS, Sync.connectedUsers));
-                output.flush();
-            } catch(IOException e) {
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendMessagesToClient() {
-            try {
-                ArrayList<String> newMessages = new ArrayList<>();
-                ArrayList<String> messageCache = Server.messages;
-                for (int i = messages.size(); i < messageCache.size(); i++) {
-                    newMessages.add(messageCache.get(i));
-                }
-                messages.clear();
-                messages.addAll(messageCache);
-                output.flush();
-                output.writeObject(new Message(MESSAGES, newMessages));
-                output.flush();
-            } catch(IOException e) {
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendMediaURL() {
-            try {
-                lastMediaUpdate = System.currentTimeMillis();
-                output.flush();
-                output.writeObject(new Message(MEDIA_URL, GUI.playbackPanel.getMedia().getURL()));
-                output.flush();
-            } catch(IOException e) {
-                disconnectClientFromServer();
-            }
-        }
-
-        private synchronized void sendMediaTime() {
-            long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
-                    - user.getMedia().getCurrentTime() + user.getPing());
-            if (timeDifference > 5000) {
-                try {
-                    output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
-                    output.flush();
-                } catch(IOException e) {
-                    disconnectClientFromServer();
-                }
-            } else if (timeDifference > 1000) {
-                try {
-                    float rate = (timeDifference + 1000 + user.getPing()) * 1.0f / 1000;
-                    output.writeObject(new Message(MEDIA_RATE, rate >= 0.75f ? rate : 0.75f));
-                    output.flush();
-                } catch(IOException e) {
-                    disconnectClientFromServer();
-                }
-            }
-        }
-
-        private synchronized void sendMediaState() {
-            try {
-                user.getMedia().setPaused(GUI.playbackPanel.getMedia().isPaused());
-                output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
+                output.writeObject(message);
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
