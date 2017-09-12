@@ -3,9 +3,6 @@ package com.kirinpatel.sync.net;
 import java.io.Serializable;
 import java.util.Random;
 
-/**
- * Simple object that holds all user information in one place.
- */
 public class User implements Serializable {
 
     private String username;

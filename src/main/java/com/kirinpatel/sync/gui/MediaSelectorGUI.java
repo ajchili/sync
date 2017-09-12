@@ -15,9 +15,6 @@ import java.nio.file.Paths;
 
 import static com.kirinpatel.sync.gui.MediaSelectorGUI.MEDIA_TYPE.*;
 
-/**
- * The MediaSelectorGUI will display a gui to the user when prompted and allow for on start media selection to occur.
- */
 public class MediaSelectorGUI extends JFrame {
 
     public enum MEDIA_TYPE {
@@ -35,14 +32,9 @@ public class MediaSelectorGUI extends JFrame {
         }
     }
 
-    /*
-        This variable is used to prevent multiple MediaSelectorGUIs from being opened.
-     */
+    // Prevents multiple MediaSelectorGUIs
     private static boolean isOpened = false;
 
-    /**
-     * Main constructor that will create and display the MediaSelectorGUI.
-     */
     public MediaSelectorGUI() {
         super("sync");
 
@@ -91,28 +83,14 @@ public class MediaSelectorGUI extends JFrame {
         isOpened = true;
     }
 
-    /**
-     * Custom ActionListener that will serve to enable usability of MediaSelectorGUI JButtons.
-     */
     class MediaButtonEvent implements ActionListener {
 
         private MEDIA_TYPE type;
 
-        /**
-         * Main constructor that will establish the ActionListener with the
-         * given type.
-         *
-         * @param type Type
-         */
         MediaButtonEvent(MEDIA_TYPE type) {
             this.type = type;
         }
 
-        /**
-         * Code that will be executed on ActionEvent.
-         *
-         * @param e ActionEvent
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             setVisible(false);

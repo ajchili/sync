@@ -91,9 +91,7 @@ public class ControlPanel extends JPanel {
         chatWindow.setLineWrap(true);
         chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
-        /*
-            Credit: https://stackoverflow.com/a/1627068
-         */
+        // Credit: https://stackoverflow.com/a/1627068
         DefaultCaret caret = (DefaultCaret)chatWindow.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane chatWindowScroll = new JScrollPane(chatWindow);

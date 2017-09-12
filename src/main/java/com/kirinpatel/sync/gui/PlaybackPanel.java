@@ -285,7 +285,6 @@ public class PlaybackPanel extends JPanel {
                 default:
                     break;
             }
-
             return false;
         }
     }
