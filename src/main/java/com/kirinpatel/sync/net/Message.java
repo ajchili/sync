@@ -1,6 +1,8 @@
 package com.kirinpatel.sync.net;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
 
     private final MESSAGE_TYPE type;
     private final Object body;
