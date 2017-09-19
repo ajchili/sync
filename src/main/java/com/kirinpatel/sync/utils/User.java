@@ -1,4 +1,6 @@
-package com.kirinpatel.sync.net;
+package com.kirinpatel.sync.utils;
+
+import com.kirinpatel.sync.net.Media;
 
 import java.io.Serializable;
 import java.util.Random;

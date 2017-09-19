@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.net;
 
-import com.kirinpatel.sync.util.UIMessage;
+import com.kirinpatel.sync.utils.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;

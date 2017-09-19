@@ -5,7 +5,7 @@ import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.PlaybackPanel;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
-import com.kirinpatel.sync.util.UIMessage;
+import com.kirinpatel.sync.utils.UIMessage;
 
 import javax.swing.*;
 import java.awt.*;

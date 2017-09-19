@@ -1,4 +1,4 @@
-package com.kirinpatel.sync.net;
+package com.kirinpatel.sync.utils;
 
 import java.io.Serializable;
 
@@ -33,21 +33,21 @@ public class Message implements Serializable {
         }
     }
 
-    static class Builder {
+    public static class Builder {
 
         private MESSAGE_TYPE type;
         private Object body = null;
 
-        Builder(MESSAGE_TYPE type) {
+        public Builder(MESSAGE_TYPE type) {
             this.type = type;
         }
 
-        Builder body(Object body) {
+        public Builder body(Object body) {
             this.body = body;
             return this;
         }
 
-        Message build() {
+        public Message build() {
             return new Message(this);
         }
     }
@@ -72,11 +72,11 @@ public class Message implements Serializable {
         }
     }
 
-    MESSAGE_TYPE getType() {
+    public MESSAGE_TYPE getType() {
         return type;
     }
 
-    Object getBody() {
+    public Object getBody() {
         return body;
     }
 }

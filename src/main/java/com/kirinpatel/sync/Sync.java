@@ -1,7 +1,7 @@
 package com.kirinpatel.sync;
 
-import com.kirinpatel.sync.net.User;
-import com.kirinpatel.sync.util.UIMessage;
+import com.kirinpatel.sync.utils.User;
+import com.kirinpatel.sync.utils.UIMessage;
 import jdk.nashorn.api.scripting.URLReader;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 

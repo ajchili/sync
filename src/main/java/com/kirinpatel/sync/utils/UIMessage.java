@@ -1,4 +1,4 @@
-package com.kirinpatel.sync.util;
+package com.kirinpatel.sync.utils;
 
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.gui.GUI;

@@ -3,7 +3,7 @@ package com.kirinpatel.sync.gui;
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
-import com.kirinpatel.sync.net.User;
+import com.kirinpatel.sync.utils.User;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;

@@ -1,4 +1,4 @@
-package com.kirinpatel.sync.util;
+package com.kirinpatel.sync.utils;
 
 import com.kirinpatel.sync.gui.ProgressView;
 import com.kirinpatel.sync.net.Server;

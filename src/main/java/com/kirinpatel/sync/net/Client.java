@@ -6,7 +6,9 @@ import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.GUI;
-import com.kirinpatel.sync.util.UIMessage;
+import com.kirinpatel.sync.utils.Message;
+import com.kirinpatel.sync.utils.UIMessage;
+import com.kirinpatel.sync.utils.User;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

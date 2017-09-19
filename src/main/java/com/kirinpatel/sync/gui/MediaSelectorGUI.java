@@ -1,8 +1,8 @@
 package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.sync.util.FileSelector;
+import com.kirinpatel.sync.utils.FileSelector;
 import com.kirinpatel.sync.net.Media;
-import com.kirinpatel.sync.util.UIMessage;
+import com.kirinpatel.sync.utils.UIMessage;
 
 import javax.swing.*;
 import java.awt.*;
