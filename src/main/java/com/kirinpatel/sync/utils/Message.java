@@ -6,9 +6,9 @@ public abstract class Message implements Serializable {
 
     Object body;
 
-    abstract class Builder {
+    static abstract class Builder {
 
-        private Object body = null;
+        Object body = null;
 
         public Builder() {
 
@@ -26,9 +26,18 @@ public abstract class Message implements Serializable {
     public abstract String toString();
 
     @Override
-    public abstract boolean equals(Object o);
+    public boolean equals(Object o) {
+        if (o instanceof Message) {
+            Message message = (Message) o;
+            return message.getType().equals(getType());
+        } else {
+            return false;
+        }
+    }
 
     public Object getBody() {
         return body;
     }
+
+    public abstract String getType();
 }

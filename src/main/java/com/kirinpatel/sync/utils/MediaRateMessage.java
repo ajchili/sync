@@ -1,14 +1,13 @@
 package com.kirinpatel.sync.utils;
 
-public class DisconnectingMessage extends Message {
-
+public class MediaRateMessage extends Message {
     @Override
     public String toString() {
-        return "Disconnecting.";
+        return "Media Rate: " + body;
     }
 
     @Override
     public String getType() {
-        return "disconnectingMessage";
+        return "mediaRateMessage";
     }
 }

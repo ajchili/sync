@@ -1,26 +1,26 @@
 package com.kirinpatel.sync.utils;
 
-public class PingMessage extends Message {
+public class MediaURLMessage extends Message {
 
     public class Builder extends Message.Builder {
 
         @Override
         Message build() {
-            return new PingMessage(this);
+            return new MediaURLMessage(this);
         }
     }
 
-    public PingMessage(Builder builder) {
+    public MediaURLMessage(Builder builder) {
         body = builder.body;
     }
 
     @Override
     public String toString() {
-        return body + "ms";
+        return "Media URL: " + body;
     }
 
     @Override
     public String getType() {
-        return "ping";
+        return "mediaURLMessage";
     }
 }

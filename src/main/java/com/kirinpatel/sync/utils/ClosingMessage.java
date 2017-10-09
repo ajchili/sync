@@ -8,7 +8,7 @@ public class ClosingMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof PingMessage;
+    public String getType() {
+        return "closingMessage";
     }
 }

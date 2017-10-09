@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.utils;
 
-public class ConnectingMessage  extends Message {
+public class ConnectingMessage extends Message {
 
     @Override
     public String toString() {
@@ -8,7 +8,7 @@ public class ConnectingMessage  extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return o instanceof PingMessage;
+    public String getType() {
+        return "connecting";
     }
 }

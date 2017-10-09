@@ -256,7 +256,7 @@ public class Server {
 
                 if (System.currentTimeMillis() > lastPingCheck + 500) {
                     lastPingCheck = System.currentTimeMillis();
-                    sendMessage(new Message.Builder(Message.MESSAGE_TYPE.PING).build());
+                    sendMessage(new Message.Builder().build());
                 }
 
                 if (System.currentTimeMillis() > lastClientUpdate + 1500) {

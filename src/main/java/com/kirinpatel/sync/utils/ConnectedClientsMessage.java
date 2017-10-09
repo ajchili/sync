@@ -15,10 +15,7 @@ public class ConnectedClientsMessage extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof ConnectedClientsMessage) {
-
-        }
-        return false;
+    public String getType() {
+        return "connectedClientsMessage";
     }
 }
