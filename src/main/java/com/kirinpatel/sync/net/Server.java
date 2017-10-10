@@ -1,14 +1,10 @@
 package com.kirinpatel.sync.net;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
-import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
-
 import com.kirinpatel.sync.Launcher;
+import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.GUI;
 import com.kirinpatel.sync.gui.MediaSelectorGUI;
-import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
 import org.bitlet.weupnp.GatewayDevice;
@@ -16,13 +12,18 @@ import org.bitlet.weupnp.GatewayDiscover;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
+import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
 public class Server {
 
@@ -94,8 +95,9 @@ public class Server {
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
                 new MediaSelectorGUI();
-            } catch (IOException e) {
+            } catch (IOException | NullPointerException e) {
                 message.showErrorDialogAndExit(e, "Couldn't open server");
+                Server.stop();
                 return;
             }
             try {
@@ -118,7 +120,10 @@ public class Server {
             try {
                 discover.discover();
                 GatewayDevice device = discover.getValidGateway();
-                checkNotNull(device);
+                if (device == null) {
+                    Server.stop();
+                    throw new NullPointerException("Couldn't map port " + SYNC_PORT + " or " + TOMCAT_PORT + " ensure UPnP is enabled");
+                }
                 boolean isSyncMapped = device.addPortMapping(
                         SYNC_PORT,
                         SYNC_PORT,
