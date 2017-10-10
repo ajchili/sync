@@ -95,7 +95,7 @@ public class Server {
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
                 new MediaSelectorGUI();
-            } catch (IOException | NullPointerException e) {
+            } catch (Exception e) {
                 message.showErrorDialogAndExit(e, "Couldn't open server");
                 Server.stop();
                 return;
@@ -121,7 +121,6 @@ public class Server {
                 discover.discover();
                 GatewayDevice device = discover.getValidGateway();
                 if (device == null) {
-                    Server.stop();
                     throw new NullPointerException("Couldn't map port " + SYNC_PORT + " or " + TOMCAT_PORT + " ensure UPnP is enabled");
                 }
                 boolean isSyncMapped = device.addPortMapping(
