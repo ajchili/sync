@@ -70,22 +70,16 @@ public final class Sync {
         String message = "";
         try {
             Scanner s = new Scanner(new URLReader(
-                    new URL("https://raw.githubusercontent.com/ajchili/sync/saberchicken/MESSAGE")));
+                    new URL("https://raw.githubusercontent.com/ajchili/sync/master/MESSAGE")));
             while(s.hasNext()) {
                 message = s.nextLine();
             }
         } catch (MalformedURLException  e) {
-            // Show error but allow usage of sync
-            UIMessage.showErrorDialog(
-                    new IllegalStateException("The version file was unable to be verified, please check the Github\n" +
-                            "page to verify that you have the most recent version of sync."),
-                    "Unable to verify current version of sync");
+            // Do nothing if url was unable to be loaded
         }
 
         if (message.length() > 0) {
-            UIMessage.showMessageDialog(
-                    message,
-                    "News");
+            UIMessage.showMessageDialog(message,"News");
         }
     }
 }
