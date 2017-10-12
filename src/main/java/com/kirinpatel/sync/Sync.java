@@ -37,6 +37,7 @@ public final class Sync {
                             "(32 or 64 bit depending on your system)."),
                     "Unable to launch sync");
         } else {
+            checkForMessage();
             checkVersion();
             Launcher.INSTANCE.open();
         }
@@ -62,6 +63,23 @@ public final class Sync {
             UIMessage.showMessageDialog(
                     "You have an outdated version of sync, please update sync!",
                     "Outdated version of sync");
+        }
+    }
+
+    private static void checkForMessage() {
+        String message = "";
+        try {
+            Scanner s = new Scanner(new URLReader(
+                    new URL("https://raw.githubusercontent.com/ajchili/sync/master/MESSAGE")));
+            while(s.hasNext()) {
+                message = s.nextLine();
+            }
+        } catch (MalformedURLException  e) {
+            // Do nothing if url was unable to be loaded
+        }
+
+        if (message.length() > 0) {
+            UIMessage.showMessageDialog(message,"News");
         }
     }
 }
