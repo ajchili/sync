@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public final class Sync {
 
-    private final static String VERSION = "1.6.0";
+    private final static String VERSION = "1.7.0";
     public static ArrayList<User> connectedUsers = new ArrayList<>();
     public static User host;
 
