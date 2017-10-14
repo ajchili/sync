@@ -32,10 +32,10 @@ class ClientInfoGUI extends JFrame {
         add(ping);
         mediaTime = new JLabel("Playback Time: "
                 + user.getMedia().getFormattedTime()
-                + ":" + user.getMedia().getCurrentTime() % 1000);
+                + ":" + user.getMedia().currentTime % 1000);
         add(mediaTime);
         mediaState = new JLabel("Playback State: "
-                + (user.getMedia().isPaused() ? "Paused" : "Playing"));
+                + (user.getMedia().isPaused ? "Paused" : "Playing"));
         add(mediaState);
         JButton disconnectUser = new JButton("Kick Client");
         updateUIThread = new UpdateUIThread();
@@ -90,9 +90,9 @@ class ClientInfoGUI extends JFrame {
                     ping.setText("Ping: " + user.getPing() + " ms");
                     mediaTime.setText("Playback Time: "
                             + user.getMedia().getFormattedTime()
-                            + ":" + user.getMedia().getCurrentTime() % 1000);
+                            + ":" + user.getMedia().currentTime % 1000);
                     mediaState.setText("Playback State: "
-                            + (user.getMedia().isPaused() ? "Paused" : "Playing"));
+                            + (user.getMedia().isPaused ? "Paused" : "Playing"));
                 } catch(InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }

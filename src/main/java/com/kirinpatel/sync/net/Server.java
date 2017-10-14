@@ -263,7 +263,7 @@ public class Server {
                     sendMediaURL();
                 }
 
-                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused()) {
+                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused) {
                     sendMediaState();
                 }
 
@@ -291,7 +291,7 @@ public class Server {
                 Message message = (Message) input.readObject();
                 isClientConnected = message.getType() == CONNECTING;
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(CONNECTED, null));
+                output.writeObject(new Message(CONNECTED, ""));
                 output.flush();
             } catch(IOException | ClassNotFoundException e) {
                 disconnectClientFromServer();
@@ -361,7 +361,7 @@ public class Server {
 
         private synchronized void sendMediaTime() {
             long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
-                    - user.getMedia().getCurrentTime() + user.getPing());
+                    - user.getMedia().currentTime + user.getPing());
             if (timeDifference > 5000) {
                 try {
                     output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
@@ -382,7 +382,7 @@ public class Server {
 
         private synchronized void sendMediaState() {
             try {
-                user.getMedia().setPaused(GUI.playbackPanel.getMedia().isPaused());
+                user.getMedia().isPaused = GUI.playbackPanel.getMedia().isPaused();
                 output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {

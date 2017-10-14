@@ -3,20 +3,17 @@ package com.kirinpatel.sync.net;
 import java.io.Serializable;
 import java.util.Random;
 
-/**
- * Simple object that holds all user information in one place.
- */
 public class User implements Serializable {
 
     private String username;
     private long userID;
-    private Media media;
+    private Media.MediaData media;
     private long ping = 0;
 
     public User(String username) {
         this.username = username;
         this.userID = Math.abs(new Random().nextLong());
-        this.media = new Media("");
+        this.media = (new Media("")).data;
     }
 
     @Override
@@ -42,7 +39,7 @@ public class User implements Serializable {
         return userID;
     }
 
-    public Media getMedia() {
+    public Media.MediaData getMedia() {
         return media;
     }
 
@@ -50,7 +47,7 @@ public class User implements Serializable {
         return ping;
     }
 
-    public void setMedia(Media media) {
+    public void setMedia(Media.MediaData media) {
         this.media = media;
     }
 
