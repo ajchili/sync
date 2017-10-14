@@ -45,11 +45,17 @@ public final class Sync {
 
     private static void checkVersion() {
         String version = "";
+        String beta = "";
         try {
             Scanner s = new Scanner(new URLReader(
                     new URL("https://raw.githubusercontent.com/ajchili/sync/master/VERSION")));
             while(s.hasNext()) {
-                version = s.nextLine();
+                String currentLine = s.nextLine();
+                if (currentLine.contains("B")) {
+                    beta = currentLine;
+                } else {
+                    version = currentLine;
+                }
             }
         } catch (MalformedURLException  e) {
             // Show error but allow usage of sync
@@ -59,10 +65,22 @@ public final class Sync {
                     "Unable to verify current version of sync");
         }
 
-        if (!version.equals(VERSION)) {
+        if (!VERSION.contains("B") && !version.equals(VERSION)) {
             UIMessage.showMessageDialog(
                     "You have an outdated version of sync, please update sync!",
                     "Outdated version of sync");
+        } else if (VERSION.contains("B")){
+            if (!beta.equals(VERSION)) {
+                UIMessage.showMessageDialog(
+                        "A new beta has been released, please update to fix bugs and test new features!",
+                        "Outdated version of sync");
+            } else {
+                UIMessage.showMessageDialog(
+                        "You have a beta version of sync! Please understand that there will be bugs and\n" +
+                                "unfinished features within the app. Should you face any issues, please create an\n" +
+                                "issue on our Github page.",
+                        "Thank you for beta testing sync");
+            }
         }
     }
 
