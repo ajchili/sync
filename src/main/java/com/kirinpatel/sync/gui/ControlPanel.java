@@ -62,11 +62,11 @@ public class ControlPanel extends JPanel {
                     final User user = Sync.connectedUsers.get(index);
 
                     if (host != null && !host.equals(user) && showUserTimes) {
-                        long currentUserTime = user.getMedia().currentTime + user.getPing();
+                        long currentUserTime = user.getMedia().getCurrentTime() + user.getPing();
 
-                        if (host.getMedia().currentTime - deSyncTime > currentUserTime) {
+                        if (host.getMedia().getCurrentTime() - deSyncTime > currentUserTime) {
                             setBackground(Color.RED);
-                        } else if (host.getMedia().currentTime - deSyncWarningTime > currentUserTime) {
+                        } else if (host.getMedia().getCurrentTime() - deSyncWarningTime > currentUserTime) {
                             setBackground(Color.YELLOW);
                         }
                     }

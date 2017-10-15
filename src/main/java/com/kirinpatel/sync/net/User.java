@@ -7,13 +7,13 @@ public class User implements Serializable {
 
     private String username;
     private long userID;
-    private Media.MediaData media;
+    private Media media;
     private long ping = 0;
 
     public User(String username) {
         this.username = username;
         this.userID = Math.abs(new Random().nextLong());
-        this.media = (new Media("")).data;
+        this.media = new Media("");
     }
 
     @Override
@@ -39,7 +39,7 @@ public class User implements Serializable {
         return userID;
     }
 
-    public Media.MediaData getMedia() {
+    public Media getMedia() {
         return media;
     }
 
@@ -47,7 +47,7 @@ public class User implements Serializable {
         return ping;
     }
 
-    public void setMedia(Media.MediaData media) {
+    public void setMedia(Media media) {
         this.media = media;
     }
 

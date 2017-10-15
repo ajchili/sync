@@ -1,5 +1,8 @@
 package com.kirinpatel.sync.net;
 
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
+
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.gui.ControlPanel;
@@ -12,9 +15,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-
-import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
-import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
 public class Client {
 
@@ -58,8 +58,6 @@ public class Client {
 
             connectToServer();
 
-            System.out.println(isConnected);
-            System.out.println(isRunning);
             while(isConnected && isRunning) {
                 try {
                     if (socket.getInputStream().available() > 0) {

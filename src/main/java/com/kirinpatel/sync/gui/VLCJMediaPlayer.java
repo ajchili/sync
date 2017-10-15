@@ -37,8 +37,8 @@ public class VLCJMediaPlayer extends JPanel {
 
     private static final int WIDTH = 1280;
     private static final int HEIGHT = 720;
-
     private final BufferedImage image;
+    private final DirectMediaPlayer mediaPlayer;
     private BufferedImage scale;
     private static Media media;
     private boolean isScrubbing = false;
@@ -52,24 +52,27 @@ public class VLCJMediaPlayer extends JPanel {
         setOpaque(true);
 
         media  = new Media("");
-        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(WIDTH, HEIGHT);
 
+        image = GraphicsEnvironment
+                .getLocalGraphicsEnvironment()
+                .getDefaultScreenDevice()
+                .getDefaultConfiguration()
+                .createCompatibleImage(WIDTH, HEIGHT);
+        BufferFormatCallback bufferFormatCallback = (sourceWidth, sourceHeight) -> new RV32BufferFormat(WIDTH, HEIGHT);
         DirectMediaPlayerComponent mediaPlayerComponent = new DirectMediaPlayerComponent(bufferFormatCallback) {
             @Override
             protected RenderCallback onGetRenderCallback() {
                 return new MediaRenderCallback();
             }
         };
-        image = GraphicsEnvironment
-                .getLocalGraphicsEnvironment()
-                .getDefaultScreenDevice()
-                .getDefaultConfiguration()
-                .createCompatibleImage(WIDTH, HEIGHT);
+        mediaPlayer = mediaPlayerComponent.getMediaPlayer();
+        mediaPlayer.setStandardMediaOptions();
+        mediaPlayer.setPlaySubItems(true);
+        mediaPlayer.addMediaPlayerEventListener(new MediaEventListener());
         Equalizer equalizer = mediaPlayerComponent.getMediaPlayerFactory().newEqualizer();
         AudioSettingsGUI.setEqualizer(equalizer);
         AudioSettingsGUI.loadSettings();
-        media.initPlayer(new MediaEventListener(), mediaPlayerComponent.getMediaPlayer());
-        media.setEqualizer(equalizer);
+        mediaPlayer.setEqualizer(equalizer);
     }
 
     /**
@@ -85,9 +88,9 @@ public class VLCJMediaPlayer extends JPanel {
             PlaybackPanel.pauseMedia.addActionListener(e -> {
                 try {
                     if (media.isPaused()) {
-                        media.play();
+                        mediaPlayer.play();
                     } else {
-                        media.pause();
+                        mediaPlayer.pause();
                     }
                 } catch (Error error) {
                     // Stop if Invalid memory access occurs
@@ -133,28 +136,40 @@ public class VLCJMediaPlayer extends JPanel {
             GUI.playbackPanel.mediaPosition.addChangeListener(e -> {
                 if (isScrubbing) {
                     int position = GUI.playbackPanel.mediaPosition.getValue();
-                    media.setTime(position * media.getLength() / 1000);
+                    mediaPlayer.setTime(position * media.getLength() / 1000);
                 }
             });
         }
 
         PlaybackPanel.pauseMedia.setText(">");
-        media.initControls();
         GUI.playbackPanel.mediaPosition.setMaximum(1000);
+        mediaPlayer.setMarqueeSize(60);
+        mediaPlayer.setMarqueeOpacity(200);
+        mediaPlayer.setMarqueeColour(Color.white);
+        mediaPlayer.setMarqueeTimeout(3500);
+        mediaPlayer.setMarqueeLocation(50, 1000);
+
         media.setPaused(true);
     }
 
     public void play() {
         try {
-            media.play();
+            if (!media.getURL().isEmpty() && media.isPaused()) {
+                media.setPaused(false);
+                mediaPlayer.play();
+            }
         } catch (Error e) {
+            // Reset media if Invalid memory access occurs
             setMedia(new Media(""));
         }
     }
 
     public void pause() {
         try {
-            media.pause();
+            if (!media.getURL().isEmpty() && !media.isPaused()) {
+                media.setPaused(true);
+                mediaPlayer.pause();
+            }
         } catch (Error e) {
             // Reset media if Invalid memory access occurs
             setMedia(new Media(""));
@@ -163,11 +178,10 @@ public class VLCJMediaPlayer extends JPanel {
 
     public void release() {
         try {
-            media.stop();
-            media.release();
+            mediaPlayer.stop();
+            mediaPlayer.release();
         } catch (Error e) {
             // Stop if Invalid memory access occurs
-            e.printStackTrace();
             if (GUI.playbackPanel.type == SERVER) {
                 new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to release media player.\n" +
                                 "Forcefully closing sync, please restart sync."),
@@ -184,8 +198,8 @@ public class VLCJMediaPlayer extends JPanel {
         isFile = false;
         VLCJMediaPlayer.media = media;
         try {
-            media.prepareMedia();
-            media.parseMedia();
+            mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getURL());
+            mediaPlayer.parseMedia();
             initControls();
         } catch (Error e) {
             // Stop client if Invalid memory access occurs
@@ -204,21 +218,24 @@ public class VLCJMediaPlayer extends JPanel {
             isFile = !media.getFilePath().equals("null");
             if (isFile) {
                 VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
+                mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getFilePath());
+            } else {
+                mediaPlayer.prepareMedia(VLCJMediaPlayer.media.getURL());
             }
-            VLCJMediaPlayer.media.prepareMedia();
-            VLCJMediaPlayer.media.parseMedia();
+            mediaPlayer.parseMedia();
             initControls();
         }
     }
 
     void setVolume(int volume) {
-        media.setVolume(volume);
+        mediaPlayer.setVolume(volume);
     }
 
     public void seekTo(long time) {
         try {
-            if (media != null && !media.isPaused()) {
-                media.setTime(time);
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                media.setCurrentTime(time);
+                mediaPlayer.setTime(time);
             }
         } catch (Error e) {
             // Reset media if Invalid memory access occurs
@@ -230,10 +247,12 @@ public class VLCJMediaPlayer extends JPanel {
         if (!media.isPaused()) {
             try {
                 media.setRate(rate);
+                mediaPlayer.setRate(media.getRate());
                 new Thread(() -> {
                     try {
                         Thread.sleep(200);
                         media.setRate(1.0f);
+                        mediaPlayer.setRate(media.getRate());
                     } catch(InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
@@ -250,7 +269,7 @@ public class VLCJMediaPlayer extends JPanel {
     }
 
     public boolean isPaused() {
-        return media.isPaused();
+        return !mediaPlayer.isPlaying();
     }
 
     @Override
