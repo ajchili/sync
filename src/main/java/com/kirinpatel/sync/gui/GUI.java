@@ -2,6 +2,7 @@ package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.util.Theme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,15 +16,11 @@ public class GUI extends JFrame {
     private final PlaybackPanel.PANEL_TYPE type;
     public static PlaybackPanel playbackPanel;
 
-    /**
-     * Primary constructor that will create the GUI of sync.
-     *
-     * @param type Type
-     */
     public GUI(PlaybackPanel.PANEL_TYPE type) {
         super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
 
+        setBackground(Theme.DARK_MODE_BACKGROUND);
         setSize(new Dimension(940, 360));
         setMinimumSize(new Dimension(940, 360));
         setLayout(new BorderLayout());
@@ -41,9 +38,6 @@ public class GUI extends JFrame {
         setVisible(type == CLIENT);
     }
 
-    /**
-     * This inner class will handle all resizing and closing of the GUI class.
-     */
     class ResizeListener implements ComponentListener {
 
         @Override

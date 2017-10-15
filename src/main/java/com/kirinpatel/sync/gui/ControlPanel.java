@@ -4,6 +4,7 @@ import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.net.User;
+import com.kirinpatel.sync.util.Theme;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -23,8 +24,10 @@ public class ControlPanel extends JPanel {
     private final JList connectedClients;
     private final JScrollPane connectedClientsScroll;
     private final JPanel chatPanel;
+    private final JPanel messagePanel;
     private final JTextArea chatWindow;
     private final JTextField chatField;
+    private final JButton send;
     private static ControlPanel INSTANCE;
     private static AtomicBoolean isInstanceSet = new AtomicBoolean(false);
     private GUI gui;
@@ -71,7 +74,8 @@ public class ControlPanel extends JPanel {
                         }
                     }
 
-                    if (!isUserDisplayShown && GUI.playbackPanel.type == SERVER && isSelected && cellHasFocus && index > 0) {
+                    if (!isUserDisplayShown && GUI.playbackPanel.type
+                            == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
                         chatWindow.requestFocus();
                         new ClientInfoGUI(user);
@@ -91,20 +95,18 @@ public class ControlPanel extends JPanel {
         chatWindow.setLineWrap(true);
         chatWindow.setWrapStyleWord(true);
         chatWindow.setToolTipText("Chat Box");
-        /*
-            Credit: https://stackoverflow.com/a/1627068
-         */
+        // Credit: https://stackoverflow.com/a/1627068
         DefaultCaret caret = (DefaultCaret)chatWindow.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         JScrollPane chatWindowScroll = new JScrollPane(chatWindow);
         chatWindowScroll.setBorder(null);
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
-        JPanel messagePanel = new JPanel(new BorderLayout());
+        messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
         chatField.setToolTipText("Message Box");
         chatField.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(chatField, BorderLayout.CENTER);
-        JButton send = new JButton("Send");
+        send = new JButton("Send");
         send.setInputMap(WHEN_FOCUSED, null);
         send.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(send, BorderLayout.EAST);
@@ -172,6 +174,37 @@ public class ControlPanel extends JPanel {
         if (chatWindow.getText().length() > 0) {
             chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
         }
+    }
+
+    void setUIMode() {
+        connectedClients.setForeground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_TEXT
+                : Theme.STANDARD_TEXT);
+        connectedClients.setBackground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_BACKGROUND
+                : Theme.STANDARD_BACKGROUND);
+        chatWindow.setForeground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_TEXT
+                : Theme.STANDARD_TEXT);
+        chatWindow.setBackground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_BACKGROUND
+                : Theme.STANDARD_BACKGROUND);
+        messagePanel.setBackground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_BACKGROUND
+                : Theme.STANDARD_BACKGROUND);
+        chatField.setForeground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_TEXT
+                : Theme.STANDARD_TEXT);
+        chatField.setBackground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_BACKGROUND
+                : Theme.STANDARD_BACKGROUND);
+        send.setForeground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_TEXT
+                : Theme.STANDARD_TEXT);
+        send.setBackground(Theme.isDarkModeEnabled
+                ? Theme.DARK_MODE_BACKGROUND
+                : Theme.STANDARD_BACKGROUND);
+        repaint();
     }
 
     class SendMessageListener implements ActionListener {

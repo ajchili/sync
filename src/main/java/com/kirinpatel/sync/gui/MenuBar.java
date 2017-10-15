@@ -2,10 +2,15 @@ package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.util.Theme;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
 
@@ -15,6 +20,17 @@ class MenuBar extends JMenuBar {
         super();
 
         JMenu menu = new JMenu("sync");
+        menu.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                System.out.println("Lsot");
+            }
+        });
 
         JMenuItem file = new JMenuItem("Set Media");
         file.addActionListener(e -> new MediaSelectorGUI());
@@ -49,10 +65,15 @@ class MenuBar extends JMenuBar {
         JMenu ui = new JMenu("Interface Settings");
 
         JMenuItem fullscreen = new JMenuItem("Launch Fullscreen");
-        fullscreen.addActionListener(e -> {
-            playbackPanel.initFullscreen();
-        });
+        fullscreen.addActionListener(e -> playbackPanel.initFullscreen());
         ui.add(fullscreen);
+
+        JRadioButtonMenuItem darkMode = new JRadioButtonMenuItem("Dark Mode");
+        darkMode.addActionListener(e -> {
+            Theme.isDarkModeEnabled = darkMode.isSelected();
+            ControlPanel.getInstance().setUIMode();
+        });
+        ui.add(darkMode);
         ui.add(new JSeparator());
 
         JMenu controlPanel = new JMenu("Control Panel");
