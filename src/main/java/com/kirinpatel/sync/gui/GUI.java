@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 
 import javax.swing.*;
@@ -8,7 +8,8 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class GUI extends JFrame {
 
@@ -63,11 +64,7 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            if (type == SERVER) {
-                Server.stop();
-            } else {
-                Client.stop();
-            }
+            Launcher.connectedUser.stop();
         }
     }
 }

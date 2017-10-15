@@ -1,5 +1,6 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Media;
 import com.kirinpatel.sync.net.Server;
@@ -207,7 +208,7 @@ public class VLCJMediaPlayer extends JPanel {
                 new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to set media.\n" +
                                 "Please restart sync and reconnect to the sync server."),
                         "Media was unable to be set.");
-                Client.stop();
+                Launcher.connectedUser.stop();
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
 
@@ -35,11 +36,7 @@ class MenuBar extends JMenuBar {
 
         JMenuItem close = new JMenuItem("Close sync");
         close.addActionListener(e -> {
-            if (playbackPanel.type == SERVER) {
-                Server.stop();
-            } else {
-                Client.stop();
-            }
+            Launcher.connectedUser.stop();
         });
         menu.add(close);
         add(menu);

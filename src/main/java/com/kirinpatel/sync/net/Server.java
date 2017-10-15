@@ -25,10 +25,11 @@ import java.util.concurrent.Executors;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
-public class Server {
+public class Server implements NetworkUsers {
 
     public static String ipAddress = "";
     public static GUI gui;
+    public static User user;
     private static ServerThread server;
     private static TomcatServer tomcatServer;
     private static final ArrayList<String> messages = new ArrayList<>();
@@ -40,14 +41,16 @@ public class Server {
 
     public Server() {
         gui = new GUI(SERVER);
-        Sync.connectedUsers.add(new User(System.getProperty("user.name") + " (host)"));
+        user = new User(System.getProperty("user.name") + " (host)");
+        Sync.connectedUsers.add(user);
         Sync.host = Sync.connectedUsers.get(0);
         ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
         new Thread(server).start();
     }
 
-    public static void stop() {
+    @Override
+    public void stop() {
         GUI.playbackPanel.getMediaPlayer().release();
         gui.dispose();
         if (Sync.connectedUsers.size() == 1) {
@@ -57,7 +60,8 @@ public class Server {
         }
     }
 
-    public static void sendMessage(String message) {
+    @Override
+    public void sendMessage(String message) {
         messages.add(message);
         ControlPanel.getInstance().setMessages(messages);
     }
@@ -74,6 +78,11 @@ public class Server {
      */
     public static void setEnabled(boolean enabled) {
         gui.setEnabled(enabled);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 
     class ServerThread implements Runnable {
@@ -97,7 +106,7 @@ public class Server {
                 new MediaSelectorGUI();
             } catch (Exception e) {
                 message.showErrorDialogAndExit(e, "Couldn't open server");
-                Server.stop();
+                Server.this.stop();
                 return;
             }
             try {

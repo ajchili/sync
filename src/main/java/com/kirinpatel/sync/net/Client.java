@@ -16,7 +16,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class Client {
+public class Client implements NetworkUsers {
 
     public static String ipAddress;
     public static User user;
@@ -35,14 +35,20 @@ public class Client {
         new Thread(clientThread).start();
     }
 
-    public static void stop() {
+    @Override
+    public void stop() {
         GUI.playbackPanel.getMediaPlayer().release();
         gui.dispose();
         clientThread.stop();
     }
-
-    public static void sendMessage(String message) {
+    @Override
+    public void sendMessage(String message) {
         messages.add(message);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 
     class ClientThread implements Runnable {
@@ -79,7 +85,8 @@ public class Client {
                                 String mediaURL = (String) message.getMessage();
                                 if (!mediaURL.equals("") && !GUI.playbackPanel.getMedia().getURL().equals(mediaURL)) {
                                     lastSentTime = 0;
-                                    GUI.playbackPanel.getMediaPlayer().setMedia(new Media(mediaURL));
+                                    GUI.playbackPanel.getMediaPlayer().getMedia().setURL(mediaURL);
+                                    GUI.playbackPanel.getMediaPlayer().play();
                                 }
                                 sendMediaURL();
                                 break;
@@ -181,7 +188,7 @@ public class Client {
                     socket.close();
                 }
             } catch(IOException e) {
-                Client.stop();
+                Client.this.stop();
             } finally {
                 Launcher.INSTANCE.open();
             }
