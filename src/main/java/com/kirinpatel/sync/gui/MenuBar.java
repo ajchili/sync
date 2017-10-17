@@ -9,8 +9,7 @@ import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.*;
 
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
 
@@ -19,18 +18,45 @@ class MenuBar extends JMenuBar {
     MenuBar(PlaybackPanel playbackPanel) {
         super();
 
-        JMenu menu = new JMenu("sync");
-        menu.addFocusListener(new FocusListener() {
+        addMouseListener(new MouseListener() {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void mouseClicked(MouseEvent e) {
 
             }
 
             @Override
-            public void focusLost(FocusEvent e) {
-                System.out.println("Lsot");
+            public void mousePressed(MouseEvent e) {
+
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (!playbackPanel.getMedia().isPaused()) {
+                    playbackPanel.repaint();
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (!playbackPanel.getMedia().isPaused()) {
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2500);
+                            playbackPanel.repaint();
+                        } catch (InterruptedException e1) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }).start();
+                }
+             }
         });
+
+        JMenu menu = new JMenu("sync");
 
         JMenuItem file = new JMenuItem("Set Media");
         file.addActionListener(e -> new MediaSelectorGUI());
