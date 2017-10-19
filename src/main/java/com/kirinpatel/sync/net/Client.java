@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
-public class Client implements NetworkUsers {
+public class Client implements NetworkUser {
 
     public static String ipAddress;
     public static User user;
@@ -28,6 +28,7 @@ public class Client implements NetworkUsers {
     public static GUI gui;
 
     public Client(String ipAddress) {
+        Launcher.connectedUser = this;
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
         clientThread = new ClientThread();
@@ -64,6 +65,8 @@ public class Client implements NetworkUsers {
 
             connectToServer();
 
+            System.out.println(isConnected);
+            System.out.println(isRunning);
             while(isConnected && isRunning) {
                 try {
                     if (socket.getInputStream().available() > 0) {
@@ -172,10 +175,10 @@ public class Client implements NetworkUsers {
         }
 
         private synchronized void disconnectFromServer() {
-            if (!isConnected) {
-                return;
-            }
             try {
+                if (!isConnected) {
+                    return;
+                }
                 isConnected = false;
                 if (output != null && !isServerClosed) {
                     output.writeObject(new Message(DISCONNECTING, null));

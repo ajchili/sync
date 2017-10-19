@@ -25,7 +25,7 @@ import java.util.concurrent.Executors;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
-public class Server implements NetworkUsers {
+public class Server implements NetworkUser {
 
     public static String ipAddress = "";
     public static GUI gui;
@@ -40,6 +40,7 @@ public class Server implements NetworkUsers {
     final static int TOMCAT_PORT = 8080;
 
     public Server() {
+        Launcher.connectedUser = this;
         gui = new GUI(SERVER);
         user = new User(System.getProperty("user.name") + " (host)");
         Sync.connectedUsers.add(user);
@@ -272,7 +273,7 @@ public class Server implements NetworkUsers {
                     sendMediaURL();
                 }
 
-                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused()) {
+                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused) {
                     sendMediaState();
                 }
 
@@ -300,7 +301,7 @@ public class Server implements NetworkUsers {
                 Message message = (Message) input.readObject();
                 isClientConnected = message.getType() == CONNECTING;
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(CONNECTED, null));
+                output.writeObject(new Message(CONNECTED, ""));
                 output.flush();
             } catch(IOException | ClassNotFoundException e) {
                 disconnectClientFromServer();
@@ -370,7 +371,7 @@ public class Server implements NetworkUsers {
 
         private synchronized void sendMediaTime() {
             long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
-                    - user.getMedia().getCurrentTime() + user.getPing());
+                    - user.getMedia().currentTime + user.getPing());
             if (timeDifference > 5000) {
                 try {
                     output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
@@ -391,7 +392,7 @@ public class Server implements NetworkUsers {
 
         private synchronized void sendMediaState() {
             try {
-                user.getMedia().setPaused(GUI.playbackPanel.getMedia().isPaused());
+                user.getMedia().isPaused = GUI.playbackPanel.getMedia().isPaused();
                 output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {

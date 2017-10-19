@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.PlaybackPanel;
 import com.kirinpatel.sync.net.Client;
-import com.kirinpatel.sync.net.NetworkUsers;
+import com.kirinpatel.sync.net.NetworkUser;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.util.UIMessage;
 
@@ -29,7 +29,7 @@ import static java.nio.file.StandardOpenOption.CREATE;
 public final class Launcher extends JFrame {
 
     public static final Launcher INSTANCE = new Launcher();
-    public static NetworkUsers connectedUser;
+    public static NetworkUser connectedUser;
 
     public void open() {
         setTitle("sync");
@@ -94,7 +94,7 @@ public final class Launcher extends JFrame {
 
             switch(type) {
                 case SERVER:
-                    connectedUser = new Server();
+                    new Server();
                     setVisible(false);
                     break;
                 case CLIENT:
@@ -170,7 +170,7 @@ public final class Launcher extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!ipField.getText().isEmpty()) {
-                    connectedUser = new Client(ipField.getText());
+                    new Client(ipField.getText());
                     dispose();
                     setVisible(false);
                 } else {

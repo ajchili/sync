@@ -1,16 +1,44 @@
 package com.kirinpatel.sync.net;
 
+import uk.co.caprica.vlcj.player.Equalizer;
+import uk.co.caprica.vlcj.player.MediaPlayer;
+import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
+
+import java.awt.*;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-public class Media implements Serializable {
+public class Media {
 
-    private String url;
-    private String filePath;
-    private long currentTime = -1;
-    private long length = -1;
-    private float rate = 1.0f;
-    private boolean isPaused = true;
+    private static MediaPlayer mediaPlayer;
+    MediaData data = new MediaData();
+
+    public static class MediaData implements Serializable {
+        String url = "";
+        String filePath;
+        public long currentTime = -1;
+        long length = -1;
+        float rate = 1.0f;
+        public boolean isPaused = false;
+        public String getFormattedTime() {
+            return formatTime(currentTime);
+        }
+
+        void setURL(String url) {
+            this.url = url;
+            this.filePath = "null";
+        }
+
+        String getURL() {
+            return this.url;
+        }
+
+        public void setCurrentTime(long time) {
+            this.currentTime = time;
+        }
+
+    }
 
     public Media(String url) {
         setURL(url);
@@ -20,62 +48,131 @@ public class Media implements Serializable {
         setFilePath(filePath);
     }
 
+    public void initPlayer(MediaPlayerEventListener e, MediaPlayer player) {
+        mediaPlayer = player;
+        mediaPlayer.setStandardMediaOptions();
+        mediaPlayer.setPlaySubItems(true);
+        mediaPlayer.addMediaPlayerEventListener(e);
+
+    }
+
+    public void setEqualizer(Equalizer equalizer) {
+        mediaPlayer.setEqualizer(equalizer);
+    }
+
+    public void play() {
+        if (!getURL().isEmpty() && isPaused()) {
+            setPaused(false);
+            mediaPlayer.play();
+        }
+    }
+
+    public void pause() {
+        if (!getURL().isEmpty() && !isPaused()) {
+                setPaused(true);
+                mediaPlayer.pause();
+        }
+    }
+
+    public void stop() {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
+    }
+
+    public void release() {
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+        }
+    }
+
+    public void setTime(long time) {
+        setCurrentTime(time);
+        mediaPlayer.setTime(time);
+    }
+
+    public void prepareMedia() {
+        if (!getFilePath().equals("null")) {
+            setFilePath(Paths.get(getFilePath()));
+            mediaPlayer.prepareMedia(getFilePath());
+        } else {
+            mediaPlayer.prepareMedia(getURL());
+        }
+    }
+
+    public void parseMedia() {
+        mediaPlayer.parseMedia();
+    }
+
+    public void setVolume(int volume) {
+        mediaPlayer.setVolume(volume);
+    }
+
+    public void initControls() {
+        mediaPlayer.setMarqueeSize(60);
+        mediaPlayer.setMarqueeOpacity(200);
+        mediaPlayer.setMarqueeColour(Color.white);
+        mediaPlayer.setMarqueeTimeout(3500);
+        mediaPlayer.setMarqueeLocation(50, 1000);
+    }
+
     public void setURL(String url) {
-        this.url = url;
-        this.filePath = "null";
+        data.url = url;
+        data.filePath = "null";
     }
 
     public void setFilePath(Path filePath) {
-        this.url = "http://" + Server.ipAddress + ":8080/" + encode(filePath.getFileName().toString());
-        this.filePath = filePath.toAbsolutePath().toString();
+        data.url = "http://" + Server.ipAddress + ":8080/" + encode(filePath.getFileName().toString());
+        data.filePath = filePath.toAbsolutePath().toString();
     }
 
     public void setCurrentTime(long currentTime) {
-        this.currentTime = currentTime;
+        data.currentTime = currentTime;
     }
 
     public void setLength(long length) {
-        this.length = length;
+        data.length = length;
     }
 
     public void setRate(float rate) {
-        this.rate = rate >= 0.75f ? rate : 0.75f;
+        data.rate = rate >= 0.75f ? rate : 0.75f;
+        mediaPlayer.setRate(data.rate);
     }
 
     public void setPaused(boolean isPaused) {
-        this.isPaused = isPaused;
+        data.isPaused = isPaused;
     }
 
     public String getURL() {
-        return url;
+        return data.url;
     }
 
     public String getFilePath() {
-        return filePath;
+        return data.filePath;
     }
 
     public long getCurrentTime() {
-        return currentTime;
+        return data.currentTime;
     }
 
     public long getLength() {
-        return length;
+        return data.length;
     }
 
     public float getRate() {
-        return rate;
+        return data.rate;
     }
 
     public boolean isPaused() {
-        return isPaused;
+        return data.isPaused;
     }
 
     public String getFormattedTime() {
-        return formatTime(currentTime);
+        return formatTime(data.currentTime);
     }
 
     public String getFormattedLength() {
-        return formatTime(length);
+        return formatTime(data.length);
     }
 
     /**
@@ -84,7 +181,7 @@ public class Media implements Serializable {
      * @param value Time
      * @return Time in displayable string format
      */
-    private String formatTime(long value) {
+    private static String formatTime(long value) {
         value /= 1000;
         int hours = (int) value / 3600;
         int remainder = (int) value - hours * 3600;
