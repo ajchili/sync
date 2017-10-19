@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 
 public class Media {
 
-    private MediaPlayer mediaPlayer;
+    private static MediaPlayer mediaPlayer;
     MediaData data = new MediaData();
 
     public static class MediaData implements Serializable {
@@ -48,11 +48,11 @@ public class Media {
         setFilePath(filePath);
     }
 
-    public void initPlayer(MediaPlayerEventListener e, MediaPlayer mediaPlayer) {
-        this.mediaPlayer = mediaPlayer;
-        this.mediaPlayer.setStandardMediaOptions();
-        this.mediaPlayer.setPlaySubItems(true);
-        this.mediaPlayer.addMediaPlayerEventListener(e);
+    public void initPlayer(MediaPlayerEventListener e, MediaPlayer player) {
+        mediaPlayer = player;
+        mediaPlayer.setStandardMediaOptions();
+        mediaPlayer.setPlaySubItems(true);
+        mediaPlayer.addMediaPlayerEventListener(e);
 
     }
 

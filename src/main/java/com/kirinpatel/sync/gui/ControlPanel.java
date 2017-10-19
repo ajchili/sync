@@ -1,8 +1,7 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.Sync;
-import com.kirinpatel.sync.net.Client;
-import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.net.User;
 
 import javax.swing.*;
@@ -179,13 +178,9 @@ public class ControlPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                if (GUI.playbackPanel.type == SERVER) {
-                    Server.sendMessage(Sync.connectedUsers.get(0) + ": " + chatField.getText());
-                    chatField.setText("");
-                } else {
-                    Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());
-                    chatField.setText("");
-                }
+                Launcher.connectedUser.sendMessage(
+                        Launcher.connectedUser.getUser().getUsername() + ": " + chatField.getText());
+                chatField.setText("");
             }
         }
     }

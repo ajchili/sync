@@ -1,5 +1,6 @@
 package com.kirinpatel.sync.net;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.util.UIMessage;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -50,7 +51,7 @@ class TomcatServer {
             tomcat.start();
         } catch(LifecycleException e) {
             // If this fails, close the server
-            Server.stop();
+            Launcher.connectedUser.stop();
             return;
         }
         tomcat.getServer().await();
