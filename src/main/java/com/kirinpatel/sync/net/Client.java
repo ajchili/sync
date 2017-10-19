@@ -1,8 +1,5 @@
 package com.kirinpatel.sync.net;
 
-import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
-import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
-
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.gui.ControlPanel;
@@ -15,6 +12,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
 public class Client implements NetworkUsers {
 
@@ -85,8 +85,7 @@ public class Client implements NetworkUsers {
                                 String mediaURL = (String) message.getMessage();
                                 if (!mediaURL.equals("") && !GUI.playbackPanel.getMedia().getURL().equals(mediaURL)) {
                                     lastSentTime = 0;
-                                    GUI.playbackPanel.getMediaPlayer().getMedia().setURL(mediaURL);
-                                    GUI.playbackPanel.getMediaPlayer().play();
+                                    GUI.playbackPanel.getMediaPlayer().setMedia(new Media(mediaURL));
                                 }
                                 sendMediaURL();
                                 break;
@@ -173,9 +172,12 @@ public class Client implements NetworkUsers {
         }
 
         private synchronized void disconnectFromServer() {
+            if (!isConnected) {
+                return;
+            }
             try {
+                isConnected = false;
                 if (output != null && !isServerClosed) {
-                    isConnected = false;
                     output.writeObject(new Message(DISCONNECTING, null));
                     output.flush();
                 } else if (isServerClosed) {

@@ -10,7 +10,7 @@ public class Media implements Serializable {
     private long currentTime = -1;
     private long length = -1;
     private float rate = 1.0f;
-    private boolean isPaused;
+    private boolean isPaused = true;
 
     public Media(String url) {
         setURL(url);
