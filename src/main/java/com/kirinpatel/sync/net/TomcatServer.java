@@ -51,7 +51,7 @@ class TomcatServer {
             tomcat.start();
         } catch(LifecycleException e) {
             // If this fails, close the server
-            Launcher.connectedUser.stop();
+            Launcher.INSTANCE.connectedUser.stop();
             return;
         }
         tomcat.getServer().await();

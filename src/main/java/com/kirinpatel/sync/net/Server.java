@@ -40,19 +40,32 @@ public class Server implements NetworkUser {
     final static int TOMCAT_PORT = 8080;
 
     public Server() {
-        Launcher.connectedUser = this;
+        Launcher.INSTANCE.connectedUser = this;
         gui = new GUI(SERVER);
         user = new User(System.getProperty("user.name") + " (host)");
         Sync.connectedUsers.add(user);
         Sync.host = Sync.connectedUsers.get(0);
         ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
+        new MediaSelectorGUI(gui);
+        new Thread(server).start();
+    }
+
+    public Server(String mediaURL) {
+        Launcher.INSTANCE.connectedUser = this;
+        gui = new GUI(SERVER);
+        user = new User(System.getProperty("user.name") + " (host)");
+        Sync.connectedUsers.add(user);
+        Sync.host = Sync.connectedUsers.get(0);
+        ControlPanel.getInstance().updateConnectedClients();
+        server = new ServerThread();
+        gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(mediaURL));
         new Thread(server).start();
     }
 
     @Override
     public void stop() {
-        GUI.playbackPanel.getMediaPlayer().release();
+        gui.playbackPanel.getMediaPlayer().release();
         gui.dispose();
         if (Sync.connectedUsers.size() == 1) {
             server.stop();
@@ -70,6 +83,10 @@ public class Server implements NetworkUser {
     public static void kickUser(User user) {
         Sync.connectedUsers.remove(user);
         ControlPanel.getInstance().updateConnectedClients();
+    }
+
+    public GUI getGUI() {
+        return gui;
     }
 
     /**
@@ -104,7 +121,6 @@ public class Server implements NetworkUser {
                 isRunning = true;
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
-                new MediaSelectorGUI();
             } catch (Exception e) {
                 message.showErrorDialogAndExit(e, "Couldn't open server");
                 Server.this.stop();
@@ -237,12 +253,12 @@ public class Server implements NetworkUser {
                                 break;
                             case MEDIA_TIME:
                                 user.getMedia().setCurrentTime((long) message.getMessage());
-                                if (GUI.playbackPanel.getMedia().getCurrentTime() != -1) {
+                                if (gui.playbackPanel.getMedia().getCurrentTime() != -1) {
                                     sendMediaTime();
                                 }
                                 break;
                             case MEDIA_STATE:
-                                if (GUI.playbackPanel.getMedia().isPaused() != (boolean) message.getMessage()) {
+                                if (gui.playbackPanel.getMedia().isPaused() != (boolean) message.getMessage()) {
                                     sendMediaState();
                                 }
                                 break;
@@ -269,11 +285,11 @@ public class Server implements NetworkUser {
 
                 if (System.currentTimeMillis() > lastMediaUpdate + 5000
                         || (user != null
-                        && !user.getMedia().getURL().equals(GUI.playbackPanel.getMedia().getURL()))) {
+                        && !user.getMedia().getURL().equals(gui.playbackPanel.getMedia().getURL()))) {
                     sendMediaURL();
                 }
 
-                if (user != null && GUI.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused) {
+                if (user != null && gui.playbackPanel.getMedia().isPaused() != user.getMedia().isPaused) {
                     sendMediaState();
                 }
 
@@ -362,7 +378,7 @@ public class Server implements NetworkUser {
             try {
                 lastMediaUpdate = System.currentTimeMillis();
                 output.flush();
-                output.writeObject(new Message(MEDIA_URL, GUI.playbackPanel.getMedia().getURL()));
+                output.writeObject(new Message(MEDIA_URL, gui.playbackPanel.getMedia().getURL()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
@@ -370,11 +386,11 @@ public class Server implements NetworkUser {
         }
 
         private synchronized void sendMediaTime() {
-            long timeDifference = Math.abs(GUI.playbackPanel.getMedia().getCurrentTime()
+            long timeDifference = Math.abs(gui.playbackPanel.getMedia().getCurrentTime()
                     - user.getMedia().currentTime + user.getPing());
             if (timeDifference > 5000) {
                 try {
-                    output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
+                    output.writeObject(new Message(MEDIA_TIME, gui.playbackPanel.getMedia().getCurrentTime()));
                     output.flush();
                 } catch(IOException e) {
                     disconnectClientFromServer();
@@ -392,8 +408,8 @@ public class Server implements NetworkUser {
 
         private synchronized void sendMediaState() {
             try {
-                user.getMedia().isPaused = GUI.playbackPanel.getMedia().isPaused();
-                output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
+                user.getMedia().isPaused = gui.playbackPanel.getMedia().isPaused();
+                output.writeObject(new Message(MEDIA_STATE, gui.playbackPanel.getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();

@@ -14,7 +14,7 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 public class GUI extends JFrame {
 
     private final PlaybackPanel.PANEL_TYPE type;
-    public static PlaybackPanel playbackPanel;
+    public PlaybackPanel playbackPanel;
 
     /**
      * Primary constructor that will create the GUI of sync.
@@ -32,12 +32,12 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         addComponentListener(new ResizeListener());
 
-        playbackPanel = new PlaybackPanel(type);
+        playbackPanel = new PlaybackPanel(type, this);
         add(playbackPanel, BorderLayout.CENTER);
         ControlPanel.setInstance(this);
         ControlPanel.getInstance().resizePanel(getHeight());
         add(ControlPanel.getInstance(), BorderLayout.EAST);
-        setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel));
+        setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel, this));
 
         setVisible(type == CLIENT);
     }
@@ -64,8 +64,8 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            if (Launcher.connectedUser != null) {
-                Launcher.connectedUser.stop();
+            if (Launcher.INSTANCE.connectedUser != null) {
+                Launcher.INSTANCE.connectedUser.stop();
             }
         }
     }

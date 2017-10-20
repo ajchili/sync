@@ -39,17 +39,17 @@ public class PlaybackPanel extends JPanel {
         }
     }
 
-    PlaybackPanel(PANEL_TYPE type) {
+    PlaybackPanel(PANEL_TYPE type, GUI gui) {
         super(new BorderLayout());
         this.type = type;
 
-        initMediaPlayer();
+        initMediaPlayer(gui);
     }
 
-    private void initMediaPlayer() {
+    private void initMediaPlayer(GUI gui) {
         fullscreenListener = new FullscreenListener();
 
-        mediaPlayer = new VLCJMediaPlayer();
+        mediaPlayer = new VLCJMediaPlayer(gui);
         add(mediaPlayer, BorderLayout.CENTER);
         mediaPlayer.addMouseListener(fullscreenListener);
 

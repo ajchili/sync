@@ -19,6 +19,7 @@ import static com.kirinpatel.sync.gui.MediaSelectorGUI.MEDIA_TYPE.*;
  * The MediaSelectorGUI will display a gui to the user when prompted and allow for on start media selection to occur.
  */
 public class MediaSelectorGUI extends JFrame {
+    private GUI gui;
 
     public enum MEDIA_TYPE {
         OFFLINE(0),
@@ -43,12 +44,13 @@ public class MediaSelectorGUI extends JFrame {
     /**
      * Main constructor that will create and display the MediaSelectorGUI.
      */
-    public MediaSelectorGUI() {
+    public MediaSelectorGUI(GUI gui) {
         super("sync");
 
         if (isOpened) {
             return;
         }
+        this.gui = gui;
 
         setSize(new Dimension(200, 100));
         setResizable(false);
@@ -122,9 +124,9 @@ public class MediaSelectorGUI extends JFrame {
                     String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
                     if (mediaURL != null && !mediaURL.isEmpty()) {
                         if (mediaURL.startsWith("http")) {
-                            GUI.playbackPanel.getMediaPlayer().setMediaSource(new Media(mediaURL));
+                            gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(mediaURL));
                         } else {
-                            GUI.playbackPanel.getMediaPlayer().setMediaSource(new Media("http://" + mediaURL));
+                            gui.playbackPanel.getMediaPlayer().setMediaSource(new Media("http://" + mediaURL));
                         }
                     } else {
                         if (mediaURL != null) {
@@ -137,7 +139,7 @@ public class MediaSelectorGUI extends JFrame {
                 case OFFLINE:
                     File mediaFile = FileSelector.getFile(null);
                     if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                        GUI.playbackPanel.getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
+                        gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
                     } else {
                         if (mediaFile != null) {
                             UIMessage.showMessageDialog(
