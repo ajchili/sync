@@ -11,7 +11,7 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 public class PlaybackPanel extends JPanel {
 
     private VLCJMediaPlayer mediaPlayer;
-    static JButton pauseMedia;
+    JButton pauseMedia;
     final PANEL_TYPE type;
     JLabel mediaPositionLabel;
     JSlider mediaPosition;
@@ -262,7 +262,7 @@ public class PlaybackPanel extends JPanel {
                             break;
                         // Space bar
                         case 32:
-                            if (playbackPanel.isFullscreen && PlaybackPanel.pauseMedia.isEnabled()) {
+                            if (playbackPanel.isFullscreen) {
                                 if (mediaPlayer.isPaused()) {
                                     mediaPlayer.play();
                                 } else {

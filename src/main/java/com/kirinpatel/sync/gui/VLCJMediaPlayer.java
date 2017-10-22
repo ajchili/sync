@@ -41,7 +41,7 @@ public class VLCJMediaPlayer extends JPanel {
 
     private final BufferedImage image;
     private BufferedImage scale;
-    private static Media media;
+    private Media media;
     private boolean isScrubbing = false;
     private boolean isFile = false;
     private final GUI gui;
@@ -85,7 +85,7 @@ public class VLCJMediaPlayer extends JPanel {
                 ControlPanel.getInstance().updateConnectedClients();
             }
 
-            PlaybackPanel.pauseMedia.addActionListener(e -> {
+            gui.playbackPanel.pauseMedia.addActionListener(e -> {
                 try {
                     if (media.isPaused()) {
                         media.play();
@@ -141,7 +141,7 @@ public class VLCJMediaPlayer extends JPanel {
             });
         }
 
-        PlaybackPanel.pauseMedia.setText(">");
+        gui.playbackPanel.pauseMedia.setText(">");
         media.initControls();
         gui.playbackPanel.mediaPosition.setMaximum(1000);
         media.setPaused(true);
@@ -185,7 +185,7 @@ public class VLCJMediaPlayer extends JPanel {
 
     public void setMedia(Media media) {
         isFile = false;
-        VLCJMediaPlayer.media = media;
+        this.media = media;
         try {
             media.prepareMedia();
             media.parseMedia();
@@ -202,14 +202,14 @@ public class VLCJMediaPlayer extends JPanel {
     }
 
     public void setMediaSource(Media media) {
-        if (!media.getURL().equals(VLCJMediaPlayer.media.getURL())|| !media.getFilePath().equals(VLCJMediaPlayer.media.getFilePath())) {
-            VLCJMediaPlayer.media.setURL(media.getURL());
+        if (!media.getURL().equals(this.media.getURL())|| !media.getFilePath().equals(this.media.getFilePath())) {
+            this.media.setURL(media.getURL());
             isFile = !media.getFilePath().equals("null");
             if (isFile) {
-                VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
+                this.media.setFilePath(Paths.get(media.getFilePath()));
             }
-            VLCJMediaPlayer.media.prepareMedia();
-            VLCJMediaPlayer.media.parseMedia();
+            this.media.prepareMedia();
+            this.media.parseMedia();
             initControls();
         }
     }
@@ -313,7 +313,7 @@ public class VLCJMediaPlayer extends JPanel {
         public void playing(MediaPlayer mediaPlayer) {
             media.setPaused(false);
             media.setLength(mediaPlayer.getLength());
-            PlaybackPanel.pauseMedia.setText("||");
+            gui.playbackPanel.pauseMedia.setText("||");
 
             mediaPlayer.setMarqueeText("Playing");
             mediaPlayer.enableMarquee(true);
@@ -323,7 +323,7 @@ public class VLCJMediaPlayer extends JPanel {
         public void paused(MediaPlayer mediaPlayer) {
             media.setPaused(true);
             media.setLength(mediaPlayer.getLength());
-            PlaybackPanel.pauseMedia.setText(">");
+            gui.playbackPanel.pauseMedia.setText(">");
 
             mediaPlayer.setMarqueeText("Paused");
             mediaPlayer.enableMarquee(true);
@@ -347,7 +347,7 @@ public class VLCJMediaPlayer extends JPanel {
         @Override
         public void finished(MediaPlayer mediaPlayer) {
             gui.playbackPanel.mediaPosition.setValue(0);
-            PlaybackPanel.pauseMedia.setText(">");
+            gui.playbackPanel.pauseMedia.setText(">");
             media.setPaused(true);
         }
 

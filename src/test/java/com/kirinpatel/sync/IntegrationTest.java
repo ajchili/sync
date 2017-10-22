@@ -18,8 +18,8 @@ public class IntegrationTest {
     @Before
     public void setup() {
         new NativeDiscovery().discover();
-        server = new Server("https://www.youtube.com/watch?v=w3loNUo7zuA");
-        sleep(Duration.ofSeconds(5));
+        server = new Server("https://www.youtube.com/watch?v=Uqpd9Ff9SpQ");
+        sleep(Duration.ofSeconds(10));
         client = new Client("localhost");
     }
 

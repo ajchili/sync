@@ -141,7 +141,6 @@ public class Client implements NetworkUser {
 
         void stop() {
             isRunning = false;
-
             isConnected = false;
         }
 
@@ -163,6 +162,7 @@ public class Client implements NetworkUser {
                 Message message = (Message) input.readObject();
                 isConnected = message.getType() == CONNECTED;
             } catch(IOException | ClassNotFoundException e) {
+                UIMessage.showErrorDialog(e, "Couldn't connect to server!");
                 disconnectFromServer();
             }
 
@@ -212,6 +212,7 @@ public class Client implements NetworkUser {
                 output.writeObject(new Message(CLIENT_NAME, user.getUsername()));
                 output.flush();
             } catch(IOException e) {
+                UIMessage.showErrorDialog(e, "Couldn't connect to server!");
                 disconnectFromServer();
             }
         }
@@ -229,8 +230,9 @@ public class Client implements NetworkUser {
 
         private synchronized void sendMediaURL() {
             try {
-                output.flush();
-                output.writeObject(new Message(MEDIA_URL, gui.playbackPanel.getMedia().getURL()));
+                output.reset();
+                Message message = new Message(MEDIA_URL, gui.playbackPanel.getMedia().getURL());
+                output.writeObject(message);
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
