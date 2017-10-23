@@ -29,7 +29,9 @@ import static java.nio.file.StandardOpenOption.CREATE;
 public final class Launcher extends JFrame {
 
     public static final Launcher INSTANCE = new Launcher();
-    public static NetworkUser connectedUser;
+    public NetworkUser connectedUser;
+
+    private Launcher() {}
 
     public void open() {
         setTitle("sync");

@@ -11,7 +11,7 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 public class PlaybackPanel extends JPanel {
 
     private VLCJMediaPlayer mediaPlayer;
-    static JButton pauseMedia;
+    JButton pauseMedia;
     final PANEL_TYPE type;
     JLabel mediaPositionLabel;
     JSlider mediaPosition;
@@ -39,17 +39,17 @@ public class PlaybackPanel extends JPanel {
         }
     }
 
-    PlaybackPanel(PANEL_TYPE type) {
+    PlaybackPanel(PANEL_TYPE type, GUI gui) {
         super(new BorderLayout());
         this.type = type;
 
-        initMediaPlayer();
+        initMediaPlayer(gui);
     }
 
-    private void initMediaPlayer() {
+    private void initMediaPlayer(GUI gui) {
         fullscreenListener = new FullscreenListener();
 
-        mediaPlayer = new VLCJMediaPlayer();
+        mediaPlayer = new VLCJMediaPlayer(gui);
         add(mediaPlayer, BorderLayout.CENTER);
         mediaPlayer.addMouseListener(fullscreenListener);
 
@@ -262,7 +262,7 @@ public class PlaybackPanel extends JPanel {
                             break;
                         // Space bar
                         case 32:
-                            if (playbackPanel.isFullscreen && PlaybackPanel.pauseMedia.isEnabled()) {
+                            if (playbackPanel.isFullscreen) {
                                 if (mediaPlayer.isPaused()) {
                                     mediaPlayer.play();
                                 } else {
