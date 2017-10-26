@@ -1,8 +1,7 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.Sync;
-import com.kirinpatel.sync.net.Client;
-import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.net.User;
 import com.kirinpatel.sync.util.Theme;
 
@@ -73,7 +72,6 @@ public class ControlPanel extends JPanel {
                             setBackground(Color.YELLOW);
                         }
                     }
-
                     if (!isUserDisplayShown && GUI.playbackPanel.type
                             == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
@@ -212,13 +210,9 @@ public class ControlPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                if (GUI.playbackPanel.type == SERVER) {
-                    Server.sendMessage(Sync.connectedUsers.get(0) + ": " + chatField.getText());
-                    chatField.setText("");
-                } else {
-                    Client.sendMessage(Client.user.getUsername() + ": " + chatField.getText());
-                    chatField.setText("");
-                }
+                Launcher.INSTANCE.connectedUser.sendMessage(
+                        Launcher.INSTANCE.connectedUser.getUser().getUsername() + ": " + chatField.getText());
+                chatField.setText("");
             }
         }
     }

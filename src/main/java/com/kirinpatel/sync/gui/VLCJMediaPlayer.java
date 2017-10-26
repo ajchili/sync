@@ -1,5 +1,6 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Media;
 import com.kirinpatel.sync.net.Server;
@@ -40,14 +41,16 @@ public class VLCJMediaPlayer extends JPanel {
 
     private final BufferedImage image;
     private BufferedImage scale;
-    private static Media media;
+    private Media media;
     private boolean isScrubbing = false;
     private boolean isFile = false;
+    private final GUI gui;
 
     /**
      * Constructor that will return a MediaPlayer.
      */
-    VLCJMediaPlayer() {
+    VLCJMediaPlayer(GUI gui) {
+        this.gui = gui;
         setBackground(Color.BLACK);
         setOpaque(true);
 
@@ -76,13 +79,13 @@ public class VLCJMediaPlayer extends JPanel {
      * Initialize media controls or reset them after media is changed.
      */
     private void initControls() {
-        if (GUI.playbackPanel.type == SERVER) {
+        if (gui.playbackPanel.type == SERVER) {
             for (User client : Sync.connectedUsers) {
                 client.getMedia().setCurrentTime(0);
                 ControlPanel.getInstance().updateConnectedClients();
             }
 
-            PlaybackPanel.pauseMedia.addActionListener(e -> {
+            gui.playbackPanel.pauseMedia.addActionListener(e -> {
                 try {
                     if (media.isPaused()) {
                         media.play();
@@ -91,7 +94,7 @@ public class VLCJMediaPlayer extends JPanel {
                     }
                 } catch (Error error) {
                     // Stop if Invalid memory access occurs
-                    if (GUI.playbackPanel.type == SERVER) {
+                    if (gui.playbackPanel.type == SERVER) {
                         new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
                                         "Forcefully closing sync, please restart sync."),
                                 "Media was unable to be set.");
@@ -103,7 +106,7 @@ public class VLCJMediaPlayer extends JPanel {
                 }
             });
 
-            GUI.playbackPanel.mediaPosition.addMouseListener(new MouseListener() {
+            gui.playbackPanel.mediaPosition.addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
 
@@ -130,17 +133,17 @@ public class VLCJMediaPlayer extends JPanel {
                 }
             });
 
-            GUI.playbackPanel.mediaPosition.addChangeListener(e -> {
+            gui.playbackPanel.mediaPosition.addChangeListener(e -> {
                 if (isScrubbing) {
-                    int position = GUI.playbackPanel.mediaPosition.getValue();
+                    int position = gui.playbackPanel.mediaPosition.getValue();
                     media.setTime(position * media.getLength() / 1000);
                 }
             });
         }
 
-        PlaybackPanel.pauseMedia.setText(">");
+        gui.playbackPanel.pauseMedia.setText(">");
         media.initControls();
-        GUI.playbackPanel.mediaPosition.setMaximum(1000);
+        gui.playbackPanel.mediaPosition.setMaximum(1000);
         media.setPaused(true);
     }
 
@@ -168,7 +171,7 @@ public class VLCJMediaPlayer extends JPanel {
         } catch (Error e) {
             // Stop if Invalid memory access occurs
             e.printStackTrace();
-            if (GUI.playbackPanel.type == SERVER) {
+            if (gui.playbackPanel.type == SERVER) {
                 new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to release media player.\n" +
                                 "Forcefully closing sync, please restart sync."),
                         "Media was unable to be set.");
@@ -182,31 +185,31 @@ public class VLCJMediaPlayer extends JPanel {
 
     public void setMedia(Media media) {
         isFile = false;
-        VLCJMediaPlayer.media = media;
+        this.media = media;
         try {
             media.prepareMedia();
             media.parseMedia();
             initControls();
         } catch (Error e) {
             // Stop client if Invalid memory access occurs
-            if (GUI.playbackPanel.type == CLIENT) {
+            if (gui.playbackPanel.type == CLIENT) {
                 new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to set media.\n" +
                                 "Please restart sync and reconnect to the sync server."),
                         "Media was unable to be set.");
-                Client.stop();
+                Launcher.INSTANCE.connectedUser.stop();
             }
         }
     }
 
-    void setMediaSource(Media media) {
-        if (!media.getURL().equals(VLCJMediaPlayer.media.getURL())|| !media.getFilePath().equals(VLCJMediaPlayer.media.getFilePath())) {
-            VLCJMediaPlayer.media.setURL(media.getURL());
+    public void setMediaSource(Media media) {
+        if (!media.getURL().equals(this.media.getURL())|| !media.getFilePath().equals(this.media.getFilePath())) {
+            this.media.setURL(media.getURL());
             isFile = !media.getFilePath().equals("null");
             if (isFile) {
-                VLCJMediaPlayer.media.setFilePath(Paths.get(media.getFilePath()));
+                this.media.setFilePath(Paths.get(media.getFilePath()));
             }
-            VLCJMediaPlayer.media.prepareMedia();
-            VLCJMediaPlayer.media.parseMedia();
+            this.media.prepareMedia();
+            this.media.parseMedia();
             initControls();
         }
     }
@@ -277,7 +280,7 @@ public class VLCJMediaPlayer extends JPanel {
             scale = scaleOp.filter(image, after);
             repaint();
             if (Sync.connectedUsers.size() > 0) {
-                if (GUI.playbackPanel.type == SERVER) {
+                if (gui.playbackPanel.type == SERVER) {
                     Sync.connectedUsers.get(0).getMedia().setCurrentTime(media.getCurrentTime());
                 } else {
                     Client.user.getMedia().setCurrentTime(media.getCurrentTime());
@@ -298,7 +301,7 @@ public class VLCJMediaPlayer extends JPanel {
 
         @Override
         public void opening(MediaPlayer mediaPlayer) {
-            mediaPlayer.setVolume(GUI.playbackPanel.mediaVolume.getValue());
+            mediaPlayer.setVolume(gui.playbackPanel.mediaVolume.getValue());
         }
 
         @Override
@@ -310,7 +313,7 @@ public class VLCJMediaPlayer extends JPanel {
         public void playing(MediaPlayer mediaPlayer) {
             media.setPaused(false);
             media.setLength(mediaPlayer.getLength());
-            PlaybackPanel.pauseMedia.setText("||");
+            gui.playbackPanel.pauseMedia.setText("||");
 
             mediaPlayer.setMarqueeText("Playing");
             mediaPlayer.enableMarquee(true);
@@ -320,7 +323,7 @@ public class VLCJMediaPlayer extends JPanel {
         public void paused(MediaPlayer mediaPlayer) {
             media.setPaused(true);
             media.setLength(mediaPlayer.getLength());
-            PlaybackPanel.pauseMedia.setText(">");
+            gui.playbackPanel.pauseMedia.setText(">");
 
             mediaPlayer.setMarqueeText("Paused");
             mediaPlayer.enableMarquee(true);
@@ -343,8 +346,8 @@ public class VLCJMediaPlayer extends JPanel {
 
         @Override
         public void finished(MediaPlayer mediaPlayer) {
-            GUI.playbackPanel.mediaPosition.setValue(0);
-            PlaybackPanel.pauseMedia.setText(">");
+            gui.playbackPanel.mediaPosition.setValue(0);
+            gui.playbackPanel.pauseMedia.setText(">");
             media.setPaused(true);
         }
 
@@ -352,9 +355,9 @@ public class VLCJMediaPlayer extends JPanel {
         public void timeChanged(MediaPlayer mediaPlayer, long length) {
             if (!isScrubbing) {
                 media.setCurrentTime(length);
-                GUI.playbackPanel.mediaPositionLabel.setText(
+                gui.playbackPanel.mediaPositionLabel.setText(
                         media.getFormattedTime() + " / " + media.getFormattedLength());
-                GUI.playbackPanel.mediaPosition.setValue(
+                gui.playbackPanel.mediaPosition.setValue(
                         (int) (media.getCurrentTime() * 1000 / media.getLength()));
             }
         }

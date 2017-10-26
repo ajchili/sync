@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.util.Theme;
 
@@ -9,12 +9,13 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
-import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
+import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class GUI extends JFrame {
 
     private final PlaybackPanel.PANEL_TYPE type;
-    public static PlaybackPanel playbackPanel;
+    public PlaybackPanel playbackPanel;
 
     public GUI(PlaybackPanel.PANEL_TYPE type) {
         super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
@@ -28,12 +29,12 @@ public class GUI extends JFrame {
         setLocationRelativeTo(null);
         addComponentListener(new ResizeListener());
 
-        playbackPanel = new PlaybackPanel(type);
+        playbackPanel = new PlaybackPanel(type, this);
         add(playbackPanel, BorderLayout.CENTER);
         ControlPanel.setInstance(this);
         ControlPanel.getInstance().resizePanel(getHeight());
         add(ControlPanel.getInstance(), BorderLayout.EAST);
-        setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel));
+        setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel, this));
 
         setVisible(type == CLIENT);
     }
@@ -57,10 +58,8 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            if (type == SERVER) {
-                Server.stop();
-            } else {
-                Client.stop();
+            if (Launcher.INSTANCE.connectedUser != null) {
+                Launcher.INSTANCE.connectedUser.stop();
             }
         }
     }

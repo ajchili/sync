@@ -1,5 +1,6 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.util.Theme;
@@ -15,7 +16,7 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
 
 class MenuBar extends JMenuBar {
 
-    MenuBar(PlaybackPanel playbackPanel) {
+    MenuBar(PlaybackPanel playbackPanel, GUI gui) {
         super();
 
         addMouseListener(new MouseListener() {
@@ -59,7 +60,7 @@ class MenuBar extends JMenuBar {
         JMenu menu = new JMenu("sync");
 
         JMenuItem file = new JMenuItem("Set Media");
-        file.addActionListener(e -> new MediaSelectorGUI());
+        file.addActionListener(e -> new MediaSelectorGUI(gui));
         if (playbackPanel.type == SERVER) {
             menu.add(file);
             menu.add(new JSeparator());
@@ -77,11 +78,7 @@ class MenuBar extends JMenuBar {
 
         JMenuItem close = new JMenuItem("Close sync");
         close.addActionListener(e -> {
-            if (playbackPanel.type == SERVER) {
-                Server.stop();
-            } else {
-                Client.stop();
-            }
+            Launcher.INSTANCE.connectedUser.stop();
         });
         menu.add(close);
         add(menu);

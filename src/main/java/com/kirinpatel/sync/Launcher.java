@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.PlaybackPanel;
 import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.net.NetworkUser;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.util.UIMessage;
 
@@ -28,6 +29,9 @@ import static java.nio.file.StandardOpenOption.CREATE;
 public final class Launcher extends JFrame {
 
     public static final Launcher INSTANCE = new Launcher();
+    public NetworkUser connectedUser;
+
+    private Launcher() {}
 
     public void open() {
         setTitle("sync");

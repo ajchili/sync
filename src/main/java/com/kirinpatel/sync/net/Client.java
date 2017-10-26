@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.sync.util.Message.MESSAGE_TYPE.*;
 
-public class Client {
+public class Client implements NetworkUser {
 
     public static String ipAddress;
     public static User user;
@@ -28,6 +28,7 @@ public class Client {
     public static GUI gui;
 
     public Client(String ipAddress) {
+        Launcher.INSTANCE.connectedUser = this;
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
         clientThread = new ClientThread();
@@ -35,14 +36,20 @@ public class Client {
         new Thread(clientThread).start();
     }
 
-    public static void stop() {
-        GUI.playbackPanel.getMediaPlayer().release();
+    @Override
+    public void stop() {
+        gui.playbackPanel.getMediaPlayer().release();
         gui.dispose();
         clientThread.stop();
     }
-
-    public static void sendMessage(String message) {
+    @Override
+    public void sendMessage(String message) {
         messages.add(message);
+    }
+
+    @Override
+    public User getUser() {
+        return user;
     }
 
     class ClientThread implements Runnable {
@@ -58,8 +65,6 @@ public class Client {
 
             connectToServer();
 
-            System.out.println(isConnected);
-            System.out.println(isRunning);
             while(isConnected && isRunning) {
                 try {
                     if (socket.getInputStream().available() > 0) {
@@ -79,31 +84,31 @@ public class Client {
                                 break;
                             case MEDIA_URL:
                                 String mediaURL = (String) message.getMessage();
-                                if (!mediaURL.equals("") && !GUI.playbackPanel.getMedia().getURL().equals(mediaURL)) {
+                                if (!mediaURL.equals("") && !gui.playbackPanel.getMedia().getURL().equals(mediaURL)) {
                                     lastSentTime = 0;
-                                    GUI.playbackPanel.getMediaPlayer().setMedia(new Media(mediaURL));
+                                    gui.playbackPanel.getMediaPlayer().setMedia(new Media(mediaURL));
                                 }
                                 sendMediaURL();
                                 break;
                             case MEDIA_TIME:
                                 long time = (long) message.getMessage();
-                                if (!GUI.playbackPanel.getMedia().isPaused()) {
-                                    GUI.playbackPanel.getMediaPlayer().seekTo(time);
+                                if (!gui.playbackPanel.getMedia().isPaused()) {
+                                    gui.playbackPanel.getMediaPlayer().seekTo(time);
                                 }
                                 break;
                             case MEDIA_RATE:
                                 float rate = (float) message.getMessage();
-                                if (!GUI.playbackPanel.getMedia().isPaused()) {
-                                    GUI.playbackPanel.getMediaPlayer().setRate(rate);
+                                if (!gui.playbackPanel.getMedia().isPaused()) {
+                                    gui.playbackPanel.getMediaPlayer().setRate(rate);
                                 }
                                 break;
                             case MEDIA_STATE:
                                 boolean isServerPaused = (boolean) message.getMessage();
-                                if (isServerPaused != GUI.playbackPanel.getMediaPlayer().isPaused()) {
+                                if (isServerPaused != gui.playbackPanel.getMediaPlayer().isPaused()) {
                                     if (isServerPaused) {
-                                        GUI.playbackPanel.getMediaPlayer().pause();
+                                        gui.playbackPanel.getMediaPlayer().pause();
                                     } else {
-                                        GUI.playbackPanel.getMediaPlayer().play();
+                                        gui.playbackPanel.getMediaPlayer().play();
                                     }
                                 }
                                 break;
@@ -136,7 +141,6 @@ public class Client {
 
         void stop() {
             isRunning = false;
-
             isConnected = false;
         }
 
@@ -158,6 +162,7 @@ public class Client {
                 Message message = (Message) input.readObject();
                 isConnected = message.getType() == CONNECTED;
             } catch(IOException | ClassNotFoundException e) {
+                UIMessage.showErrorDialog(e, "Couldn't connect to server!");
                 disconnectFromServer();
             }
 
@@ -169,8 +174,11 @@ public class Client {
 
         private synchronized void disconnectFromServer() {
             try {
+                if (!isConnected) {
+                    return;
+                }
+                isConnected = false;
                 if (output != null && !isServerClosed) {
-                    isConnected = false;
                     output.writeObject(new Message(DISCONNECTING, null));
                     output.flush();
                 } else if (isServerClosed) {
@@ -183,7 +191,7 @@ public class Client {
                     socket.close();
                 }
             } catch(IOException e) {
-                Client.stop();
+                Client.this.stop();
             } finally {
                 Launcher.INSTANCE.open();
             }
@@ -204,6 +212,7 @@ public class Client {
                 output.writeObject(new Message(CLIENT_NAME, user.getUsername()));
                 output.flush();
             } catch(IOException e) {
+                UIMessage.showErrorDialog(e, "Couldn't connect to server!");
                 disconnectFromServer();
             }
         }
@@ -221,8 +230,9 @@ public class Client {
 
         private synchronized void sendMediaURL() {
             try {
-                output.flush();
-                output.writeObject(new Message(MEDIA_URL, GUI.playbackPanel.getMedia().getURL()));
+                output.reset();
+                Message message = new Message(MEDIA_URL, gui.playbackPanel.getMedia().getURL());
+                output.writeObject(message);
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
@@ -233,7 +243,7 @@ public class Client {
             try {
                 lastSentTime = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(MEDIA_TIME, GUI.playbackPanel.getMedia().getCurrentTime()));
+                output.writeObject(new Message(MEDIA_TIME, gui.playbackPanel.getMedia().getCurrentTime()));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
@@ -244,7 +254,7 @@ public class Client {
             try {
                 lastSentState = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(MEDIA_STATE, GUI.playbackPanel.getMedia().isPaused()));
+                output.writeObject(new Message(MEDIA_STATE, gui.playbackPanel.getMedia().isPaused()));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
