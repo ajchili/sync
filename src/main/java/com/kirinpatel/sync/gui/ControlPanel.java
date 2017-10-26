@@ -72,8 +72,8 @@ public class ControlPanel extends JPanel {
                             setBackground(Color.YELLOW);
                         }
                     }
-                    if (!isUserDisplayShown && GUI.playbackPanel.type
-                            == SERVER && isSelected && cellHasFocus && index > 0) {
+
+                    if (!isUserDisplayShown && gui.playbackPanel.type == SERVER && isSelected && cellHasFocus && index > 0) {
                         isUserDisplayShown = true;
                         chatWindow.requestFocus();
                         new ClientInfoGUI(user);
