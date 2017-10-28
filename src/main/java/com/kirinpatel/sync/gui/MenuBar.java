@@ -3,10 +3,14 @@ package com.kirinpatel.sync.gui;
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
+import com.kirinpatel.sync.util.Theme;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.*;
 
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.*;
 
@@ -14,6 +18,44 @@ class MenuBar extends JMenuBar {
 
     MenuBar(PlaybackPanel playbackPanel, GUI gui) {
         super();
+
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (!playbackPanel.getMedia().isPaused()) {
+                    playbackPanel.repaint();
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                if (!playbackPanel.getMedia().isPaused()) {
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2500);
+                            playbackPanel.repaint();
+                        } catch (InterruptedException e1) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }).start();
+                }
+             }
+        });
 
         JMenu menu = new JMenu("sync");
 
@@ -46,10 +88,15 @@ class MenuBar extends JMenuBar {
         JMenu ui = new JMenu("Interface Settings");
 
         JMenuItem fullscreen = new JMenuItem("Launch Fullscreen");
-        fullscreen.addActionListener(e -> {
-            playbackPanel.initFullscreen();
-        });
+        fullscreen.addActionListener(e -> playbackPanel.initFullscreen());
         ui.add(fullscreen);
+
+        JRadioButtonMenuItem darkMode = new JRadioButtonMenuItem("Dark Mode");
+        darkMode.addActionListener(e -> {
+            Theme.isDarkModeEnabled = darkMode.isSelected();
+            ControlPanel.getInstance().setUIMode();
+        });
+        ui.add(darkMode);
         ui.add(new JSeparator());
 
         JMenu controlPanel = new JMenu("Control Panel");

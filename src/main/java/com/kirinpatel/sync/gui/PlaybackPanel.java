@@ -1,6 +1,7 @@
 package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.net.Media;
+import com.kirinpatel.sync.util.Theme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,6 +43,7 @@ public class PlaybackPanel extends JPanel {
     PlaybackPanel(PANEL_TYPE type, GUI gui) {
         super(new BorderLayout());
         this.type = type;
+        setBackground(Theme.DARK_MODE_BACKGROUND);
 
         initMediaPlayer(gui);
     }

@@ -140,7 +140,7 @@ public final class Launcher extends JFrame {
             });
             setLocationRelativeTo(null);
 
-            JLabel label = new JLabel("Please enter or select the sync server you would like to join");
+            JLabel label = new JLabel("Please enter or select the server you want to join");
             label.setHorizontalAlignment(SwingConstants.CENTER);
             add(label);
 
