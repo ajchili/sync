@@ -1,5 +1,6 @@
 package com.kirinpatel.sync;
 
+import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.User;
 import com.kirinpatel.sync.util.UIMessage;
 import jdk.nashorn.api.scripting.URLReader;
@@ -26,10 +27,14 @@ public final class Sync {
                 | ClassNotFoundException e) {
             UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
         }
-        verifyDependencies();
+        if (args.length > 1 && args[0].equals("connect")) {
+            verifyDependencies(true, args[1]);
+        } else {
+            verifyDependencies(false, "");
+        }
     }
 
-    private static void verifyDependencies() {
+    private static void verifyDependencies(boolean shouldAutoConnect, String ipAddress) {
         if (!new NativeDiscovery().discover()) {
             UIMessage.showErrorDialog(
                     new IllegalStateException("Unable to load VLCJ or Java." +
@@ -40,6 +45,10 @@ public final class Sync {
             checkForMessage();
             checkVersion();
             Launcher.INSTANCE.open();
+            if (shouldAutoConnect) {
+                Launcher.INSTANCE.setVisible(false);
+                new Client(ipAddress);
+            }
         }
     }
 
