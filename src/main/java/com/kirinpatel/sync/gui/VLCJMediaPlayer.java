@@ -31,9 +31,6 @@ import java.nio.file.Paths;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
-/**
- * Modified JPanel that will play media for the sync application.
- */
 public class VLCJMediaPlayer extends JPanel {
 
     private static final int WIDTH = 1280;
@@ -46,9 +43,6 @@ public class VLCJMediaPlayer extends JPanel {
     private boolean isFile = false;
     private final GUI gui;
 
-    /**
-     * Constructor that will return a MediaPlayer.
-     */
     VLCJMediaPlayer(GUI gui) {
         this.gui = gui;
         setBackground(Color.BLACK);
@@ -75,9 +69,6 @@ public class VLCJMediaPlayer extends JPanel {
         media.setEqualizer(equalizer);
     }
 
-    /**
-     * Initialize media controls or reset them after media is changed.
-     */
     private void initControls() {
         if (gui.playbackPanel.type == SERVER) {
             for (User client : Sync.connectedUsers) {
