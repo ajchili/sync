@@ -2,9 +2,6 @@ package com.kirinpatel.sync.util;
 
 import java.io.Serializable;
 
-/**
- * Message object used to send/receive data between clients and a server.
- */
 public class Message implements Serializable {
 
     private MESSAGE_TYPE type;
@@ -41,22 +38,11 @@ public class Message implements Serializable {
         this.message = message;
     }
 
-    /**
-     * Provides printable version of message.
-     *
-     * @return Returns message
-     */
     @Override
     public String toString() {
         return "[" + type + "] " + message.toString();
     }
 
-    /**
-     * Determines if provided message is equal to this one.
-     *
-     * @param o Message object
-     * @return Returns if equal
-     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Message))
@@ -67,20 +53,10 @@ public class Message implements Serializable {
         }
     }
 
-    /**
-     * Provides type of message.
-     *
-     * @return Returns message type
-     */
     public MESSAGE_TYPE getType() {
         return type;
     }
 
-    /**
-     * Provides message.
-     *
-     * @return Returns message
-     */
     public Object getMessage() {
         return message;
     }

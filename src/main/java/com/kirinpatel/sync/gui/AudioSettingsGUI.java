@@ -10,18 +10,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * AudioSettingsGUI class will be used to show the Audio Equalizer to allow a user to set the db boost of each audio
- * frequency band.
- */
 class AudioSettingsGUI extends JFrame {
     private static final Path SETTINGS_PATH = Paths.get("equalizer.dat");
 
     private static Equalizer equalizer;
 
-    /**
-     * Main constructor that will create the AudioSettingsGUI.
-     */
     AudioSettingsGUI() {
         super("Audio Equalizer");
 
@@ -55,20 +48,11 @@ class AudioSettingsGUI extends JFrame {
         setVisible(true);
     }
 
-    /**
-     * Saves provided band db boost value.
-     *
-     * @param index Band index
-     * @param value Value of band
-     */
     private void setBandValue(int index, int value) {
         equalizer.setAmp(index, value);
         saveSettings();
     }
 
-    /**
-     * Load the settings into the equalizer
-     */
     static void loadSettings() {
         if (Files.exists(SETTINGS_PATH)) {
             try (BufferedReader reader = Files.newBufferedReader(SETTINGS_PATH)) {
@@ -82,9 +66,6 @@ class AudioSettingsGUI extends JFrame {
         }
     }
 
-    /**
-     * Saves user equalization settings.
-     */
     private void saveSettings() {
         try (BufferedWriter writer = Files.newBufferedWriter(SETTINGS_PATH)) {
             for (int i = 0; i < 10; i++) {

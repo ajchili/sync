@@ -24,12 +24,6 @@ public class FileSelector {
         }
     }
 
-    /**
-     * Credit: https://www.mkyong.com/java/how-to-move-file-to-another-directory-in-java/
-     *
-     * @param selectedFile Selected media file
-     * @return Media file that is in Tomcat directory
-     */
     private static File moveFile(File selectedFile) {
         File newFile = new File("tomcat/webapps/media/" + selectedFile.getName());
 
