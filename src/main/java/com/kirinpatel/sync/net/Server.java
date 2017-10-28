@@ -89,11 +89,6 @@ public class Server implements NetworkUser {
         return gui;
     }
 
-    /**
-     * Sets whether the server GUI will be usable or not.
-     *
-     * @param enabled Is usable
-     */
     public static void setEnabled(boolean enabled) {
         gui.setEnabled(enabled);
     }
