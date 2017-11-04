@@ -21,7 +21,7 @@ public class GUI extends JFrame {
         super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
 
-        setBackground(Theme.DARK_MODE_BACKGROUND);
+        setBackground(Theme.Companion.getBACKGROUND_DARK());
         setSize(new Dimension(940, 360));
         setMinimumSize(new Dimension(940, 360));
         setLayout(new BorderLayout());

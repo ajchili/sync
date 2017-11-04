@@ -175,33 +175,33 @@ public class ControlPanel extends JPanel {
     }
 
     void setUIMode() {
-        connectedClients.setForeground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_TEXT
-                : Theme.STANDARD_TEXT);
-        connectedClients.setBackground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_BACKGROUND
-                : Theme.STANDARD_BACKGROUND);
-        chatWindow.setForeground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_TEXT
-                : Theme.STANDARD_TEXT);
-        chatWindow.setBackground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_BACKGROUND
-                : Theme.STANDARD_BACKGROUND);
-        messagePanel.setBackground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_BACKGROUND
-                : Theme.STANDARD_BACKGROUND);
-        chatField.setForeground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_TEXT
-                : Theme.STANDARD_TEXT);
-        chatField.setBackground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_BACKGROUND
-                : Theme.STANDARD_BACKGROUND);
-        send.setForeground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_TEXT
-                : Theme.STANDARD_TEXT);
-        send.setBackground(Theme.isDarkModeEnabled
-                ? Theme.DARK_MODE_BACKGROUND
-                : Theme.STANDARD_BACKGROUND);
+        connectedClients.setForeground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getTEXT_DARK()
+                : Theme.Companion.getTEXT_STANDARD());
+        connectedClients.setBackground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getBACKGROUND_DARK()
+                : Theme.Companion.getBACKGROUND_STANDARD());
+        chatWindow.setForeground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getTEXT_DARK()
+                : Theme.Companion.getTEXT_STANDARD());
+        chatWindow.setBackground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getBACKGROUND_DARK()
+                : Theme.Companion.getBACKGROUND_STANDARD());
+        messagePanel.setBackground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getBACKGROUND_DARK()
+                : Theme.Companion.getBACKGROUND_STANDARD());
+        chatField.setForeground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getTEXT_DARK()
+                : Theme.Companion.getTEXT_STANDARD());
+        chatField.setBackground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getBACKGROUND_DARK()
+                : Theme.Companion.getBACKGROUND_STANDARD());
+        send.setForeground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getTEXT_DARK()
+                : Theme.Companion.getTEXT_STANDARD());
+        send.setBackground(Theme.Companion.isDarkModeEnabled()
+                ? Theme.Companion.getBACKGROUND_DARK()
+                : Theme.Companion.getBACKGROUND_STANDARD());
         repaint();
     }
 
