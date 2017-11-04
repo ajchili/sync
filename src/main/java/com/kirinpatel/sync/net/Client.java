@@ -69,7 +69,7 @@ public class Client implements NetworkUser {
                 try {
                     if (socket.getInputStream().available() > 0) {
                         Message message = (Message) input.readObject();
-                        switch(message.getType()) {
+                        switch(message.getMessageType()) {
                             case CLOSING:
                                 isServerClosed = true;
                                 gui.hide();
@@ -160,7 +160,7 @@ public class Client implements NetworkUser {
                 output.flush();
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
-                isConnected = message.getType() == CONNECTED;
+                isConnected = message.getMessageType() == CONNECTED;
             } catch(IOException | ClassNotFoundException e) {
                 UIMessage.showErrorDialog(e, "Couldn't connect to server!");
                 disconnectFromServer();
