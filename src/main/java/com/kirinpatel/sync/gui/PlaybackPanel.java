@@ -43,7 +43,7 @@ public class PlaybackPanel extends JPanel {
     PlaybackPanel(PANEL_TYPE type, GUI gui) {
         super(new BorderLayout());
         this.type = type;
-        setBackground(Theme.DARK_MODE_BACKGROUND);
+        setBackground(Theme.Companion.getBACKGROUND_DARK());
 
         initMediaPlayer(gui);
     }
