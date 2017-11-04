@@ -93,7 +93,7 @@ class MenuBar extends JMenuBar {
 
         JRadioButtonMenuItem darkMode = new JRadioButtonMenuItem("Dark Mode");
         darkMode.addActionListener(e -> {
-            Theme.isDarkModeEnabled = darkMode.isSelected();
+            Theme.Companion.setIsDarkModeEnabled(darkMode.isSelected());
             ControlPanel.getInstance().setUIMode();
         });
         ui.add(darkMode);
