@@ -2,7 +2,7 @@ package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
-import com.kirinpatel.sync.util.Theme;
+import com.kirinpatel.sync.util.ThemeKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,7 +21,7 @@ public class GUI extends JFrame {
         super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
         this.type = type;
 
-        setBackground(Theme.Companion.getBACKGROUND_DARK());
+        setBackground(ThemeKt.getBACKGROUND_DARK());
         setSize(new Dimension(940, 360));
         setMinimumSize(new Dimension(940, 360));
         setLayout(new BorderLayout());
