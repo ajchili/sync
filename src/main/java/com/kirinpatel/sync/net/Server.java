@@ -227,7 +227,7 @@ public class Server implements NetworkUser {
                 try {
                     if (socket.getInputStream().available() > 0) {
                         Message message = (Message) input.readObject();
-                        switch(message.getType()) {
+                        switch(message.getMessageType()) {
                             case DISCONNECTING:
                                 Sync.connectedUsers.remove(user);
                                 ControlPanel.getInstance().updateConnectedClients();
@@ -310,7 +310,7 @@ public class Server implements NetworkUser {
             try {
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
-                isClientConnected = message.getType() == CONNECTING;
+                isClientConnected = message.getMessageType() == CONNECTING;
                 output = new ObjectOutputStream(socket.getOutputStream());
                 output.writeObject(new Message(CONNECTED, ""));
                 output.flush();

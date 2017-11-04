@@ -3,7 +3,7 @@ package com.kirinpatel.sync.gui;
 import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
-import com.kirinpatel.sync.util.Theme;
+import com.kirinpatel.sync.util.ThemeKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,7 +92,7 @@ class MenuBar extends JMenuBar {
 
         JRadioButtonMenuItem darkMode = new JRadioButtonMenuItem("Dark Mode");
         darkMode.addActionListener(e -> {
-            Theme.setIsDarkModeEnabled(darkMode.isSelected());
+            ThemeKt.setIsDarkModeEnabled(darkMode.isSelected());
             ControlPanel.getInstance().setUIMode();
         });
         ui.add(darkMode);
