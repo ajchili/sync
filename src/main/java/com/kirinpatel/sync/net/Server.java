@@ -47,7 +47,6 @@ public class Server implements NetworkUser {
         Sync.host = Sync.connectedUsers.get(0);
         ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
-        new MediaSelectorGUI(gui);
         new Thread(server).start();
     }
 
@@ -116,6 +115,7 @@ public class Server implements NetworkUser {
                 isRunning = true;
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
+                new MediaSelectorGUI(gui);
             } catch (Exception e) {
                 message.showErrorDialogAndExit(e, "Couldn't open server");
                 Server.this.stop();
