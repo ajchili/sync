@@ -12,9 +12,9 @@ class User constructor(var username: String): Serializable {
         return username
     }
 
-    override fun equals(o: Any?): Boolean {
-        return if (o is User) {
-            username == o.username && userID == o.userID
+    override fun equals(other: Any?): Boolean {
+        return if (other is User) {
+            username == other.username && userID == other.userID
         } else {
             false
         }
