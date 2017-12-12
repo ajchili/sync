@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.sync.util.FileSelector;
+import com.kirinpatel.sync.util.FileSelectorKt;
 import com.kirinpatel.sync.net.Media;
 import com.kirinpatel.sync.util.UIMessage;
 
@@ -115,7 +115,7 @@ public class MediaSelectorGUI extends JFrame {
                     }
                     break;
                 case OFFLINE:
-                    File mediaFile = FileSelector.getFile(null);
+                    File mediaFile = FileSelectorKt.getFile(null);
                     if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
                         gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
                     } else {
