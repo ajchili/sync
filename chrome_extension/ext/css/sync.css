@@ -1,0 +1,45 @@
+.sync-netflix {
+    width: 80%;
+    max-width: 80%;
+    height: 100vh;
+    max-height: 100vh;
+    float: left;
+    overflow-y: scroll;
+}
+
+.sync {
+    width: 20%;
+    max-width: 20%;
+    height: 100vh;
+    max-height: 100vh;
+    float: right;
+    background-color: #141414;
+}
+
+.sync-header {
+    width: 100%;
+    height: 5vh;
+    max-height: 5vh;
+    text-align: center;
+}
+
+.sync-browser {
+    width: 100%;
+    height: 80vh;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.sync-taskbar {
+    width: 100%;
+    margin-top: 2vh;
+}
+
+.sync-taskbar-button-container {
+    display: table;
+    margin: 0 auto;
+}
+
+.server {
+    list-style-type: none;
+}
