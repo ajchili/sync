@@ -1,6 +1,6 @@
 .sync-netflix {
-    width: 80%;
-    max-width: 80%;
+    width: 80% !important;
+    max-width: 80% !important;
     height: 100vh;
     max-height: 100vh;
     float: left;
@@ -8,8 +8,8 @@
 }
 
 .sync {
-    width: 20%;
-    max-width: 20%;
+    width: 20% !important;
+    max-width: 20% !important;
     height: 100vh;
     max-height: 100vh;
     float: right;
@@ -40,6 +40,22 @@
     margin: 0 auto;
 }
 
+.sync-player {
+    width: 80% !important;
+    max-width: 80% !important;
+}
+
 .server {
+    font-size: 1.25em;
+    padding: 0.5em;
     list-style-type: none;
+}
+
+.server > .sync-server-title {
+    width: 80%;
+    word-wrap: break-word;
+}
+
+.server > .sync-server-button {
+    margin-top: 1vh;
 }

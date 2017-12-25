@@ -1,32 +1,31 @@
-var url = window.location.href;
-var state = 0;
-var key = '';
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    switch(request.func) {
+        case 'setUI':
+            setUI(request.user);
+            break;
+        case 'displayServers':
+            break;
+        default:
+            break;
+    }
+});
 
-if (url.includes("browse")) {
-    loadBrowseElements();
+function sendMessageToBackground(message) {
+    chrome.runtime.sendMessage(message, function(response) {});
 }
 
-function loadBrowseElements() {
-    document.body.innerHTML = '<div class="sync-netflix">' + document.body.innerHTML + '</div>';
-    document.body.innerHTML += '<div class="sync"/><h3 class="sync-header">sync for Chrome</h3><div class="sync-browser"><ul id="syncServerList"></ul></div><div class="sync-taskbar"><div class="sync-taskbar-button-container"><a role="link" aria-label="Host"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Host</span></span></a><a role="link" aria-label="Join"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Join</span></span></a></div></div></div>';
-    
-    loadServers();
+function setUI(user) {
+    document.getElementsByClassName('ArkiaPlayer').classList += 'sync-player';
+    document.getElementById('appMountPoint').classList += 'sync-netflix';
+    document.body.childNodes[1].classList = 'sync';
+    document.body.childNodes[1].innerHTML += '<h3 class="sync-header">sync for Chrome</h3><div class="sync-browser"><ul id="syncServerList"></ul></div><div class="sync-taskbar"><div class="sync-taskbar-button-container"><a role="link" aria-label="Host"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Host</span></span></a><a role="link" aria-label="Join"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Join</span></span></a></div></div></div>';
 }
 
-function loadServers() {
-    document.getElementById('syncServerList').innerHTML = ''
-}
+function displayServers(servers) {
+    var serverList = document.getElementById('syncServerList');
+    serverList.innerHTML = '';
 
-function askIfShouldShowServers() {
-    
-}
-
-function createServer() {
-    var serverKey = firebase.database().ref().child('servers').push().key;
-    state = 1;
-    key = serverKey;
-}
-
-function joinServer(key) {
-    
+    servers.forEach(function(server) {
+        serverList.innerHTML += '<li class="server"><h4 class="sync-server-title">' + server.title + '<h4><div class="sync-server-button"><a role="link" aria-label="Join" onclick="";><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Join</span></span></a></div></li>';
+    });
 }
