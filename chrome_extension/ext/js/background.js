@@ -24,6 +24,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         case 'createServer':
             createServer(request.title);
             break;
+        case 'joinServer':
+            joinServer(request.key);
+            break;
+        case 'endServer':
+            endServer();
+            break;
+        case 'leaveServer':
+            leaveServer();
+            break;
+        case 'loadServerInfo':
+            loadServerInfo();
+            break;
         default:
             break;
     }
@@ -56,6 +68,7 @@ function setupUser() {
     ref.child('users').child(user.uid).on('value', function(snapshot) {
         user.name = snapshot.child('name').val();
         user.state = snapshot.child('state').val();
+        user.server = snapshot.child('server').val();
 
         setUI();
     });
@@ -71,9 +84,46 @@ function setUserState(state) {
 
 function createServer(title) {
     var key = ref.child('servers').push().key;
-    ref.child('servers').child(key).set({ title: title, size: 4, host: user.uid });
-    ref.child('users').child(user.uid).child('server').update({ id: key, isHost: true })
+    ref.child('servers').child(key).set({ title: title, isPrivate: false, host: user.uid });
+    ref.child('servers').child(key).child('clients').child(key).set(user.uid);
+    ref.child('users').child(user.uid).child('server').set(key);
     setUserState(1);
+}
+
+function joinServer(serverKey) {
+    var key = ref.child('servers').child(serverKey).child('clients').push().key;
+    ref.child('servers').child(serverKey).child('clients').child(key).set(user.uid);
+    ref.child('users').child(user.uid).child('server').set(serverKey);
+    setUserState(2);
+}
+
+function endServer() {
+    ref.child('servers').child(user.server).once('value').then(function(snapshot) {
+        if (snapshot.exists()) {
+            var serverId = user.server;
+
+            if (user.uid === snapshot.child('host').val()) {
+                snapshot.child('clients').forEach(function(childSnapshot) {
+                    ref.child('users').child(childSnapshot.val()).child('state').set(0);
+                    ref.child('users').child(childSnapshot.val()).child('server').remove();
+                });
+            }
+
+            ref.child('servers').child(serverId).remove();
+        }
+    });
+}
+
+function leaveServer() {
+    ref.child('servers').child(user.server).child('clients').once('value').then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
+            if (user.uid === childSnapshot.val()) {
+                ref.child('servers').child(user.server).child('clients').child(childSnapshot.key).remove();
+                ref.child('users').child(user.uid).child('state').set(0);
+                ref.child('users').child(user.uid).child('server').remove();
+            }
+        });
+    });
 }
 
 function setUI() {
@@ -85,12 +135,29 @@ function loadServers() {
         var servers = [];
 
         snapshot.forEach(function(childSnapshot) {
+            var key = childSnapshot.key;
             var title = childSnapshot.child('title').val();
-            var size = childSnapshot.child('size').val();
+            var isPrivate = childSnapshot.child('isPrivate').val();
 
-            servers.push({ title: title, size: size });
+            servers.push({ key: key, title: title, isPrivate: isPrivate });
         });
         sendMessageToContent({ func: 'displayServers', servers: servers });
+    });
+}
+
+function loadServerInfo() {
+    ref.child('servers').child(user.server).on('value', function(snapshot) {
+        var server = [];
+        var clients = [];
+
+        snapshot.child('clients').forEach(function(childSnapshot) {
+            ref.child('users').child(childSnapshot.val()).once('value').then(function(childChildSnapshot) {
+                clients.push({ id: childSnapshot.val(), name: childChildSnapshot.child('name').val() });
+            });
+        });
+
+        server = { clients: clients };
+        sendMessageToContent({ func: 'displayServerInfo', server: server });
     });
 }
     
