@@ -18,6 +18,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         case 'setUserState':
             setUserName(request.state);
             break;
+        case 'loadServers':
+            loadServers();
+            break;
+        case 'createServer':
+            createServer(request.title);
+            break;
         default:
             break;
     }
@@ -63,12 +69,19 @@ function setUserState(state) {
     ref.child('users').child(user.uid).child('state').set(state);
 }
 
+function createServer(title) {
+    var key = ref.child('servers').push().key;
+    ref.child('servers').child(key).set({ title: title, size: 4, host: user.uid });
+    ref.child('users').child(user.uid).child('server').update({ id: key, isHost: true })
+    setUserState(1);
+}
+
 function setUI() {
     sendMessageToContent({ func: 'setUI', user: user });
 }
 
 function loadServers() {
-    ref.child('servers').once('value').then(function(snapshot) {
+    ref.child('servers').on('value', function(snapshot) {
         var servers = [];
 
         snapshot.forEach(function(childSnapshot) {
