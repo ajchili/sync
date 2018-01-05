@@ -8,21 +8,25 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.swing.JFileChooser
+import javax.swing.UIManager
 
 fun getFile(parent : Component) : File? {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     val mediaSelector = JFileChooser("tomcat/webapps/media")
     mediaSelector.fileSelectionMode = JFileChooser.FILES_ONLY
     mediaSelector.showOpenDialog(parent)
     val selectedFile = mediaSelector.selectedFile ?: return null
-    if (selectedFile.absolutePath.startsWith(File("tomcat/webapps/media").absolutePath)) {
-        return selectedFile
+    UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
+    return if (selectedFile.absolutePath.startsWith(File("tomcat/webapps/media").absolutePath)) {
+        selectedFile
     } else {
-        return moveFile(selectedFile)
+        moveFile(selectedFile)
     }
 }
 private fun moveFile(selectedFile : File) : File {
     val newFile = File("tomcat/webapps/media/" + selectedFile.name)
-    val progressView = ProgressView("Moving media", "Please wait while your media is moved to the proper folder.")
+    val progressView = ProgressView("Moving media",
+            "Please wait while your media is moved to the proper folder.")
     Thread {
         try {
             FileInputStream(selectedFile).use({ inStream ->
@@ -48,7 +52,8 @@ private fun moveFile(selectedFile : File) : File {
             progressView.setProgress(newFile.length(), selectedFile.length())
             if (timeout + 1000 * 300 < time) {
                 UIMessage.showMessageDialog(
-                        "Your media was unable to be moved." + "\nPlease try to manually move your media to the Tomcat directory.",
+                        "Your media was unable to be moved." +
+                                "\nPlease try to manually move your media to the Tomcat directory.",
                         "Unable to move media")
                 break
             }
