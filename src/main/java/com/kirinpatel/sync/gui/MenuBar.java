@@ -4,12 +4,14 @@ import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.util.ThemeKt;
+import com.kirinpatel.sync.util.UIMessage;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
@@ -73,6 +75,19 @@ class MenuBar extends JMenuBar {
                                 : Client.ipAddress),
                         null));
         menu.add(share);
+        menu.add(new JSeparator());
+
+        JMenuItem feedback = new JMenuItem("Feedback");
+        feedback.addActionListener(e -> {
+            String url = "https://github.com/ajchili/sync/issues";
+            try {
+                Desktop.getDesktop().browse(java.net.URI.create(url));
+            } catch (IOException exception) {
+                UIMessage.showErrorDialog(exception, "Please go to \"" + url + "\" to provide feedback and " +
+                        "report this issue.");
+            }
+        });
+        menu.add(feedback);
         menu.add(new JSeparator());
 
         JMenuItem close = new JMenuItem("Close sync");

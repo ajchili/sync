@@ -26,6 +26,24 @@
                 <role>developer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Brian Littlefield</name>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Elijah Cutler</name>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Brian Huang</name>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
     </developers>
 
     <scm>
