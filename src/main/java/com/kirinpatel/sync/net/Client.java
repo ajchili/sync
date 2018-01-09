@@ -199,7 +199,7 @@ public class Client implements NetworkUser {
 
         private synchronized void sendPing() {
             try {
-                output.writeObject(new Message(PING, null));
+                output.writeObject(new Message(PING, ""));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();

@@ -334,7 +334,7 @@ public class Server implements NetworkUser {
         private synchronized void sendPing() {
             try {
                 lastPingCheck = System.currentTimeMillis();
-                output.writeObject(new Message(PING, null));
+                output.writeObject(new Message(PING, ""));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();
