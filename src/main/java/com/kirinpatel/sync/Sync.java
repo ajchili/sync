@@ -42,9 +42,9 @@ public final class Sync {
                             "(32 or 64 bit depending on your system)."),
                     "Unable to launch sync");
         } else {
-            checkForMessage();
             checkVersion();
             Launcher.INSTANCE.open();
+            checkForMessage();
             if (shouldAutoConnect) {
                 Launcher.INSTANCE.setVisible(false);
                 new Client(ipAddress);
