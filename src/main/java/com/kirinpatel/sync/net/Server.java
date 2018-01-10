@@ -110,7 +110,7 @@ public class Server implements NetworkUser {
                 device = createGatewayDevice();
                 tomcatServer = new TomcatServer();
                 new Thread(() -> tomcatServer.start()).start();
-                connectionExecutor = Executors.newFixedThreadPool(10);
+                connectionExecutor = Executors.newCachedThreadPool();
                 service = new ServerSocket(SYNC_PORT);
                 isRunning = true;
                 gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
