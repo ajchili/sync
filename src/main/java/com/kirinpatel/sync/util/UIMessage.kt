@@ -23,7 +23,12 @@ class UIMessage(g : GUI) {
 
         @JvmStatic
         fun getInput(title: String, message: String) : String {
-            return JOptionPane.showInputDialog(null, message, title, JOptionPane.QUESTION_MESSAGE)
+            val input = JOptionPane.showInputDialog(null, message, title, JOptionPane.QUESTION_MESSAGE)
+            return if (input.isNullOrEmpty()) {
+                ""
+            } else {
+                input
+            }
         }
     }
 }
