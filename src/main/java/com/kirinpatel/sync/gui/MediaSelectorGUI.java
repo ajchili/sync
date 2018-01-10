@@ -100,18 +100,16 @@ public class MediaSelectorGUI extends JFrame {
             switch(type) {
                 case ONLINE:
                     String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
-                    if (mediaURL != null && !mediaURL.isEmpty()) {
+                    if (!mediaURL.isEmpty()) {
                         if (mediaURL.startsWith("http")) {
                             gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(mediaURL));
                         } else {
                             gui.playbackPanel.getMediaPlayer().setMediaSource(new Media("http://" + mediaURL));
                         }
                     } else {
-                        if (mediaURL != null) {
-                            UIMessage.showMessageDialog(
-                                    "The Media URL must be specified!",
-                                    "Error setting Media URL!");
-                        }
+                        UIMessage.showMessageDialog(
+                                "The Media URL must be specified!",
+                                "Error setting Media URL!");
                     }
                     break;
                 case OFFLINE:
@@ -122,6 +120,10 @@ public class MediaSelectorGUI extends JFrame {
                         if (mediaFile != null) {
                             UIMessage.showMessageDialog(
                                     "The media file that you selected could not be used.",
+                                    "Error selecting media!");
+                        } else {
+                            UIMessage.showMessageDialog(
+                                    "A file must be selected.",
                                     "Error selecting media!");
                         }
                     }
