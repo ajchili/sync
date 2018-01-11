@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public final class Sync {
 
-    private final static String VERSION = "1.7.1";
+    private final static String VERSION = "2.0.0B";
     public static ArrayList<User> connectedUsers = new ArrayList<>();
     public static User host;
 
