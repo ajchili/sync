@@ -179,7 +179,7 @@ public class Client implements NetworkUser {
                 }
                 isConnected = false;
                 if (output != null && !isServerClosed) {
-                    output.writeObject(new Message(DISCONNECTING, null));
+                    output.writeObject(new Message(DISCONNECTING, ""));
                     output.flush();
                 } else if (isServerClosed) {
                     UIMessage.showMessageDialog(
