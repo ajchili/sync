@@ -35,7 +35,7 @@ public final class Launcher extends JFrame {
 
     public void open() {
         setTitle("sync");
-        setSize(new Dimension(200, 100));
+        setSize(new Dimension(225, 115));
         setResizable(false);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -112,8 +112,8 @@ public final class Launcher extends JFrame {
 
         IPAddressReceiver() {
             super("sync");
-            setSize(new Dimension(300, 100));
-            setResizable(false);
+            setSize(new Dimension(300, 115));
+            setResizable(true);
             setLayout(new GridLayout(3, 1));
             setDefaultCloseOperation(HIDE_ON_CLOSE);
             addComponentListener(new ComponentListener() {
