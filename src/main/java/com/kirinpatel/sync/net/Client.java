@@ -72,6 +72,7 @@ public class Client implements NetworkUser {
                         switch(message.getMessageType()) {
                             case CLOSING:
                                 isServerClosed = true;
+                                disconnectFromServer();
                                 gui.hide();
                                 break;
                             case PING:
@@ -141,7 +142,6 @@ public class Client implements NetworkUser {
 
         void stop() {
             isRunning = false;
-            isConnected = false;
         }
 
         private synchronized void connectToServer() {
@@ -156,11 +156,18 @@ public class Client implements NetworkUser {
 
             try {
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(CONNECTING, ""));
+                output.writeObject(new Message(CONNECTING, Sync.VERSION));
                 output.flush();
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
                 isConnected = message.getMessageType() == CONNECTED;
+                if (!isConnected) {
+                    UIMessage.showErrorDialog(new IOException("Sever is on a different version of sync,\n"
+                                    + "please use version " + message.getMessage().toString() + "."),
+                            "Couldn't connect to server!");
+                    isConnected = false;
+                    return;
+                }
             } catch(IOException | ClassNotFoundException e) {
                 UIMessage.showErrorDialog(e, "Couldn't connect to server!");
                 disconnectFromServer();
@@ -179,14 +186,13 @@ public class Client implements NetworkUser {
                 }
                 isConnected = false;
                 if (output != null && !isServerClosed) {
-                    output.writeObject(new Message(DISCONNECTING, ""));
+                    output.writeObject(new Message(DISCONNECTING, null));
                     output.flush();
                 } else if (isServerClosed) {
                     UIMessage.showMessageDialog(
                             "The sync server that you were connected to has shutdown.",
                             "Server shut down.");
                 }
-
                 if (socket != null) {
                     socket.close();
                 }
@@ -199,7 +205,7 @@ public class Client implements NetworkUser {
 
         private synchronized void sendPing() {
             try {
-                output.writeObject(new Message(PING, ""));
+                output.writeObject(new Message(PING, null));
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
