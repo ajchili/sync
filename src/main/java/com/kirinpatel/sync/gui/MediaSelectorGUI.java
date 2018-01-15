@@ -44,7 +44,7 @@ public class MediaSelectorGUI extends JFrame {
         }
         this.gui = gui;
 
-        setSize(new Dimension(200, 100));
+        setSize(new Dimension(225, 115));
         setResizable(false);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);

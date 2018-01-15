@@ -12,11 +12,8 @@ import org.bitlet.weupnp.GatewayDiscover;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.io.*;
+import java.net.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -136,13 +133,21 @@ public class Server implements NetworkUser {
             }
         }
 
-        private GatewayDevice createGatewayDevice() throws IOException {
+        private GatewayDevice createGatewayDevice() {
             GatewayDiscover discover = new GatewayDiscover();
             try {
                 discover.discover();
                 GatewayDevice device = discover.getValidGateway();
                 if (device == null) {
-                    throw new NullPointerException("Couldn't map port " + SYNC_PORT + " or " + TOMCAT_PORT + " ensure UPnP is enabled");
+                    UIMessage.showErrorDialog(new IOException("Couldn't map port "
+                                    + SYNC_PORT
+                                    + " or "
+                                    + TOMCAT_PORT
+                                    + " to use UPnP, please ensure that it is enabled" +
+                                    "\nin your router. Otherwise you will have to manually port forward."),
+                            "Error establishing UPnP");
+                    getIPAddress();
+                    return null;
                 }
                 boolean isSyncMapped = device.addPortMapping(
                         SYNC_PORT,
@@ -160,9 +165,27 @@ public class Server implements NetworkUser {
                     Server.ipAddress = device.getExternalIPAddress();
                     return device;
                 }
-                throw new IOException("Couldn't map port " + SYNC_PORT + " or " + TOMCAT_PORT + " ensure UPnP is enabled");
-            } catch (SAXException | ParserConfigurationException e) {
-                throw new IOException(e);
+            } catch (SAXException | ParserConfigurationException | IOException e) {
+                UIMessage.showErrorDialog(new IOException("Couldn't map port "
+                        + SYNC_PORT
+                        + " or "
+                        + TOMCAT_PORT
+                        + "\nto use UPnP please ensure"
+                        + "that it is enabled in your router." +
+                        "\nOtherwise you will have to manually port forward."),
+                        "Error establishing UPnP");
+            }
+            return null;
+        }
+
+        private void getIPAddress() {
+            try {
+                URL url = new URL("http://checkip.amazonaws.com");
+                BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+
+                Server.ipAddress = in.readLine();
+            } catch (IOException e) {
+                UIMessage.showErrorDialog(e, "Unable to obtain your IP Address.");
             }
         }
 
@@ -310,9 +333,14 @@ public class Server implements NetworkUser {
             try {
                 input = new ObjectInputStream(socket.getInputStream());
                 Message message = (Message) input.readObject();
-                isClientConnected = message.getMessageType() == CONNECTING;
+                isClientConnected = message.getMessageType() == CONNECTING
+                        && message.getMessage().toString().equals(Sync.VERSION);
                 output = new ObjectOutputStream(socket.getOutputStream());
-                output.writeObject(new Message(CONNECTED, ""));
+                if (isClientConnected) {
+                    output.writeObject(new Message(CONNECTED, null));
+                } else {
+                    output.writeObject(new Message(ERROR, Sync.VERSION));
+                }
                 output.flush();
             } catch(IOException | ClassNotFoundException e) {
                 disconnectClientFromServer();
@@ -321,7 +349,7 @@ public class Server implements NetworkUser {
 
         private synchronized void disconnectClientFromServer() {
             try {
-                output.writeObject(new Message(CLOSING, ""));
+                output.writeObject(new Message(CLOSING, null));
                 output.flush();
             } catch(IOException e) {
                 // Do nothing if sending closing message fails
@@ -334,7 +362,7 @@ public class Server implements NetworkUser {
         private synchronized void sendPing() {
             try {
                 lastPingCheck = System.currentTimeMillis();
-                output.writeObject(new Message(PING, ""));
+                output.writeObject(new Message(PING, null));
                 output.flush();
             } catch(IOException e) {
                 disconnectClientFromServer();

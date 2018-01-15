@@ -2,8 +2,9 @@ package com.kirinpatel.sync.util
 
 import java.io.Serializable
 
-data class Message(val messageType : Message.MESSAGE_TYPE, val message : Any) : Serializable {
+data class Message(val messageType : Message.MESSAGE_TYPE, val message : Any?) : Serializable {
     enum class MESSAGE_TYPE(val code : Int) {
+        ERROR(-1),
         DISCONNECTING(0),
         CONNECTING(1),
         CONNECTED(2),

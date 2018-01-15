@@ -1,6 +1,5 @@
 package com.kirinpatel.sync;
 
-import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.User;
 import com.kirinpatel.sync.util.UIMessage;
 import jdk.nashorn.api.scripting.URLReader;
@@ -14,7 +13,7 @@ import java.util.Scanner;
 
 public final class Sync {
 
-    private final static String VERSION = "2.0.0B";
+    public final static String VERSION = "2.0.0B";
     public static ArrayList<User> connectedUsers = new ArrayList<>();
     public static User host;
 
@@ -27,14 +26,10 @@ public final class Sync {
                 | ClassNotFoundException e) {
             UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
         }
-        if (args.length > 1 && args[0].equals("connect")) {
-            verifyDependencies(true, args[1]);
-        } else {
-            verifyDependencies(false, "");
-        }
+        verifyDependencies();
     }
 
-    private static void verifyDependencies(boolean shouldAutoConnect, String ipAddress) {
+    private static void verifyDependencies() {
         if (!new NativeDiscovery().discover()) {
             UIMessage.showErrorDialog(
                     new IllegalStateException("Unable to load VLCJ or Java." +
@@ -42,13 +37,8 @@ public final class Sync {
                             "(32 or 64 bit depending on your system)."),
                     "Unable to launch sync");
         } else {
-            checkVersion();
             Launcher.INSTANCE.open();
-            checkForMessage();
-            if (shouldAutoConnect) {
-                Launcher.INSTANCE.setVisible(false);
-                new Client(ipAddress);
-            }
+            checkVersion();
         }
     }
 
@@ -78,18 +68,12 @@ public final class Sync {
             UIMessage.showMessageDialog(
                     "You have an outdated version of sync, please update sync!",
                     "Outdated version of sync");
-        } else if (VERSION.contains("B")){
-            if (!beta.equals(VERSION)) {
-                UIMessage.showMessageDialog(
+        } else if (VERSION.contains("B") && !beta.equals(VERSION)) {
+            UIMessage.showMessageDialog(
                         "A new beta has been released, please update to fix bugs and test new features!",
                         "Outdated version of sync");
-            } else {
-                UIMessage.showMessageDialog(
-                        "You have a beta version of sync! Please understand that there will be bugs and\n" +
-                                "unfinished features within the app. Should you face any issues, please create an\n" +
-                                "issue on our Github page.",
-                        "Thank you for beta testing sync");
-            }
+        } else {
+            checkForMessage();
         }
     }
 
