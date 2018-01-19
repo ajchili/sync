@@ -42,6 +42,8 @@ public class Server implements NetworkUser {
         user = new User(System.getProperty("user.name") + " (host)");
         Sync.connectedUsers.add(user);
         Sync.host = Sync.connectedUsers.get(0);
+        messages.clear();
+        ControlPanel.getInstance().setMessages(messages);
         ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
         new Thread(server).start();

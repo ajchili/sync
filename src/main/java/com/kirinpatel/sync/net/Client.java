@@ -31,8 +31,8 @@ public class Client implements NetworkUser {
         Launcher.INSTANCE.connectedUser = this;
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
-        clientThread = new ClientThread();
         messages.clear();
+        clientThread = new ClientThread();
         new Thread(clientThread).start();
     }
 
@@ -174,6 +174,7 @@ public class Client implements NetworkUser {
             }
 
             gui = new GUI(CLIENT);
+            ControlPanel.getInstance().setMessages(messages);
             Launcher.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
