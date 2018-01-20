@@ -6,6 +6,7 @@ import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.GUI;
 import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -21,7 +22,7 @@ public class Client implements NetworkUser {
     public static String ipAddress;
     public static User user;
     private static ClientThread clientThread;
-    private static ArrayList<String> messages = new ArrayList<>();
+    private ArrayList<String> messages;
     private boolean isRunning = false;
     private boolean isServerClosed = false;
     private Socket socket;
@@ -31,8 +32,8 @@ public class Client implements NetworkUser {
         Launcher.INSTANCE.connectedUser = this;
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
+        messages = new ArrayList<>();
         clientThread = new ClientThread();
-        messages.clear();
         new Thread(clientThread).start();
     }
 
@@ -42,8 +43,9 @@ public class Client implements NetworkUser {
         gui.dispose();
         clientThread.stop();
     }
+
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(@NotNull String message) {
         messages.add(message);
     }
 
@@ -174,6 +176,7 @@ public class Client implements NetworkUser {
             }
 
             gui = new GUI(CLIENT);
+            ControlPanel.getInstance().setMessages(messages);
             Launcher.saveIPAddress(ipAddress);
 
             sendUsernameToServer();

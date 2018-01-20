@@ -9,6 +9,7 @@ import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
 import org.bitlet.weupnp.GatewayDevice;
 import org.bitlet.weupnp.GatewayDiscover;
+import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -27,11 +28,11 @@ public class Server implements NetworkUser {
     public static String ipAddress = "";
     public static GUI gui;
     public static User user;
-    private static ServerThread server;
-    private static TomcatServer tomcatServer;
-    private static final ArrayList<String> messages = new ArrayList<>();
-    private static boolean isRunning = false;
-    private static boolean closeServer = false;
+    private ServerThread server;
+    private TomcatServer tomcatServer;
+    private ArrayList<String> messages;
+    private boolean isRunning = false;
+    private boolean closeServer = false;
 
     private final static int SYNC_PORT = 8000;
     final static int TOMCAT_PORT = 8080;
@@ -42,6 +43,8 @@ public class Server implements NetworkUser {
         user = new User(System.getProperty("user.name") + " (host)");
         Sync.connectedUsers.add(user);
         Sync.host = Sync.connectedUsers.get(0);
+        messages = new ArrayList<>();
+        ControlPanel.getInstance().setMessages(messages);
         ControlPanel.getInstance().updateConnectedClients();
         server = new ServerThread();
         new Thread(server).start();
@@ -71,7 +74,7 @@ public class Server implements NetworkUser {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(@NotNull String message) {
         messages.add(message);
         ControlPanel.getInstance().setMessages(messages);
     }
@@ -223,7 +226,7 @@ public class Server implements NetworkUser {
         private User user;
         private boolean isClientConnected = false;
         private boolean hasConnected = false;
-        private ArrayList<String> messages = new ArrayList<>();
+        private ArrayList<String> clientMessages = new ArrayList<>();
         private long lastPingCheck = 0;
         private long lastClientUpdate = 0;
         private long lastMediaUpdate = 0;
@@ -311,7 +314,7 @@ public class Server implements NetworkUser {
                     sendMediaState();
                 }
 
-                if (messages.size() < Server.messages.size()) {
+                if (clientMessages.size() < messages.size()) {
                     sendMessagesToClient();
                 }
             }
@@ -383,12 +386,12 @@ public class Server implements NetworkUser {
         private synchronized void sendMessagesToClient() {
             try {
                 ArrayList<String> newMessages = new ArrayList<>();
-                ArrayList<String> messageCache = Server.messages;
-                for (int i = messages.size(); i < messageCache.size(); i++) {
+                ArrayList<String> messageCache = messages;
+                for (int i = clientMessages.size(); i < messageCache.size(); i++) {
                     newMessages.add(messageCache.get(i));
                 }
-                messages.clear();
-                messages.addAll(messageCache);
+                clientMessages.clear();
+                clientMessages.addAll(messageCache);
                 output.flush();
                 output.writeObject(new Message(MESSAGES, newMessages));
                 output.flush();
