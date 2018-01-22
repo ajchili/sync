@@ -1,6 +1,7 @@
 package com.kirinpatel.sync;
 
 import com.kirinpatel.sync.net.User;
+import com.kirinpatel.sync.util.DependencyVerifier;
 import com.kirinpatel.sync.util.UIMessage;
 import jdk.nashorn.api.scripting.URLReader;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
@@ -18,6 +19,7 @@ public final class Sync {
     public static User host;
 
     public static void main(String[] args) {
+
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch(IllegalAccessException
@@ -27,15 +29,18 @@ public final class Sync {
             UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
         }
         verifyDependencies();
+
     }
 
     private static void verifyDependencies() {
         if (!new NativeDiscovery().discover()) {
-            UIMessage.showErrorDialog(
+            /*UIMessage.showErrorDialog(
                     new IllegalStateException("Unable to load VLCJ or Java." +
                             "\nPlease ensure that both VLC and Java are installed and are the same " +
                             "(32 or 64 bit depending on your system)."),
                     "Unable to launch sync");
+                    */
+            DependencyVerifier.downloadDependencies();
         } else {
             Launcher.INSTANCE.open();
             checkVersion();
