@@ -36,3 +36,7 @@ src/main/main\.iml
 src/test/test\.iml
 
 *.exe
+
+*.dmg
+
+*.DS_Store

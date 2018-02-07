@@ -19,7 +19,6 @@ public final class Sync {
     public static User host;
 
     public static void main(String[] args) {
-
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch(IllegalAccessException
@@ -34,12 +33,6 @@ public final class Sync {
 
     private static void verifyDependencies() {
         if (!new NativeDiscovery().discover()) {
-            /*UIMessage.showErrorDialog(
-                    new IllegalStateException("Unable to load VLCJ or Java." +
-                            "\nPlease ensure that both VLC and Java are installed and are the same " +
-                            "(32 or 64 bit depending on your system)."),
-                    "Unable to launch sync");
-                    */
             DependencyVerifier.downloadDependencies();
         } else {
             Launcher.INSTANCE.open();
