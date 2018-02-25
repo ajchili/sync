@@ -18,33 +18,22 @@ public class DependencyVerifier {
             "https://ftp.osuosl.org/pub/videolan/vlc/2.2.8/macosx/vlc-2.2.8.dmg"
     };
 
-    public static void downloadDependencies() {
+    public static void downloadDependencies() throws IOException {
         UIMessage.showMessageDialog("The correct version(s) of Java/VLC were unable to be found on\n" +
                 "your computer. They will be downloaded and ran for you. Please\n" +
                 "allow them to be run.", "Downloading dependencies");
 
         if (OS.contains("win")) {
             if (!IS_64_BIT){
-                try {
-                    runAsAdmin(downloadFile("Java.exe",
-                            new URL("http://javadl.oracle.com/webapps/download/AutoDL?BundleId=230542_" +
-                                    "2f38c3b165be4555a1fa6e98c45e0808")));
-                } catch (IOException e) {
-                    UIMessage.showErrorDialog(e, "Unable to download Java");
-                }
+                runAsAdmin(downloadFile("Java.exe",
+                        new URL("http://javadl.oracle.com/webapps/download/AutoDL?BundleId=230542_" +
+                                "2f38c3b165be4555a1fa6e98c45e0808")));
             }
 
-            try {
-                runAsAdmin(downloadFile("VLC.exe", new URL(VLC_DOWNLOAD_LINKS[0])));
-            } catch (IOException e) {
-                UIMessage.showErrorDialog(e, "Unable to download VLC");
-            }
+
+            runAsAdmin(downloadFile("VLC.exe", new URL(VLC_DOWNLOAD_LINKS[0])));
         } else if (OS.contains("mac")) {
-            try {
-                runDMG(downloadFile("VLC.dmg", new URL(VLC_DOWNLOAD_LINKS[1])));
-            } catch (IOException e) {
-                UIMessage.showErrorDialog(e, "Unable to download VLC");
-            }
+            runDMG(downloadFile("VLC.dmg", new URL(VLC_DOWNLOAD_LINKS[1])));
         }
         /*
             Linux dependency downloading will be unsupported until a system can be used to test/develop on.

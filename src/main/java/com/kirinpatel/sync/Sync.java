@@ -7,6 +7,7 @@ import jdk.nashorn.api.scripting.URLReader;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -33,7 +34,11 @@ public final class Sync {
 
     private static void verifyDependencies() {
         if (!new NativeDiscovery().discover()) {
-            DependencyVerifier.downloadDependencies();
+            try {
+                DependencyVerifier.downloadDependencies();
+            } catch (IOException e) {
+                UIMessage.showErrorDialog(e, "Unable to download dependencies");
+            }
         } else {
             Launcher.INSTANCE.open();
             checkVersion();
