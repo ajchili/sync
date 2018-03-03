@@ -7,7 +7,7 @@ import {
     Redirect
 } from 'react-router-dom';
 import onAuth from './helpers/auth';
-import SignIn from './pages/SignIn';
+import Initial from './pages/Initial';
 
 export default class Routes extends Component {
 
@@ -34,7 +34,7 @@ export default class Routes extends Component {
     return(
       <Router>
         <Switch>
-          <Route component={SignIn}/>
+          <Route component={Initial}/>
         </Switch>
       </Router>
     );
