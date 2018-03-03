@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+  <title>sync</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    (function() {
+      const script = document.createElement('script');
+      script.src = process.env.ENV === 'development' ? 'http://localhost:8080/webpack-dev-server.js' : '';
+      document.write(script.outerHTML);
+    }());
+  </script>
+    <script>
+    (function() {
+      const script = document.createElement('script');
+      script.src = process.env.ENV === 'development' ? 'http://localhost:8080/build/app.bundle.js' : './build/app.bundle.js';
+      document.write(script.outerHTML);
+    }());
+  </script>
+</body>
+</html>
