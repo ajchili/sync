@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { Router, Route, IndexRoute, hashHistory } from 'react-router';
+import Routes from './components/Routes';
+
+const mainDivStyle = {
+  width: '100%',
+  height: '100vh',
+};
 
 render((
-  <div>
-    <h1>Testing</h1>
+  <div style={mainDivStyle}>
+    <Routes />
   </div>
 ), document.getElementById('app'));
