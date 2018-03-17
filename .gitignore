@@ -1,4 +1,7 @@
 *.DS_Store
 node_modules/
 build/
-src/components/config/firebase\.js
+config/firebase\.js
+semantic/dist/*
+semantic/src/*
+semantic/tasks/*

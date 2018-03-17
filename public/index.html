@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>sync</title>
+
+    <link rel="stylesheet" type="text/css" href="../semantic/dist/semantic.min.css">
+    <script
+    src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+    </script>
+    <style>
+      .feedback {
+        position: absolute;
+        left: 1em;
+        bottom: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="ui button feedback">Leave Feedback</button>
+
+    <div class="ui tiny modal feedbackModal">
+      <div class="header">Feedback</div>
+      <div class="content">
+        <div class="ui fluid labeled input">
+          <div class="ui label">
+            Suggestion
+          </div>
+          <input type="text" placeholder="Your idea/complaint">
+        </div>
+      </div>
+      <div class="actions">
+        <div class="ui approve button">Submit</div>
+        <div class="ui cancel button">Cancel</div>
+      </div>
+    </div>
+
+    <script>
+      require('../renderer.js')
+    </script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script
+    src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+    <script src="../semantic/dist/semantic.min.js"></script>
+    <script src="../config/firebase.js"></script>
+    <script src="./js/public.js"></script>
+    <script src="./js/log.js"></script>
+    </body>
+</html>

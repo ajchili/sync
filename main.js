@@ -1,33 +1,41 @@
-const { app, BrowserWindow } = require('electron');
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+
 const path = require('path');
 const url = require('url');
 
-let win;
+let mainWindow;
 
 function createWindow () {
-  win = new BrowserWindow({ minWidth: 800, minHeight: 600, width: 800, height: 600, title: "sync" });
+  mainWindow = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    minWidth: 1024,
+    minHeight: 768
+  });
 
-  win.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
+  mainWindow.loadURL(url.format({
+    pathname: path.join(__dirname, 'public/index.html'),
     protocol: 'file:',
     slashes: true
   }));
 
-  win.on('closed', () => {
-    win = null;
-  })
+  mainWindow.on('closed', function () {
+    mainWindow = null;
+  });
 };
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
+app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
 });
 
-app.on('activate', () => {
-  if (win === null) {
-    createWindow()
+app.on('activate', function () {
+  if (mainWindow === null) {
+    createWindow();
   }
 });
