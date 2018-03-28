@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>sync</title>
 
-    <link rel="stylesheet" type="text/css" href="../semantic/dist/semantic.min.css">
-    <script
-    src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
-    </script>
-    <style>
-      .feedback {
-        position: absolute;
-        left: 1em;
-        bottom: 1em;
-      }
-    </style>
-  </head>
-  <body>
-    <button class="ui button feedback">Leave Feedback</button>
+<head>
+  <meta charset="UTF-8">
+  <title>sync</title>
 
-    <div class="ui tiny modal feedbackModal">
-      <div class="header">Feedback</div>
-      <div class="content">
-        <div class="ui fluid labeled input">
-          <div class="ui label">
-            Suggestion
-          </div>
-          <input type="text" placeholder="Your idea/complaint">
+  <link rel="stylesheet" type="text/css" href="../semantic/dist/semantic.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+  <div id="home" style="height: 100vh; position: relative;">
+    <div class="ui right sidebar inverted vertical menu">
+      <div style="color: #fff; padding: 1em;">
+        <h1>Server List</h1>
+        <div id="serverId" class="item">
+          <h3>Server Title</h3>
+          <p>Media</p>
+          <button  class="mini fluid ui iverted button">Join</button>
         </div>
       </div>
-      <div class="actions">
-        <div class="ui approve button">Submit</div>
-        <div class="ui cancel button">Cancel</div>
+    </div>
+    <div class="pusher" style="height: 100%;">
+      <div id="center" style="width: 100%; text-align: center; position: relative; top: 50%; transform: translateY(-50%);">
+        <h1>sync</h1>
+        <h3>The easy way to watch media together</h3>
+        <div id="buttons">
+          <button id="host" class="massive ui button">Host</button>
+          <button id="join" class="massive ui button">Join</button>
+        </div>
+      </div>
+      <div id="footer" style="width: 100%; bottom: 0; position: absolute;">
       </div>
     </div>
+  </div>
 
-    <script>
-      require('../renderer.js')
-    </script>
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script
-    src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
-    <script src="../semantic/dist/semantic.min.js"></script>
-    <script src="../config/firebase.js"></script>
-    <script src="./js/public.js"></script>
-    <script src="./js/log.js"></script>
-    </body>
+  <script>require('../renderer.js')</script>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+  <script src="../semantic/dist/semantic.min.js"></script>
+  <script src="../config/firebase.js"></script>
+  <script src="./js/public.js"></script>
+  <script src="./js/log.js"></script>
+</body>
+
 </html>
