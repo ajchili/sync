@@ -13,6 +13,12 @@
 <body>
 
   <div id="home" style="height: 100vh; position: relative;">
+    <div style="position: absolute; left: 1em; top: 1em;">
+      <p>Logged in as:
+        <span id="homeUsername"></span>
+      </p>
+      <button id="homeChangeUsername" class="mini ui button">Change Username</button>
+    </div>
     <div class="ui right sidebar inverted vertical menu">
       <div style="color: #fff; padding: 1em;">
         <h1>Server List</h1>
@@ -29,6 +35,27 @@
         </div>
       </div>
       <div id="footer" style="width: 100%; bottom: 0; position: absolute;">
+      </div>
+    </div>
+  </div>
+
+  <div id="homeChangeUsernameModal" class="mini ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+      Change your username
+    </div>
+    <div class="content">
+        <div class="ui fluid input">
+            <input id="newUsername" type="text" placeholder="New username">
+          </div>
+    </div>
+    <div class="actions">
+      <div class="ui black deny button">
+        Cancel
+      </div>
+      <div id="homeChangeUsernameModalSet" class="ui positive right labeled icon button">
+        Yep, that's me!
+        <i class="checkmark icon"></i>
       </div>
     </div>
   </div>

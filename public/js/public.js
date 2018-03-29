@@ -9,6 +9,10 @@ function authenticateUser() {
     });
 }
 
+function updateUsername(name) {
+    document.getElementById('homeUsername').innerText = name
+}
+
 function loadServers() {
     ref.child('rooms').once('value').then(function (rooms) {
         let serverList = document.getElementById('servers');
@@ -32,6 +36,22 @@ document.getElementById('join').addEventListener('click', function (e) {
     return false;
 });
 
+document.getElementById('homeChangeUsername').addEventListener('click', function (e) {
+    e.preventDefault();
+    $('#homeChangeUsernameModal').modal('show');
+    return false;
+});
+
+document.getElementById('homeChangeUsernameModalSet').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    let newUsername = document.getElementById('newUsername').value
+    let user = firebase.auth().currentUser
+    ref.child('users').child(user.uid).child('name').set(newUsername);
+    updateUsername(newUsername);
+    return false;
+});
+
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         ref.child('users').child(user.uid).once('value').then(function (snapshot) {
@@ -40,6 +60,9 @@ firebase.auth().onAuthStateChanged(function (user) {
                     name: 'syncer',
                     state: 0
                 });
+                updateUsername('syncer');
+            } else {
+                updateUsername(snapshot.child('name').val());
             }
         });
     } else {
