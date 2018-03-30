@@ -2,7 +2,6 @@ const ref = firebase.database().ref();
 
 function authenticateUser() {
     firebase.auth().signInAnonymously().catch(function (error) {
-        // Handle Errors here.
         var errorCode = error.code;
         var errorMessage = error.message;
         console.log(errorCode, errorMessage);
@@ -21,11 +20,39 @@ function loadServers() {
             let div = document.createElement('div');
             div.id = room.key;
             div.classList.add('item');
-            div.innerHTML = '<h3>' + room.child('title').val() + '</h3><p>' + room.child('media').val() + '</p><button  class="mini fluid ui iverted button">Join</button>';
+            let title = room.child('title').val()
+            let media = room.child('media').val() != null ? room.child('media').val() : 'No media'
+            div.innerHTML = '<h3>' + title + '</h3><p>' + media + '</p><button  class="mini fluid ui iverted button">Join</button>';
             serverList.appendChild(div);
         });
     });
 }
+
+document.getElementById('host').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    $('#homeCreateRoomModal').modal('show');
+    
+    return false;
+});
+
+document.getElementById('homeCreateRoom').addEventListener('click', function (e) {
+    e.preventDefault();
+    let title = document.getElementById('roomTitle')
+
+    if (title.value.length < 3) {
+        title.classList.add('error')
+    } else {
+        title.classList.remove('error')
+        let key = ref.child('rooms').push().key
+        let user = firebase.auth().currentUser
+        ref.child('rooms').child(key).set({
+            title: title.value,
+            host: user.uid
+        })
+    }
+    return false;
+})
 
 document.getElementById('join').addEventListener('click', function (e) {
     e.preventDefault();
