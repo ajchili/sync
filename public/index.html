@@ -11,7 +11,7 @@
 </head>
 
 <body>
-
+  <div style="width: 100%; height: 1em; position: absolute; z-index: 1000; -webkit-app-region: drag"></div>
   <div id="home" style="height: 100vh; position: relative;">
     <div style="position: absolute; left: 1em; top: 1em;">
       <p>Logged in as:
@@ -39,8 +39,127 @@
     </div>
   </div>
 
-<div id="room" hidden style="height: 100vh; position: relative;">
-</div>
+  <div id="room" hidden style="height: 100vh; position: relative; overflow: hidden;">
+    <video id="roomVideo" controls style="width: 75%; height: 100%; float: left; background-color: #000;"></video>
+    <div style="width: 25%; height: 100%; float: left;">
+      <div class="ui inverted segment" style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
+        <div class="ui inverted accordion">
+          <div class="title">
+            <i class="dropdown icon"></i>
+            Users
+          </div>
+          <div class="content">
+            <div class="ui inverted relaxed divided list">
+              <div class="item">
+                <div class="content">
+                  <div class="header">Snickerdoodle</div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="content">
+                  <div class="header">Poodle</div>
+                </div>
+              </div>
+              <div class="item">
+                <div class="content">
+                  <div class="header">Paulo</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="title">
+            <i class="dropdown icon"></i>
+            Settings
+          </div>
+          <div class="content">
+          </div>
+          <button id="roomLeave" class="ui fluid button">Leave</button>
+        </div>
+      </div>
+      <div class="ui inverted segment" style="width: 100%; height: 50%; display: flex; flex-flow: column; margin: 0 !important; border-radius: 0 !important;">
+        <div class="title">
+          Chat
+        </div>
+        <div class="ui inverted relaxed divided list" style="overflow-y: scroll;">
+          <div class="item">
+            <div class="content">
+              <div class="header">Snickerdoodle</div>
+              An excellent companion
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Poodle</div>
+              A poodle, its pretty basic
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Paulo</div>
+              He's also a dog
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Snickerdoodle</div>
+              An excellent companion
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Poodle</div>
+              A poodle, its pretty basic
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Paulo</div>
+              He's also a dog
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Snickerdoodle</div>
+              An excellent companion
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Poodle</div>
+              A poodle, its pretty basic
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Paulo</div>
+              He's also a dog
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Snickerdoodle</div>
+              An excellent companion
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Poodle</div>
+              A poodle, its pretty basic
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <div class="header">Paulo</div>
+              He's also a dog
+            </div>
+          </div>
+        </div>
+        <div class="ui fluid input" style="min-height: 38px;">
+          <input id="chatMessage" type="text" placeholder="Your message...">
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div id="homeChangeUsernameModal" class="mini ui modal">
     <i class="close icon"></i>

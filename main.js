@@ -15,7 +15,9 @@ function createWindow() {
     width: 1024,
     height: 768,
     minWidth: 1024,
-    minHeight: 768
+    minHeight: 768,
+    frame: false,
+    titleBarStyle: 'hidden'
   });
 
   mainWindow.loadURL(url.format({
@@ -33,7 +35,11 @@ app.on('ready', createWindow);
 expressApp.use('/media', express.static('media'));
 expressApp.listen(3000);
 let tunnel = localtunnel(3000, function(err, tunnel) {
-  console.log(tunnel.url);
+  if (err) {
+    console.log(err);
+  } else {
+    console.log(tunnel.url);
+  }
 }); 
 
 app.on('window-all-closed', function () {

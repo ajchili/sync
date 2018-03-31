@@ -1,4 +1,5 @@
 const ref = firebase.database().ref();
+$('.ui.accordion').accordion();
 
 function authenticateUser() {
     firebase.auth().signInAnonymously().catch(function (error) {
@@ -9,7 +10,7 @@ function authenticateUser() {
 }
 
 function updateUsername(name) {
-    document.getElementById('homeUsername').innerText = name
+    document.getElementById('homeUsername').innerText = name;
 }
 
 function loadServers() {
@@ -18,11 +19,13 @@ function loadServers() {
         serverList.innerHTML = '';
         rooms.forEach(function (room) {
             let div = document.createElement('div');
+            let title = room.child('title').val();
+            let media = room.child('media').val() != null ? room.child('media').val() : 'No media';
+
             div.id = room.key;
             div.classList.add('item');
-            let title = room.child('title').val()
-            let media = room.child('media').val() != null ? room.child('media').val() : 'No media'
             div.innerHTML = '<h3>' + title + '</h3><p>' + media + '</p><button  class="mini fluid ui iverted button">Join</button>';
+
             serverList.appendChild(div);
         });
     });
@@ -31,27 +34,30 @@ function loadServers() {
 function setViewVisibility(level) {
     switch (level) {
         case 1:
-            document.getElementById('home').hidden = true
-            document.getElementById('room').hidden = false
+            document.getElementById('home').hidden = true;
+            document.getElementById('room').hidden = false;
             break;
         default:
-            document.getElementById('home').hidden = false
-            document.getElementById('room').hidden = true
+            document.getElementById('home').hidden = false;
+            document.getElementById('room').hidden = true;
             break;
     }
 }
 
 function createRoom(title) {
-    let key = ref.child('rooms').push().key
-    let user = firebase.auth().currentUser
+    let key = ref.child('rooms').push().key;
+    let user = firebase.auth().currentUser;
+
     ref.child('rooms').child(key).set({
         title: title,
         host: user.uid
-    })
+    });
+
     ref.child('users').child(user.uid).update({
         state: 1,
         room: key
-    })
+    });
+
     setViewVisibility(1);
 }
 
@@ -66,11 +72,11 @@ function checkIfInRoom() {
                     ref.child('users').child(user.uid).update({
                         state: 0,
                         room: null
-                    })
+                    });
                 }
-            })
+            });
         }
-    })
+    });
 }
 
 document.getElementById('host').addEventListener('click', function (e) {
@@ -86,11 +92,12 @@ document.getElementById('homeCreateRoom').addEventListener('click', function (e)
     let title = document.getElementById('roomTitle')
 
     if (title.value.length < 3) {
-        title.classList.add('error')
+        title.classList.add('error');
     } else {
-        title.classList.remove('error')
+        title.classList.remove('error');
         createRoom(title.value);
     }
+
     return false;
 })
 
@@ -105,17 +112,22 @@ document.getElementById('join').addEventListener('click', function (e) {
 
 document.getElementById('homeChangeUsername').addEventListener('click', function (e) {
     e.preventDefault();
+
     $('#homeChangeUsernameModal').modal('show');
+
     return false;
 });
 
 document.getElementById('homeChangeUsernameModalSet').addEventListener('click', function (e) {
     e.preventDefault();
 
-    let newUsername = document.getElementById('newUsername').value
-    let user = firebase.auth().currentUser
+    let newUsername = document.getElementById('newUsername').value;
+    let user = firebase.auth().currentUser;
+
     ref.child('users').child(user.uid).child('name').set(newUsername);
+    
     updateUsername(newUsername);
+
     return false;
 });
 
