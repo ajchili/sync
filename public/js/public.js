@@ -1,5 +1,23 @@
 const ref = firebase.database().ref();
+const xmlHttp = new XMLHttpRequest();
+
 $('.ui.accordion').accordion();
+
+window.onbeforeunload = function () {
+    let user = firebase.auth().currentUser;
+
+    ref.child('users').child(user.uid).once('value').then(function (snapshot) {
+        if (snapshot.child('room').exists()) {
+            if (snapshot.child('state').val() === 1) {
+                xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/closeRoom/' + snapshot.child('room').val(), true);
+                xmlHttp.send(null);
+            } else if (snapshot.child('state').val() === 2) {
+                xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/leaveRoom/' + snapshot.child('room').val(), true);
+                xmlHttp.send(null);
+            }
+        }
+    })
+};
 
 function authenticateUser() {
     firebase.auth().signInAnonymously().catch(function (error) {
@@ -34,12 +52,20 @@ function loadServers() {
 function setViewVisibility(level) {
     switch (level) {
         case 1:
-            document.getElementById('home').hidden = true;
-            document.getElementById('room').hidden = false;
+            $('#home').fadeOut('fast', function () {
+
+            });
+            $('#room').fadeIn('slow', function () {
+
+            });
             break;
         default:
-            document.getElementById('home').hidden = false;
-            document.getElementById('room').hidden = true;
+            $('#room').fadeOut('fast', function () {
+
+            });
+            $('#home').fadeIn('fast', function () {
+
+            });
             break;
     }
 }
@@ -48,17 +74,23 @@ function createRoom(title) {
     let key = ref.child('rooms').push().key;
     let user = firebase.auth().currentUser;
 
-    ref.child('rooms').child(key).set({
-        title: title,
-        host: user.uid
+    ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
+        if (sessionId.exists()) {
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    let key = xmlHttp.response;
+                    
+                    setViewVisibility(1);
+                } else if (xmlHttp.readyState == 4 && xmlHttp.status == 403) {
+                    alert('Unable to create room, please restart sync.');
+                }
+            }
+            xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
+            xmlHttp.send(null);
+        } else {
+            alert('Unable to create room, please restart sync.');
+        }
     });
-
-    ref.child('users').child(user.uid).update({
-        state: 1,
-        room: key
-    });
-
-    setViewVisibility(1);
 }
 
 function checkIfInRoom() {
@@ -71,10 +103,14 @@ function checkIfInRoom() {
                 } else {
                     ref.child('users').child(user.uid).update({
                         state: 0,
-                        room: null
+                        room: null,
+                        link: null
                     });
+                    setViewVisibility(0);
                 }
             });
+        } else {
+            setViewVisibility(0);
         }
     });
 }
@@ -82,7 +118,9 @@ function checkIfInRoom() {
 document.getElementById('host').addEventListener('click', function (e) {
     e.preventDefault();
 
-    $('#homeCreateRoomModal').modal('show');
+    $('#homeCreateRoomModal').modal({
+        blurring: true
+    }).modal('show');
 
     return false;
 });
@@ -91,15 +129,16 @@ document.getElementById('homeCreateRoom').addEventListener('click', function (e)
     e.preventDefault();
     let title = document.getElementById('roomTitle')
 
-    if (title.value.length < 3) {
-        title.classList.add('error');
+    if (title.value.length === 0) {
+        title.parentElement.classList.add('error');
     } else {
-        title.classList.remove('error');
+        title.parentElement.classList.remove('error');
+        $('#homeCreateRoomModal').modal('hide');
         createRoom(title.value);
     }
 
     return false;
-})
+});
 
 document.getElementById('join').addEventListener('click', function (e) {
     e.preventDefault();
@@ -113,7 +152,9 @@ document.getElementById('join').addEventListener('click', function (e) {
 document.getElementById('homeChangeUsername').addEventListener('click', function (e) {
     e.preventDefault();
 
-    $('#homeChangeUsernameModal').modal('show');
+    $('#homeChangeUsernameModal').modal({
+        blurring: true
+    }).modal('show');
 
     return false;
 });
@@ -125,7 +166,7 @@ document.getElementById('homeChangeUsernameModalSet').addEventListener('click', 
     let user = firebase.auth().currentUser;
 
     ref.child('users').child(user.uid).child('name').set(newUsername);
-    
+
     updateUsername(newUsername);
 
     return false;
@@ -134,13 +175,18 @@ document.getElementById('homeChangeUsernameModalSet').addEventListener('click', 
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         ref.child('users').child(user.uid).once('value').then(function (snapshot) {
+            let sessionId = ref.child('users').child(user.uid).child('sessionId').push().key;
             if (!snapshot.child('name').exists()) {
                 ref.child('users').child(user.uid).set({
                     name: 'syncer',
+                    sessionId: sessionId,
                     state: 0
                 });
                 updateUsername('syncer');
             } else {
+                ref.child('users').child(user.uid).update({
+                    sessionId: sessionId
+                });
                 updateUsername(snapshot.child('name').val());
             }
             checkIfInRoom();

@@ -12,12 +12,13 @@
 
 <body>
   <div style="width: 100%; height: 1em; position: absolute; z-index: 1000; -webkit-app-region: drag"></div>
-  <div id="home" style="height: 100vh; position: relative;">
-    <div style="position: absolute; left: 1em; top: 1em;">
-      <p>Logged in as:
+  <div id="home" style="height: 100vh; position: relative;" hidden>
+    <div style="position: absolute; left: 1em; top: 2em;">
+      <p>Welcome
         <span id="homeUsername"></span>
       </p>
-      <button id="homeChangeUsername" class="mini ui button">Change Username</button>
+      <button id="homeChangeUsername" class="mini ui button" data-tooltip="Set the username that others will see while you watch media together."
+        data-position="bottom left">Change Username</button>
     </div>
     <div class="ui right sidebar inverted vertical menu">
       <div style="color: #fff; padding: 1em;">
@@ -28,7 +29,7 @@
     <div class="pusher" style="height: 100%;">
       <div id="center" style="width: 100%; text-align: center; position: relative; top: 50%; transform: translateY(-50%);">
         <h1>sync</h1>
-        <h3>The easy way to watch media together</h3>
+        <h3>the easy way to watch media together</h3>
         <div id="buttons">
           <button id="host" class="massive ui button">Host</button>
           <button id="join" class="massive ui button">Join</button>
@@ -39,7 +40,7 @@
     </div>
   </div>
 
-  <div id="room" hidden style="height: 100vh; position: relative; overflow: hidden;">
+  <div id="room" style="height: 100vh; position: relative; overflow: hidden;" hidden>
     <video id="roomVideo" controls style="width: 75%; height: 100%; float: left; background-color: #000;"></video>
     <div style="width: 25%; height: 100%; float: left;">
       <div class="ui inverted segment" style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
@@ -52,17 +53,32 @@
             <div class="ui inverted relaxed divided list">
               <div class="item">
                 <div class="content">
-                  <div class="header">Snickerdoodle</div>
+                  <div class="header">
+                    <a class="ui grey image label">
+                      Snickerdoodle
+                      <div class="detail">Host</div>
+                    </a>
+                  </div>
                 </div>
               </div>
               <div class="item">
                 <div class="content">
-                  <div class="header">Poodle</div>
+                  <div class="header">
+                    <a class="ui grey image label">
+                      Poodle
+                      <i class="delete icon"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
               <div class="item">
                 <div class="content">
-                  <div class="header">Paulo</div>
+                  <div class="header">
+                    <a class="ui grey image label">
+                      Paulo
+                      <i class="delete icon"></i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -72,6 +88,9 @@
             Settings
           </div>
           <div class="content">
+            <div class="ui fluid input">
+              <input type="text" placeholder="Title">
+            </div>
           </div>
           <button id="roomLeave" class="ui fluid button">Leave</button>
         </div>
@@ -196,7 +215,7 @@
       <div class="ui black deny button">
         Cancel
       </div>
-      <div id="homeCreateRoom" class="ui positive right icon button">
+      <div id="homeCreateRoom" class="ui right green icon button">
         Create!
       </div>
     </div>
@@ -208,7 +227,6 @@
   <script src="../semantic/dist/semantic.min.js"></script>
   <script src="../config/firebase.js"></script>
   <script src="./js/public.js"></script>
-  <script src="./js/log.js"></script>
 </body>
 
 </html>
