@@ -1,0 +1,24 @@
+{
+  "name": "sync",
+  "version": "0.0.1",
+  "description": "An Electron based media syncing application.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/ajchili/sync",
+  "keywords": [
+    "Electron",
+    "sync"
+  ],
+  "author": "Kirin Patel, Elijah Cutler",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "~1.8.2"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "localtunnel": "^1.8.3",
+    "semantic-ui": "^2.3.0"
+  }
+}
