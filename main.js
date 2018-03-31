@@ -1,5 +1,8 @@
 const electron = require('electron');
+const express = require('express');
+const localtunnel = require('localtunnel');
 const app = electron.app;
+const expressApp = express();
 const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
@@ -7,7 +10,7 @@ const url = require('url');
 
 let mainWindow;
 
-function createWindow () {
+function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1024,
     height: 768,
@@ -27,6 +30,11 @@ function createWindow () {
 };
 
 app.on('ready', createWindow);
+expressApp.use('/media', express.static('media'));
+expressApp.listen(3000);
+let tunnel = localtunnel(3000, function(err, tunnel) {
+  console.log(tunnel.url);
+}); 
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {

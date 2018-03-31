@@ -5,3 +5,5 @@ config/firebase\.js
 semantic/dist/*
 semantic/src/*
 semantic/tasks/*
+
+media/

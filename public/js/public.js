@@ -28,11 +28,56 @@ function loadServers() {
     });
 }
 
+function setViewVisibility(level) {
+    switch (level) {
+        case 1:
+            document.getElementById('home').hidden = true
+            document.getElementById('room').hidden = false
+            break;
+        default:
+            document.getElementById('home').hidden = false
+            document.getElementById('room').hidden = true
+            break;
+    }
+}
+
+function createRoom(title) {
+    let key = ref.child('rooms').push().key
+    let user = firebase.auth().currentUser
+    ref.child('rooms').child(key).set({
+        title: title,
+        host: user.uid
+    })
+    ref.child('users').child(user.uid).update({
+        state: 1,
+        room: key
+    })
+    setViewVisibility(1);
+}
+
+function checkIfInRoom() {
+    let user = firebase.auth().currentUser
+    ref.child('users').child(user.uid).child('room').once('value').then(function (room) {
+        if (room.exists()) {
+            ref.child('rooms').child(room.val()).once('value').then(function (room) {
+                if (room.exists()) {
+                    setViewVisibility(1);
+                } else {
+                    ref.child('users').child(user.uid).update({
+                        state: 0,
+                        room: null
+                    })
+                }
+            })
+        }
+    })
+}
+
 document.getElementById('host').addEventListener('click', function (e) {
     e.preventDefault();
 
     $('#homeCreateRoomModal').modal('show');
-    
+
     return false;
 });
 
@@ -44,12 +89,7 @@ document.getElementById('homeCreateRoom').addEventListener('click', function (e)
         title.classList.add('error')
     } else {
         title.classList.remove('error')
-        let key = ref.child('rooms').push().key
-        let user = firebase.auth().currentUser
-        ref.child('rooms').child(key).set({
-            title: title.value,
-            host: user.uid
-        })
+        createRoom(title.value);
     }
     return false;
 })
@@ -91,6 +131,7 @@ firebase.auth().onAuthStateChanged(function (user) {
             } else {
                 updateUsername(snapshot.child('name').val());
             }
+            checkIfInRoom();
         });
     } else {
         authenticateUser();
