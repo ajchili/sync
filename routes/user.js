@@ -112,7 +112,7 @@ router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
         ref.child('rooms').child(req.params.room).once('value').then(function (room) {
             if (room.exists() && room.child('host').val() === req.params.uid) {
                 ref.child('rooms').child(req.params.room).child('media').set({
-                    name: fileName,
+                    title: fileName,
                     paused: true,
                     time: 0
                 });
