@@ -46,7 +46,13 @@ function loadServers() {
                         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                             roomListener = ref.child('rooms').child(room.key);
                             roomListener.on('value', function (snapshot) {
-                                setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
+                                if (!snapshot.exists()) {
+                                    alert('The sync room you were in was disbanded.');
+                                    leaveRoom();
+                                } else {
+                                    setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
+                                    setRoomMedia(snapshot.child('link').val(), snapshot.child('media'));
+                                }
                             });
 
                             setViewVisibility(1);
@@ -105,6 +111,17 @@ function setRoomUsers(host, users) {
     });
 }
 
+function setRoomMedia(link, media) {
+    if (media.child('title').exists()) {
+        let video = document.getElementById('roomVideo');
+        let source = encodeURI(link + media.child('title').val());
+        if (video.src !== source) {
+            video.src = source;
+            video.load();
+        }
+    }
+}
+
 function createRoom(title) {
     let user = firebase.auth().currentUser;
 
@@ -117,6 +134,7 @@ function createRoom(title) {
                     roomListener = ref.child('rooms').child(key);
                     roomListener.on('value', function (snapshot) {
                         setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
+                        setRoomMedia(snapshot.child('link').val(), snapshot.child('media'));
                     });
 
                     document.addEventListener('drop', function (e) {
