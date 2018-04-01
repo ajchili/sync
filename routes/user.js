@@ -8,9 +8,10 @@ const ref = firebaseApp.database().ref();
 
 // https://stackoverflow.com/a/30405105
 function moveFileToMediaFolder(file) {
-    let location = __dirname.substring(0, __dirname.lastIndexOf('/')) + '/media';
+    let location = process.platform !== 'darwin' ? __dirname.substring(0, __dirname.lastIndexOf('\\')) + '\\media' : __dirname.substring(0, __dirname.lastIndexOf('/')) + '/media';
     let readStream = fs.createReadStream(file);
-    let writeStream = fs.createWriteStream(location + file.substring(file.lastIndexOf('/'), file.length));
+    fs.ensureDir(location, null);
+    let writeStream = fs.createWriteStream(location + file.substring(file.lastIndexOf(process.platform !== 'darwin' ? '\\' : '/'), file.length));
 
     return new Promise(function (resolve, reject) {
         readStream.on('error', reject);
@@ -99,14 +100,14 @@ router.get('/:uid/:room/setRoomMedia/:url', function (req, res) {
 });
 
 router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
-    let path = '/' + decodeURI(req.params.path);
+    let path = decodeURI(req.params.path);
 
     while (path.includes('_____')) {
         path = path.replace('_____', '/');
     }
 
     moveFileToMediaFolder(path).then(function () {
-        let fileName = path.substring(path.lastIndexOf('/') + 1, path.length);
+        let fileName = path.substring(path.lastIndexOf(process.platform !== 'drawin' ? '\\' : '/', path.length));
 
         ref.child('rooms').child(req.params.room).once('value').then(function (room) {
             if (room.exists() && room.child('host').val() === req.params.uid) {

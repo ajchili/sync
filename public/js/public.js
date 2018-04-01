@@ -85,7 +85,7 @@ function createRoom(title) {
                         let file = e.dataTransfer.files[0];
 
                         if (file.type.includes('video/')) {
-                            let path = encodeURI(file.path).substring(1);
+                            let path = encodeURI(file.path);
 
                             while (path.includes('/')) {
                                 path = path.replace('/', '_____');
@@ -154,9 +154,7 @@ function setMedia(url) {
 document.getElementById('homeHost').addEventListener('click', function (e) {
     e.preventDefault();
 
-    $('#homeCreateRoomModal').modal({
-        blurring: true
-    }).modal('show');
+    $('#homeCreateRoomModal').modal('show');
 
     return false;
 });
@@ -180,7 +178,7 @@ document.getElementById('homeJoin').addEventListener('click', function (e) {
     e.preventDefault();
 
     loadServers();
-    $('.ui.sidebar').sidebar('toggle');
+    $('.ui.sidebar').sidebar('push page');
 
     return false;
 });
@@ -188,9 +186,7 @@ document.getElementById('homeJoin').addEventListener('click', function (e) {
 document.getElementById('homeChangeUsername').addEventListener('click', function (e) {
     e.preventDefault();
 
-    $('#homeChangeUsernameModal').modal({
-        blurring: true
-    }).modal('show');
+    $('#homeChangeUsernameModal').modal('show');
 
     return false;
 });

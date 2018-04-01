@@ -15,8 +15,8 @@ function createWindow() {
     height: 768,
     minWidth: 1024,
     minHeight: 768,
-    frame: false,
-    titleBarStyle: 'hidden'
+    frame: process.platform !== 'darwin',
+    titleBarStyle: process.platform !== 'darwin' ? 'default' : 'hidden'
   });
 
   mainWindow.loadURL(url.format({
