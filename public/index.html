@@ -41,7 +41,7 @@
     </div>
   </div>
 
-  <div id="room" style="height: 100vh; position: relative; overflow: hidden;" hidden>
+  <div id="room" style="height: 100vh; position: relative;" hidden>
     <video id="roomVideo" controls style="width: 75%; height: 100%; float: left; background-color: #000;"></video>
     <div style="width: 25%; height: 100%; float: left;">
       <div class="ui inverted segment" style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
@@ -50,39 +50,8 @@
             <i class="dropdown icon"></i>
             Users
           </div>
-          <div id="roomUsers" class="content">
-            <div class="ui inverted relaxed divided list">
-              <div class="item">
-                <div class="content">
-                  <div class="header">
-                    <a class="ui grey image label">
-                      Snickerdoodle
-                      <div class="detail">Host</div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="content">
-                  <div class="header">
-                    <a class="ui grey image label">
-                      Poodle
-                      <i class="delete icon"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="item">
-                <div class="content">
-                  <div class="header">
-                    <a class="ui grey image label">
-                      Paulo
-                      <i class="delete icon"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="content">
+            <div id="roomUsers" class="ui inverted relaxed divided list"></div>
           </div>
           <div class="title">
             <i class="dropdown icon"></i>
@@ -195,9 +164,8 @@
       <div class="ui black deny button">
         Cancel
       </div>
-      <div id="homeChangeUsernameModalSet" class="ui positive right labeled icon button">
+      <div id="homeChangeUsernameModalSet" class="ui right green button">
         Yep, that's me!
-        <i class="checkmark icon"></i>
       </div>
     </div>
   </div>
@@ -216,7 +184,7 @@
       <div class="ui black deny button">
         Cancel
       </div>
-      <div id="homeCreateRoom" class="ui right green icon button">
+      <div id="homeCreateRoom" class="ui right green button">
         Create!
       </div>
     </div>

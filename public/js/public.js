@@ -1,9 +1,15 @@
 const ref = firebase.database().ref();
 const xmlHttp = new XMLHttpRequest();
 
+var serverListListener, roomListener;
+
 (function setupSemantic() {
     $('.ui.accordion').accordion();
 })();
+
+window.onbeforeunload = function () {
+    leaveRoom();
+}
 
 function authenticateUser() {
     firebase.auth().signInAnonymously().catch(function (error) {
@@ -38,6 +44,11 @@ function loadServers() {
                 ref.child('users').child(user.uid).once('value').then(function (snapshot) {
                     xmlHttp.onreadystatechange = function () {
                         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                            roomListener = ref.child('rooms').child(room.key);
+                            roomListener.on('value', function (snapshot) {
+                                setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
+                            });
+
                             setViewVisibility(1);
                         }
                     }
@@ -66,25 +77,35 @@ function setViewVisibility(level) {
         case 1:
             $('.ui.sidebar').sidebar('hide');
             $('#home').fadeOut('fast', function () {
+                $('#room').fadeIn('slow', function () {
 
-            });
-            $('#room').fadeIn('slow', function () {
-
+                });
             });
             break;
         default:
             $('#room').fadeOut('fast', function () {
+                $('#home').fadeIn('slow', function () {
 
-            });
-            $('#home').fadeIn('fast', function () {
-
+                });
             });
             break;
     }
 }
 
+function setRoomUsers(host, users) {
+    let userList = document.getElementById('roomUsers');
+    userList.innerHTML = '';
+
+    users.forEach(function (user) {
+        if (host === user.key) {
+            userList.innerHTML += '<div class="item"><div class="content"><div class="header"><a class="ui grey image label">' + user.val() + '<div class="detail">Host</div></a></div></div></div>';
+        } else {
+            userList.innerHTML += '<div class="item"><div class="content"><div class="header"><a class="ui grey image label">' + user.val() + '<i class="delete icon"></i></a></div></div></div>';
+        }
+    });
+}
+
 function createRoom(title) {
-    let key = ref.child('rooms').push().key;
     let user = firebase.auth().currentUser;
 
     ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
@@ -93,7 +114,10 @@ function createRoom(title) {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
                     let key = xmlHttp.response;
 
-                    setViewVisibility(1);
+                    roomListener = ref.child('rooms').child(key);
+                    roomListener.on('value', function (snapshot) {
+                        setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
+                    });
 
                     document.addEventListener('drop', function (e) {
                         e.preventDefault();
@@ -101,7 +125,8 @@ function createRoom(title) {
 
                         let file = e.dataTransfer.files[0];
 
-                        if (file.type.includes('video/')) {
+                        if (file.type.includes('video/')
+                            || file.type.includes('audio/')) {
                             let path = encodeURI(file.path);
 
                             while (path.includes('/')) {
@@ -109,9 +134,7 @@ function createRoom(title) {
                             }
 
                             xmlHttp.onreadystatechange = function () {
-                                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                                    setMedia(xmlHttp.response);
-                                } else if (xmlHttp.readyState == 4 && xmlHttp.status == 401) {
+                                if (xmlHttp.readyState == 4 && xmlHttp.status == 401) {
                                     alert('Only the host can set the room media!');
                                 } else if (xmlHttp.readyState == 4 && xmlHttp.status == 404) {
                                     alert('Unable to set media!');
@@ -120,6 +143,8 @@ function createRoom(title) {
 
                             xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/local/' + path, true);
                             xmlHttp.send();
+                        } else {
+                            alert(file.type)
                         }
                     });
 
@@ -127,6 +152,8 @@ function createRoom(title) {
                         e.preventDefault();
                         e.stopPropagation();
                     });
+
+                    setViewVisibility(1);
                 } else if (xmlHttp.readyState == 4 && xmlHttp.status == 403) {
                     alert('Unable to create room, please restart sync.');
                 }
@@ -139,29 +166,6 @@ function createRoom(title) {
     });
 }
 
-function checkIfInRoom() {
-    let user = firebase.auth().currentUser
-    ref.child('users').child(user.uid).child('room').once('value').then(function (room) {
-        if (room.exists()) {
-            ref.child('rooms').child(room.val()).once('value').then(function (room) {
-                if (room.exists()) {
-                    setViewVisibility(1);
-                    setMedia(room.child('link').val() + room.child('media').child('name').val());
-                } else {
-                    ref.child('users').child(user.uid).update({
-                        state: 0,
-                        room: null,
-                        link: null
-                    });
-                    setViewVisibility(0);
-                }
-            });
-        } else {
-            setViewVisibility(0);
-        }
-    });
-}
-
 function setMedia(url) {
     let video = document.getElementById('roomVideo');
     video.src = url;
@@ -169,6 +173,10 @@ function setMedia(url) {
 }
 
 function leaveRoom() {
+    if (roomListener != null) {
+        roomListener.off();
+    }
+
     let user = firebase.auth().currentUser;
     ref.child('users').child(user.uid).once('value').then(function (snapshot) {
         if (snapshot.child('state').val() > 0) {
@@ -193,7 +201,7 @@ document.getElementById('homeHost').addEventListener('click', function (e) {
 
 document.getElementById('homeCreateRoom').addEventListener('click', function (e) {
     e.preventDefault();
-    let title = document.getElementById('roomTitle')
+    let title = document.getElementById('roomTitle');
 
     if (title.value.length === 0) {
         title.parentElement.classList.add('error');
@@ -201,6 +209,7 @@ document.getElementById('homeCreateRoom').addEventListener('click', function (e)
         title.parentElement.classList.remove('error');
         $('#homeCreateRoomModal').modal('hide');
         createRoom(title.value);
+        title.value = '';
     }
 
     return false;
@@ -226,12 +235,17 @@ document.getElementById('homeChangeUsername').addEventListener('click', function
 document.getElementById('homeChangeUsernameModalSet').addEventListener('click', function (e) {
     e.preventDefault();
 
-    let newUsername = document.getElementById('newUsername').value;
-    let user = firebase.auth().currentUser;
+    let newUsername = document.getElementById('newUsername');
 
-    ref.child('users').child(user.uid).child('name').set(newUsername);
-
-    updateUsername(newUsername);
+    if (newUsername.value == 0) {
+        newUsername.parentElement.classList.add('error');
+    } else {
+        newUsername.parentElement.classList.remove('error');
+        let user = firebase.auth().currentUser;
+        ref.child('users').child(user.uid).child('name').set(newUsername.value);
+        updateUsername(newUsername.value);
+        newUsername.value = '';
+    }
 
     return false;
 });
@@ -261,7 +275,8 @@ firebase.auth().onAuthStateChanged(function (user) {
                 });
                 updateUsername(snapshot.child('name').val());
             }
-            checkIfInRoom();
+            setViewVisibility(0);
+            leaveRoom();
         });
     } else {
         authenticateUser();
