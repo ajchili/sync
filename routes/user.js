@@ -53,21 +53,25 @@ router.get('/:uid/:sessionId/createRoom/:title', function (req, res) {
     }
 });
 
-router.get('/:uid/:sessionId/closeRoom/:room', function (req, res) {
+router.get('/:uid/:sessionId/joinRoom/:room', function (req, res) {
     try {
         localtunnel(3000, function (err, tunnel) {
             if (err) {
                 return res.status(403).send(err);
             } else {
-                ref.child('rooms').child(req.params.room).remove();
+                ref.child('rooms').child(req.params.room).once('value').then(function (room) {
+                    if (room.exists()) {
+                        ref.child('users').child(req.params.uid).update({
+                            state: 2,
+                            room: room.key,
+                            sessionId: req.params.sessionId
+                        });
 
-                ref.child('users').child(req.params.uid).update({
-                    state: 0,
-                    room: null,
-                    sessionId: req.params.sessionId
+                        return res.sendStatus(200);
+                    } else {
+                        return res.sendStatus(404);
+                    }
                 });
-
-                return res.sendStatus(200);
             }
         });
     } catch (err) {
@@ -81,13 +85,19 @@ router.get('/:uid/:sessionId/leaveRoom/:room', function (req, res) {
             if (err) {
                 return res.status(403).send(err);
             } else {
-                ref.child('users').child(req.params.uid).update({
-                    state: 0,
-                    room: null,
-                    sessionId: req.params.sessionId
-                });
+                ref.child('rooms').child(req.params.room).once('value').then(function (room) {
+                    if (room.exists() && room.child('host').val() === req.params.uid) {
+                        ref.child('rooms').child(req.params.room).remove();
+                    }
 
-                return res.sendStatus(200);
+                    ref.child('users').child(req.params.uid).update({
+                        state: 0,
+                        room: null,
+                        sessionId: req.params.sessionId
+                    });
+
+                    return res.sendStatus(200);
+                });
             }
         });
     } catch (err) {

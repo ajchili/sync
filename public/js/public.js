@@ -24,13 +24,29 @@ function loadServers() {
         rooms.forEach(function (room) {
             let div = document.createElement('div');
             let title = room.child('title').val();
-            let media = room.child('media').val() != null ? room.child('media').val() : 'No media';
+            let media = room.child('media').child('title').val() != null ? room.child('media').child('title').val().substring(1) : 'No media';
 
             div.id = room.key;
             div.classList.add('item');
-            div.innerHTML = '<h3>' + title + '</h3><p>' + media + '</p><button  class="mini fluid ui iverted button">Join</button>';
+            div.innerHTML = '<h3>' + title + '</h3><p>' + media + '</p><button id="join_' + room.key + '" class="mini fluid ui iverted button">Join</button>';
 
             serverList.appendChild(div);
+            document.getElementById('join_' + room.key).addEventListener('click', function (e) {
+                e.preventDefault();
+
+                let user = firebase.auth().currentUser;
+                ref.child('users').child(user.uid).once('value').then(function (snapshot) {
+                    xmlHttp.onreadystatechange = function () {
+                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                            setViewVisibility(1);
+                        }
+                    }
+                    xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/joinRoom/' + room.key, true);
+                    xmlHttp.send();
+                });
+
+                return false;
+            });
         });
     });
 }
@@ -40,7 +56,7 @@ function setViewVisibility(level) {
         e.preventDefault();
         e.stopPropagation();
     });
-    
+
     document.addEventListener('dragover', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -48,6 +64,7 @@ function setViewVisibility(level) {
 
     switch (level) {
         case 1:
+            $('.ui.sidebar').sidebar('hide');
             $('#home').fadeOut('fast', function () {
 
             });
@@ -105,7 +122,7 @@ function createRoom(title) {
                             xmlHttp.send();
                         }
                     });
-                    
+
                     document.addEventListener('dragover', function (e) {
                         e.preventDefault();
                         e.stopPropagation();
@@ -151,6 +168,21 @@ function setMedia(url) {
     video.load();
 }
 
+function leaveRoom() {
+    let user = firebase.auth().currentUser;
+    ref.child('users').child(user.uid).once('value').then(function (snapshot) {
+        if (snapshot.child('state').val() > 0) {
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    setViewVisibility(0);
+                }
+            }
+            xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/leaveRoom/' + snapshot.child('room').val(), true);
+            xmlHttp.send();
+        }
+    });
+}
+
 document.getElementById('homeHost').addEventListener('click', function (e) {
     e.preventDefault();
 
@@ -178,7 +210,7 @@ document.getElementById('homeJoin').addEventListener('click', function (e) {
     e.preventDefault();
 
     loadServers();
-    $('.ui.sidebar').sidebar('push page');
+    $('.ui.sidebar').sidebar('toggle');
 
     return false;
 });
@@ -203,6 +235,14 @@ document.getElementById('homeChangeUsernameModalSet').addEventListener('click', 
 
     return false;
 });
+
+document.getElementById('roomLeave').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    leaveRoom();
+
+    return false;
+})
 
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {

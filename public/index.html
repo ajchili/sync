@@ -13,29 +13,31 @@
 <body>
   <div style="width: 100%; height: 20px; position: absolute; z-index: 1000; -webkit-app-region: drag;"></div>
 
-  <div class="ui right sidebar inverted vertical menu">
-    <div style="color: #fff; padding: 1em;">
-      <h1>Server List</h1>
-      <div id="homeServers"></div>
-    </div>
-  </div>
-  <div id="home" class="pusher" style="height: 100vh; position: relative;" hidden>
-    <div style="position: absolute; left: 1em; top: 2em;">
-      <p>Welcome
-        <span id="homeUsername"></span>
-      </p>
-      <button id="homeChangeUsername" class="mini ui button" data-tooltip="Set the username that others will see while you watch media together."
-        data-position="bottom left">Change Username</button>
-    </div>
-    <div style="width: 100%; text-align: center; position: relative; top: 50%; transform: translateY(-50%);">
-      <h1>sync</h1>
-      <h3>the easy way to watch media together</h3>
-      <div id="buttons">
-        <button id="homeHost" class="massive ui button">Host</button>
-        <button id="homeJoin" class="massive ui button">Join</button>
+  <div id="home" style="height: 100vh; position: relative;" hidden>
+    <div class="ui right sidebar inverted vertical menu">
+      <div style="color: #fff; padding: 1em;">
+        <h1>Server List</h1>
+        <div id="homeServers"></div>
       </div>
     </div>
-    <div style="width: 100%; bottom: 0; position: absolute;">
+    <div class="pusher" style="height: 100%">
+      <div style="position: absolute; left: 1em; top: 2em;">
+        <p>Welcome
+          <span id="homeUsername"></span>
+        </p>
+        <button id="homeChangeUsername" class="mini ui button" data-tooltip="Set the username that others will see while you watch media together."
+          data-position="bottom left">Change Username</button>
+      </div>
+      <div style="width: 100%; text-align: center; position: relative; top: 50%; transform: translateY(-50%);">
+        <h1>sync</h1>
+        <h3>the easy way to watch media together</h3>
+        <div id="buttons">
+          <button id="homeHost" class="massive ui button">Host</button>
+          <button id="homeJoin" class="massive ui button">Join</button>
+        </div>
+      </div>
+      <div style="width: 100%; bottom: 0; position: absolute;">
+      </div>
     </div>
   </div>
 
