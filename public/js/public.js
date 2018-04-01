@@ -79,9 +79,9 @@ function loadServers() {
                                     e.preventDefault();
 
                                     let message = document.getElementById('roomChatMessage').value;
-    
+
                                     if (message.length > 0) {
-                                        xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/sendMessage/' + message, true);
+                                        xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
                                         xmlHttp.send();
                                         document.getElementById('roomChatMessage').value = '';
                                     }
