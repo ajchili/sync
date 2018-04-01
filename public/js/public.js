@@ -46,7 +46,7 @@ function loadServers() {
         rooms.forEach(function (room) {
             let div = document.createElement('div');
             let title = room.child('title').val();
-            let media = room.child('media').child('title').val() != null ? room.child('media').child('title').val().substring(1) : 'No media';
+            let media = room.child('media').child('title').val() != null ? room.child('media').child('title').val() : 'No media';
 
             div.id = room.key;
             div.classList.add('item');
@@ -69,18 +69,21 @@ function loadServers() {
                                     setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
                                     setRoomMedia(snapshot.child('link').val(), snapshot.child('media'));
                                     setRoomMessages(snapshot.child('messages'));
+                                    setRoomVideoEvents(snapshot.key, false);
                                 }
                             });
 
+                            $('#roomChatMessage').off();
                             $('#roomChatMessage').keypress(function (e) {
                                 if (e.which == 13 && !e.shiftKey) {
                                     e.preventDefault();
 
                                     let message = document.getElementById('roomChatMessage').value;
-
+    
                                     if (message.length > 0) {
-                                        xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
+                                        xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/sendMessage/' + message, true);
                                         xmlHttp.send();
+                                        document.getElementById('roomChatMessage').value = '';
                                     }
 
                                     return false;
@@ -128,12 +131,29 @@ function setRoomUsers(host, users) {
         media: title of media
 */
 function setRoomMedia(link, media) {
+    let video = document.getElementById('roomVideo');
     if (media.child('title').exists()) {
-        let video = document.getElementById('roomVideo');
         let source = encodeURI(link + media.child('title').val());
         if (video.src !== source) {
             video.src = source;
             video.load();
+        }
+    }
+
+    if (media.child('paused').exists()) {
+        if (media.child('paused').val()) {
+            video.pause();
+        } else {
+            video.play();
+        }
+    }
+
+    if (media.child('time').exists()) {
+        let time = media.child('time').val();
+        let currentTime = video.currentTime;
+
+        if (currentTime < time - 1 || currentTime > time + 1) {
+            video.currentTime = time;
         }
     }
 }
@@ -223,6 +243,7 @@ function createRoom(title) {
                             setRoomVideoEvents(snapshot.key, true);
                         });
 
+                        $('#roomChatMessage').off();
                         $('#roomChatMessage').keypress(function (e) {
                             if (e.which == 13 && !e.shiftKey) {
                                 e.preventDefault();
