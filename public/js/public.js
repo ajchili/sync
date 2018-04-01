@@ -1,16 +1,20 @@
 const ref = firebase.database().ref();
 const xmlHttp = new XMLHttpRequest();
 
-var serverListListener, roomListener;
+var serverListListener, roomListener, videoTimeInterval;
 
-(function setupSemantic() {
-    $('.ui.accordion').accordion();
-})();
-
+/*
+    Name: onbeforeunload
+    Purpose: Leave current room if electron is refreshed.
+*/
 window.onbeforeunload = function () {
     leaveRoom();
 }
 
+/*
+    Name: authenticateUser
+    Purpose: Sign in the user
+*/
 function authenticateUser() {
     firebase.auth().signInAnonymously().catch(function (error) {
         var errorCode = error.code;
@@ -19,10 +23,22 @@ function authenticateUser() {
     });
 }
 
+/*
+    Name: updateUserName
+    Purpose: Set the username span to display username and if a new username is provided, update it in Firebase.
+    Params:
+        name: username
+*/
 function updateUsername(name) {
+    let user = firebase.auth().currentUser;
+    ref.child('users').child(user.uid).child('name').set(name);
     document.getElementById('homeUsername').innerText = name;
 }
 
+/*
+    Name: loadServers
+    Purpose: Load servers to be displayed in server list.
+*/
 function loadServers() {
     ref.child('rooms').once('value').then(function (rooms) {
         let serverList = document.getElementById('homeServers');
@@ -84,36 +100,13 @@ function loadServers() {
     });
 }
 
-function setViewVisibility(level) {
-    document.addEventListener('drop', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    document.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    switch (level) {
-        case 1:
-            $('.ui.sidebar').sidebar('hide');
-            $('#home').fadeOut('fast', function () {
-                $('#room').fadeIn('slow', function () {
-
-                });
-            });
-            break;
-        default:
-            $('#room').fadeOut('fast', function () {
-                $('#home').fadeIn('slow', function () {
-
-                });
-            });
-            break;
-    }
-}
-
+/* 
+    Name: setRoomUsers
+    Purpose: Display the users that are in a room in the user list.
+    Parmas:
+        host: host uid
+        users: snapshot of users in room
+*/
 function setRoomUsers(host, users) {
     let userList = document.getElementById('roomUsers');
     userList.innerHTML = '';
@@ -127,6 +120,13 @@ function setRoomUsers(host, users) {
     });
 }
 
+/*
+    Name: setRoomMedia
+    Purpose: Set the media that the room is currently playing.
+    Params:
+        link: url that is associated with room
+        media: title of media
+*/
 function setRoomMedia(link, media) {
     if (media.child('title').exists()) {
         let video = document.getElementById('roomVideo');
@@ -138,6 +138,12 @@ function setRoomMedia(link, media) {
     }
 }
 
+/*
+    Name: setRoomMessages
+    Purpose: Display the messages that have been sent.
+    Params:
+        messages: snapshot of messages sent in room
+*/
 function setRoomMessages(messages) {
     let messageList = document.getElementById('roomMessages');
     messageList.innerHTML = '';
@@ -149,6 +155,55 @@ function setRoomMessages(messages) {
     messageList.scrollTop = messageList.scrollHeight;
 }
 
+/*
+    Name: setRoomVideoEvents
+    Purpose: Set event listeners for video events.
+    Params:
+        room: room id
+        isHost: is current user the host
+*/
+function setRoomVideoEvents(room, isHost) {
+    let video = document.getElementById('roomVideo');
+
+    clearInterval(videoTimeInterval);
+
+    const pauseEventListener = function (e) {
+        e.preventDefault();
+
+        ref.child('rooms').child(room).child('media').child('paused').set(true);
+
+        return false;
+    };
+
+    const playEventListener = function (e) {
+        e.preventDefault();
+
+        ref.child('rooms').child(room).child('media').child('paused').set(false);
+
+        return false;
+    };
+
+    video.classList.remove('userVideo');
+    video.removeEventListener('pause', pauseEventListener);
+    video.removeEventListener('play', playEventListener);
+
+    if (isHost) {
+        video.addEventListener('pause', pauseEventListener);
+        video.addEventListener('play', playEventListener);
+        videoTimeInterval = setInterval(function () {
+            ref.child('rooms').child(room).child('media').child('time').set(video.currentTime);
+        }, 200);
+    } else {
+        video.classList.add('userVideo');
+    }
+}
+
+/*
+    Name: createRoom
+    Purpose: Interacts with nodejs backend to create room.
+    Params:
+        title: title of room
+*/
 function createRoom(title) {
     let user = firebase.auth().currentUser;
 
@@ -165,6 +220,7 @@ function createRoom(title) {
                             setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
                             setRoomMedia(snapshot.child('link').val(), snapshot.child('media'));
                             setRoomMessages(snapshot.child('messages'));
+                            setRoomVideoEvents(snapshot.key, true);
                         });
 
                         $('#roomChatMessage').keypress(function (e) {
@@ -231,16 +287,16 @@ function createRoom(title) {
     });
 }
 
-function setMedia(url) {
-    let video = document.getElementById('roomVideo');
-    video.src = url;
-    video.load();
-}
-
+/*
+    Name: leaveRoom
+    Purpose: Interacts with nodejs backend to leave or disband current room depending on if the user is the host.
+*/
 function leaveRoom() {
     if (roomListener != null) {
         roomListener.off();
     }
+
+    clearInterval(videoTimeInterval);
 
     let user = firebase.auth().currentUser;
     ref.child('users').child(user.uid).once('value').then(function (snapshot) {
@@ -257,73 +313,10 @@ function leaveRoom() {
     });
 }
 
-document.getElementById('homeHost').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    $('#homeCreateRoomModal').modal('show');
-
-    return false;
-});
-
-document.getElementById('homeCreateRoom').addEventListener('click', function (e) {
-    e.preventDefault();
-    let title = document.getElementById('roomTitle');
-
-    if (title.value.length === 0) {
-        title.parentElement.classList.add('error');
-    } else {
-        title.parentElement.classList.remove('error');
-        $('#homeCreateRoomModal').modal('hide');
-        createRoom(title.value);
-        title.value = '';
-    }
-
-    return false;
-});
-
-document.getElementById('homeJoin').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    loadServers();
-    $('.ui.sidebar').sidebar('toggle');
-
-    return false;
-});
-
-document.getElementById('homeChangeUsername').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    $('#homeChangeUsernameModal').modal('show');
-
-    return false;
-});
-
-document.getElementById('homeChangeUsernameModalSet').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    let newUsername = document.getElementById('newUsername');
-
-    if (newUsername.value == 0) {
-        newUsername.parentElement.classList.add('error');
-    } else {
-        newUsername.parentElement.classList.remove('error');
-        let user = firebase.auth().currentUser;
-        ref.child('users').child(user.uid).child('name').set(newUsername.value);
-        updateUsername(newUsername.value);
-        newUsername.value = '';
-    }
-
-    return false;
-});
-
-document.getElementById('roomLeave').addEventListener('click', function (e) {
-    e.preventDefault();
-
-    leaveRoom();
-
-    return false;
-})
-
+/*
+    Name: onAuthStateChanged
+    Purpose: Setup sync when a user is authenticated or create a user if a user does not already exist.
+*/
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {
         ref.child('users').child(user.uid).once('value').then(function (snapshot) {
