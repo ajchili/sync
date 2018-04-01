@@ -162,8 +162,33 @@ router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
             }
         });
     }).catch(function (err) {
-        console.log(err)
+        console.log(err);
         return res.status(404).send(err);
+    });
+});
+
+router.get('/:uid/:room/sendMessage/:message', function (req, res) {
+    let messeage = decodeURI(req.params.message);
+
+    while (messeage.includes('_____')) {
+        messeage = messeage.replace('_____', '/');
+    }
+
+    ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
+        let messageId = ref.child('rooms').child(req.params.room).child('messages').push().key;
+
+        ref.child('rooms').child(req.params.room).child('users').child(req.params.uid).once('value').then(function (user) {
+            if (user.exists()) {
+                ref.child('rooms').child(req.params.room).child('messages').child(messageId).set({
+                    sender: username.val(),
+                    body: req.params.message
+                });
+        
+                return res.sendStatus(200);
+            } else {
+                return res.sendStatus(401);
+            }
+        })
     });
 });
 
