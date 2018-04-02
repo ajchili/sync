@@ -1,7 +1,7 @@
 const ref = firebase.database().ref();
 const xmlHttp = new XMLHttpRequest();
 
-var serverListListener, roomListener, videoTimeInterval;
+var serverListListener, roomListener, roomMediaListener, roomUserListener, roomMessageListener, videoTimeInterval;
 
 /*
     Name: onbeforeunload
@@ -63,14 +63,27 @@ function loadServers() {
                             roomListener = ref.child('rooms').child(room.key);
                             roomListener.on('value', function (snapshot) {
                                 if (!snapshot.exists()) {
+                                    roomListener.off();
                                     alert('The sync room you were in was disbanded.');
                                     leaveRoom();
-                                } else {
-                                    setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
-                                    setRoomMedia(snapshot.child('link').val(), snapshot.child('media'));
-                                    setRoomMessages(snapshot.child('messages'));
-                                    setRoomVideoEvents(snapshot.key, false);
                                 }
+                            });
+
+                            ref.child('rooms').child(room.key).once('value').then(function (room) {
+                                roomMediaListener = ref.child('rooms').child(room.key).child('media');
+                                roomMediaListener.on('value', function (media) {
+                                    setRoomMedia(room.child('link').val(), media, false);
+                                });
+
+                                roomUserListener = ref.child('rooms').child(room.key).child('users');
+                                roomUserListener.on('value', function (users) {
+                                    setRoomUsers(room.child('host').val(), users);
+                                });
+
+                                roomMessageListener = ref.child('rooms').child(room.key).child('messages');
+                                roomMessageListener.on('value', function (messages) {
+                                    setRoomMessages(messages);
+                                });
                             });
 
                             $('#roomChatMessage').off();
@@ -129,31 +142,31 @@ function setRoomUsers(host, users) {
     Params:
         link: url that is associated with room
         media: title of media
+        isHost: is host of room
 */
-function setRoomMedia(link, media) {
-    let video = document.getElementById('roomVideo');
+function setRoomMedia(link, media, isHost) {
+    let player = videojs('roomVideo')
     if (media.child('title').exists()) {
-        let source = encodeURI(link + media.child('title').val());
-        if (video.src !== source) {
-            video.src = source;
-            video.load();
+        let url = encodeURI(link + media.child('title').val())
+        if (player.currentSrc() !== url) {
+            player.src(url);
         }
     }
 
-    if (media.child('paused').exists()) {
-        if (media.child('paused').val()) {
-            video.pause();
-        } else {
-            video.play();
-        }
-    }
-
-    if (media.child('time').exists()) {
-        let time = media.child('time').val();
-        let currentTime = video.currentTime;
-
-        if (currentTime < time - 1 || currentTime > time + 1) {
-            video.currentTime = time;
+    if (!isHost) {
+        if (media.child('paused').exists()) {
+            if (media.child('paused').val()) {
+                player.pause();
+            } else {
+                if (media.child('time').exists()) {
+                    let currentTime = player.currentTime();
+                    let mediaTime = media.child('time').val();
+                    if (currentTime < mediaTime - 1 || currentTime > mediaTime + 1) {
+                        player.currentTime(mediaTime);
+                    }
+                }
+                player.play();
+            }
         }
     }
 }
@@ -180,42 +193,20 @@ function setRoomMessages(messages) {
     Purpose: Set event listeners for video events.
     Params:
         room: room id
-        isHost: is current user the host
 */
-function setRoomVideoEvents(room, isHost) {
-    let video = document.getElementById('roomVideo');
+function setRoomVideoEvents(room) {
+    let player = videojs('roomVideo')
 
     clearInterval(videoTimeInterval);
-
-    const pauseEventListener = function (e) {
-        e.preventDefault();
-
-        ref.child('rooms').child(room).child('media').child('paused').set(true);
-
-        return false;
-    };
-
-    const playEventListener = function (e) {
-        e.preventDefault();
-
-        ref.child('rooms').child(room).child('media').child('paused').set(false);
-
-        return false;
-    };
-
-    video.classList.remove('userVideo');
-    video.removeEventListener('pause', pauseEventListener);
-    video.removeEventListener('play', playEventListener);
-
-    if (isHost) {
-        video.addEventListener('pause', pauseEventListener);
-        video.addEventListener('play', playEventListener);
-        videoTimeInterval = setInterval(function () {
-            ref.child('rooms').child(room).child('media').child('time').set(video.currentTime);
-        }, 200);
-    } else {
-        video.classList.add('userVideo');
-    }
+    videoTimeInterval = setInterval(function () {
+        ref.child('rooms').child(room).child('media').child('time').set(player.currentTime());
+    }, 200);
+    player.on('pause', function () {
+        ref.child('rooms').child(room).child('media').child('paused').set(true)
+    });
+    player.on('play', function () {
+        ref.child('rooms').child(room).child('media').child('paused').set(false)
+    });
 }
 
 /*
@@ -235,12 +226,23 @@ function createRoom(title) {
                     if (key == null) {
                         key = xmlHttp.response;
 
-                        roomListener = ref.child('rooms').child(key);
-                        roomListener.on('value', function (snapshot) {
-                            setRoomUsers(snapshot.child('host').val(), snapshot.child('users'));
-                            setRoomMedia(snapshot.child('link').val(), snapshot.child('media'));
-                            setRoomMessages(snapshot.child('messages'));
-                            setRoomVideoEvents(snapshot.key, true);
+                        ref.child('rooms').child(key).once('value').then(function (room) {
+                            roomMediaListener = ref.child('rooms').child(key).child('media');
+                            roomMediaListener.on('value', function (media) {
+                                setRoomMedia(room.child('link').val(), media, true);
+                            });
+
+                            roomUserListener = ref.child('rooms').child(key).child('users');
+                            roomUserListener.on('value', function (users) {
+                                setRoomUsers(room.child('host').val(), users);
+                            });
+
+                            roomMessageListener = ref.child('rooms').child(key).child('messages');
+                            roomMessageListener.on('value', function (messages) {
+                                setRoomMessages(messages);
+                            });
+
+                            setRoomVideoEvents(key);
                         });
 
                         $('#roomChatMessage').off();
@@ -266,8 +268,7 @@ function createRoom(title) {
 
                             let file = e.dataTransfer.files[0];
 
-                            if (file.type.includes('video/')
-                                || file.type.includes('audio/')) {
+                            if (file.type.includes('video/')) {
                                 let path = encodeURI(file.path);
 
                                 while (path.includes('/')) {
@@ -317,6 +318,18 @@ function leaveRoom() {
         roomListener.off();
     }
 
+    if (roomMediaListener != null) {
+        roomMediaListener.off();
+    }
+
+    if (roomUserListener != null) {
+        roomUserListener.off();
+    }
+
+    if (roomMessageListener != null) {
+        roomMessageListener.off();
+    }
+
     clearInterval(videoTimeInterval);
 
     let user = firebase.auth().currentUser;
@@ -335,8 +348,8 @@ function leaveRoom() {
 }
 
 /*
-    Name: onAuthStateChanged
-    Purpose: Setup sync when a user is authenticated or create a user if a user does not already exist.
+Name: onAuthStateChanged
+Purpose: Setup sync when a user is authenticated or create a user if a user does not already exist.
 */
 firebase.auth().onAuthStateChanged(function (user) {
     if (user) {

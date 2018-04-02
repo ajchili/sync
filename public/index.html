@@ -6,6 +6,7 @@
   <title>sync</title>
 
   <link rel="stylesheet" type="text/css" href="../semantic/dist/semantic.min.css">
+  <link href="http://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="./css/video.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -43,7 +44,10 @@
   </div>
 
   <div id="room" style="height: 100vh; position: relative;" hidden>
-    <video id="roomVideo" controls style="width: 75%; height: 100%; float: left; background-color: #000;"></video>
+    <!-- <video id="roomVideo" controls style="width: 75%; height: 100%; float: left; background-color: #000;"></video> -->
+    <div style="width: 75%; height: 100%; float: left; background-color: #000;">
+      <video id="roomVideo" class="video-js" controls preload="auto" style="width: 100%; height: 100%; float: left; background-color: #000;" data-setup="{}"></video>
+    </div>
     <div style="width: 25%; height: 100%; float: left;">
       <div class="ui inverted segment" style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
         <div class="ui inverted accordion">
@@ -121,6 +125,7 @@
   <script>require('../renderer.js')</script>
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+  <script src="http://vjs.zencdn.net/6.6.3/video.js"></script>
   <script src="../semantic/dist/semantic.min.js"></script>
   <script src="../config/firebase.js"></script>
   <script src="./js/utils.js"></script>
