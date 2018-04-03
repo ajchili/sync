@@ -31,6 +31,25 @@ document.getElementById('homeCreateRoom').addEventListener('click', function (e)
 });
 
 /*
+    Name: roomTitle keyup
+    Purpose: Create room with provided title on enter, however, if no title is provided, display error.
+*/
+$('#roomTitle').on('keyup', function (e) {
+    if (e.keyCode == 13) {
+        let title = document.getElementById('roomTitle');
+    
+        if (title.value.length === 0) {
+            title.parentElement.classList.add('error');
+        } else {
+            title.parentElement.classList.remove('error');
+            $('#homeCreateRoomModal').modal('hide');
+            createRoom(title.value);
+            title.value = '';
+        }
+    }
+});
+
+/*
     Name: homeJoin click
     Purpose: Show server list.
 */
