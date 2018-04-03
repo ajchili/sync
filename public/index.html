@@ -39,14 +39,13 @@
         </div>
       </div>
       <div style="width: 100%; bottom: 0; position: absolute;">
+        <p style="width: 100%; text-align: center;">3.0.0 Pre-Alpha</p>
       </div>
     </div>
   </div>
 
   <div id="room" style="height: 100vh; position: relative;" hidden>
-    <!-- <video id="roomVideo" controls style="width: 75%; height: 100%; float: left; background-color: #000;"></video> -->
-    <div style="width: 75%; height: 100%; float: left; background-color: #000;">
-      <video id="roomVideo" class="video-js" controls preload="auto" style="width: 100%; height: 100%; float: left; background-color: #000;" data-setup="{}"></video>
+    <div id="roomVideoHolder" style="width: 75%; height: 100%; float: left; background-color: #000;">
     </div>
     <div style="width: 25%; height: 100%; float: left;">
       <div class="ui inverted segment" style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
@@ -122,7 +121,22 @@
     </div>
   </div>
 
-  <script>require('../renderer.js')</script>
+  <div id="roomDisbandedModal" class="ui basic modal">
+    <div class="header">
+      The sync room you were in was disband!
+    </div>
+    <div class="content">
+      It looks like the host was all done watching.
+      <br>If you want to keep watching feel free to join another room or host one yourself!
+    </div>
+    <div class="actions">
+      <div id="roomDisbandedModalClose" class="ui ok inverted button">
+        Gotcha
+      </div>
+    </div>
+  </div>
+
+  <script>require('../renderer.js');</script>
   <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
   <script src="http://vjs.zencdn.net/6.6.3/video.js"></script>

@@ -64,10 +64,15 @@ function loadServers() {
                             roomListener.on('value', function (snapshot) {
                                 if (!snapshot.exists()) {
                                     roomListener.off();
-                                    alert('The sync room you were in was disbanded.');
-                                    leaveRoom();
+                                    $('#roomDisbandedModal').modal({
+                                        onHidden: function () {
+                                            leaveRoom();
+                                        }
+                                    }).modal('show');
                                 }
                             });
+
+                            createPlayer();
 
                             ref.child('rooms').child(room.key).once('value').then(function (room) {
                                 roomMediaListener = ref.child('rooms').child(room.key).child('media');
@@ -84,6 +89,8 @@ function loadServers() {
                                 roomMessageListener.on('value', function (messages) {
                                     setRoomMessages(messages);
                                 });
+
+                                setRoomVideoEvents(room.key, false);
                             });
 
                             $('#roomChatMessage').off();
@@ -117,6 +124,15 @@ function loadServers() {
 }
 
 /* 
+    Name: createPlayer
+    Purpose: Creates videojs player when user connects to a room.
+*/
+function createPlayer() {
+    let roomVideo = '<video id="roomVideo" class="video-js" controls preload="auto" style="width: 100%; height: 100%; float: left; background-color: #000;" data-setup="{}"></video>';
+    document.getElementById('roomVideoHolder').innerHTML = roomVideo;
+}
+
+/* 
     Name: setRoomUsers
     Purpose: Display the users that are in a room in the user list.
     Parmas:
@@ -145,7 +161,8 @@ function setRoomUsers(host, users) {
         isHost: is host of room
 */
 function setRoomMedia(link, media, isHost) {
-    let player = videojs('roomVideo')
+    let player = videojs('roomVideo');
+
     if (media.child('title').exists()) {
         let url = encodeURI(link + media.child('title').val())
         if (player.currentSrc() !== url) {
@@ -158,14 +175,15 @@ function setRoomMedia(link, media, isHost) {
             if (media.child('paused').val()) {
                 player.pause();
             } else {
-                if (media.child('time').exists()) {
-                    let currentTime = player.currentTime();
-                    let mediaTime = media.child('time').val();
-                    if (currentTime < mediaTime - 1 || currentTime > mediaTime + 1) {
-                        player.currentTime(mediaTime);
-                    }
-                }
                 player.play();
+            }
+        }
+
+        if (media.child('time').exists()) {
+            let currentTime = player.currentTime();
+            let mediaTime = media.child('time').val();
+            if (currentTime < mediaTime - 1 || currentTime > mediaTime + 1) {
+                player.currentTime(mediaTime);
             }
         }
     }
@@ -193,20 +211,34 @@ function setRoomMessages(messages) {
     Purpose: Set event listeners for video events.
     Params:
         room: room id
+        isHost: is host of room
 */
-function setRoomVideoEvents(room) {
-    let player = videojs('roomVideo')
+function setRoomVideoEvents(room, isHost) {
+    let player = videojs('roomVideo');
 
     clearInterval(videoTimeInterval);
-    videoTimeInterval = setInterval(function () {
-        ref.child('rooms').child(room).child('media').child('time').set(player.currentTime());
-    }, 200);
-    player.on('pause', function () {
-        ref.child('rooms').child(room).child('media').child('paused').set(true)
-    });
-    player.on('play', function () {
-        ref.child('rooms').child(room).child('media').child('paused').set(false)
-    });
+
+    if (isHost) {
+        videoTimeInterval = setInterval(function () {
+            ref.child('rooms').child(room).child('media').child('time').set(player.currentTime());
+        }, 200);
+
+        player.on('pause', function () {
+            ref.child('rooms').child(room).child('media').child('paused').set(true);
+        });
+
+        player.on('play', function () {
+            ref.child('rooms').child(room).child('media').child('paused').set(false);
+        });
+    } else {
+        player.on('play', function () {
+            ref.child('rooms').child(room).child('media').child('paused').once('value').then(function (isMediaPaused) {
+                if (isMediaPaused.exists() && isMediaPaused.val()) {
+                    player.pause();
+                }
+            });
+        });
+    }
 }
 
 /*
@@ -227,6 +259,8 @@ function createRoom(title) {
                         key = xmlHttp.response;
 
                         ref.child('rooms').child(key).once('value').then(function (room) {
+                            createPlayer();
+
                             roomMediaListener = ref.child('rooms').child(key).child('media');
                             roomMediaListener.on('value', function (media) {
                                 setRoomMedia(room.child('link').val(), media, true);
@@ -242,7 +276,7 @@ function createRoom(title) {
                                 setRoomMessages(messages);
                             });
 
-                            setRoomVideoEvents(key);
+                            setRoomVideoEvents(key, true);
                         });
 
                         $('#roomChatMessage').off();
@@ -286,7 +320,7 @@ function createRoom(title) {
                                 xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/local/' + path, true);
                                 xmlHttp.send();
                             } else {
-                                alert(file.type)
+                                alert('Incompatable File Type: ' + file.type);
                             }
                         });
 
@@ -337,7 +371,10 @@ function leaveRoom() {
         if (snapshot.child('state').val() > 0) {
             xmlHttp.onreadystatechange = function () {
                 if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    document.getElementById('roomVideo').src = '';
+                    if (videojs('roomVideo')) {
+                        player = videojs('roomVideo');
+                        player.dispose();
+                    }
                     setViewVisibility(0);
                 }
             }
@@ -368,8 +405,12 @@ firebase.auth().onAuthStateChanged(function (user) {
                 });
                 updateUsername(snapshot.child('name').val());
             }
+
+            if (snapshot.child('room').exists()) {
+                leaveRoom();
+            }
+
             setViewVisibility(0);
-            leaveRoom();
         });
     } else {
         authenticateUser();
