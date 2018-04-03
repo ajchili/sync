@@ -6,3 +6,4 @@ semantic/dist/*
 semantic/src/*
 semantic/tasks/*
 media/
+chrome_extension/ext/js/firebase\.js
