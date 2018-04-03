@@ -106,3 +106,11 @@ document.getElementById('roomLeave').addEventListener('click', function (e) {
 
     return false;
 });
+
+document.getElementById('homeAdInfo').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    $('#homeAdInfoModal').modal('show');
+
+    return false;
+});
