@@ -75,63 +75,43 @@ router.get('/:uid/:sessionId/createRoom/:title', function (req, res) {
 });
 
 router.get('/:uid/:sessionId/joinRoom/:room', function (req, res) {
-    try {
-        localtunnel(3000, function (err, tunnel) {
-            if (err) {
-                return res.status(403).send(err);
-            } else {
-                ref.child('rooms').child(req.params.room).once('value').then(function (room) {
-                    if (room.exists()) {
-                        ref.child('users').child(req.params.uid).update({
-                            state: 2,
-                            room: room.key,
-                            sessionId: req.params.sessionId
-                        });
+    ref.child('rooms').child(req.params.room).once('value').then(function (room) {
+        if (room.exists()) {
+            ref.child('users').child(req.params.uid).update({
+                state: 2,
+                room: room.key,
+                sessionId: req.params.sessionId
+            });
 
-                        ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
-                            ref.child('rooms').child(room.key).child('users').child(req.params.uid).set(username.val());
-                    
-                            return res.sendStatus(200);
-                        });
-                    } else {
-                        return res.sendStatus(404);
-                    }
-                });
-            }
-        });
-    } catch (err) {
-        return res.status(403).send(err);
-    }
+            ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
+                ref.child('rooms').child(room.key).child('users').child(req.params.uid).set(username.val());
+        
+                return res.sendStatus(200);
+            });
+        } else {
+            return res.sendStatus(404);
+        }
+    });
 });
 
 router.get('/:uid/:sessionId/leaveRoom/:room', function (req, res) {
-    try {
-        localtunnel(3000, function (err, tunnel) {
-            if (err) {
-                return res.status(403).send(err);
+    ref.child('rooms').child(req.params.room).once('value').then(function (room) {
+        if (room.exists()) {
+            if (room.child('host').val() === req.params.uid) {
+                ref.child('rooms').child(req.params.room).remove();
             } else {
-                ref.child('rooms').child(req.params.room).once('value').then(function (room) {
-                    if (room.exists()) {
-                        if (room.child('host').val() === req.params.uid) {
-                            ref.child('rooms').child(req.params.room).remove();
-                        } else {
-                            ref.child('rooms').child(req.params.room).child('users').child(req.params.uid).remove();
-                        }
-                    }
-
-                    ref.child('users').child(req.params.uid).update({
-                        state: 0,
-                        room: null,
-                        sessionId: req.params.sessionId
-                    });
-
-                    return res.sendStatus(200);
-                });
+                ref.child('rooms').child(req.params.room).child('users').child(req.params.uid).remove();
             }
+        }
+
+        ref.child('users').child(req.params.uid).update({
+            state: 0,
+            room: null,
+            sessionId: req.params.sessionId
         });
-    } catch (err) {
-        return res.status(403).send(err);
-    }
+
+        return res.sendStatus(200);
+    });
 });
 
 router.get('/:uid/:room/setRoomMedia/:url', function (req, res) {
