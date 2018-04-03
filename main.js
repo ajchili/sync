@@ -16,7 +16,8 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 768,
     frame: process.platform !== 'darwin',
-    titleBarStyle: process.platform !== 'darwin' ? 'default' : 'hidden'
+    titleBarStyle: process.platform !== 'darwin' ? 'default' : 'hidden',
+    show: false
   });
 
   mainWindow.loadURL(url.format({
@@ -27,6 +28,10 @@ function createWindow() {
 
   mainWindow.on('closed', function () {
     mainWindow = null;
+  });
+
+  mainWindow.once('ready-to-show', function () {
+    mainWindow.show()
   });
 
   mainWindow.webContents.on('new-window', function (e, url) {
