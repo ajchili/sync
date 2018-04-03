@@ -93,6 +93,7 @@ function loadServers() {
                                 });
 
                                 setRoomVideoEvents(room.key, false);
+                                setRoomSettingsEvents(room.key, false);
                             });
 
                             $('#roomChatMessage').off();
@@ -244,6 +245,18 @@ function setRoomVideoEvents(room, isHost) {
 }
 
 /*
+    Name: setRoomSettingsEvents
+    Purpose: Sets up UI elements to properly interact with the room.
+    Params:
+        room: room id
+        isHost: is host of room
+*/
+function setRoomSettingsEvents(room, isHost) {
+    let settingsDropdown = document.getElementById('roomSettingsDropdown');
+    settingsDropdown.hidden = !isHost;
+}
+
+/*
     Name: createRoom
     Purpose: Interacts with nodejs backend to create room.
     Params:
@@ -279,6 +292,7 @@ function createRoom(title) {
                             });
 
                             setRoomVideoEvents(key, true);
+                            setRoomSettingsEvents(key, true);
                         });
 
                         $('#roomChatMessage').off();
