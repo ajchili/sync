@@ -64,6 +64,8 @@ function loadServers() {
                             roomListener.on('value', function (snapshot) {
                                 if (!snapshot.exists()) {
                                     roomListener.off();
+                                    let player = videojs('roomVideo');
+                                    player.pause();
                                     $('#roomDisbandedModal').modal({
                                         onHidden: function () {
                                             leaveRoom();
@@ -128,7 +130,7 @@ function loadServers() {
     Purpose: Creates videojs player when user connects to a room.
 */
 function createPlayer() {
-    let roomVideo = '<video id="roomVideo" class="video-js" controls preload="auto" style="width: 100%; height: 100%; float: left; background-color: #000;" data-setup="{}"></video>';
+    let roomVideo = '<video id="roomVideo" class="video-js" controls preload="auto" style="width: 100%; height: 100%; float: left;" data-setup="{}"></video>';
     document.getElementById('roomVideoHolder').innerHTML = roomVideo;
 }
 
@@ -163,8 +165,8 @@ function setRoomUsers(host, users) {
 function setRoomMedia(link, media, isHost) {
     let player = videojs('roomVideo');
 
-    if (media.child('title').exists()) {
-        let url = encodeURI(link + media.child('title').val())
+    if (media.child('title').exists() && media.child('title').val().length > 0) {
+        let url = encodeURI(link + media.child('title').val());
         if (player.currentSrc() !== url) {
             player.src(url);
         }
