@@ -286,7 +286,11 @@ function createRoom(title) {
                             if (e.which == 13 && !e.shiftKey) {
                                 e.preventDefault();
 
-                                let message = document.getElementById('roomChatMessage').value;
+                                let message = urlify(document.getElementById('roomChatMessage').value);
+
+                                while (message.includes('/')) {
+                                    message = message.replace('/', '_____');
+                                }
 
                                 if (message.length > 0) {
                                     xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/sendMessage/' + message, true);

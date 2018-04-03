@@ -1,3 +1,5 @@
+const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
 /*
     Name: setupSemantic
     Purpose: Setup semantic jquery so that UI elements that rely on it can work properly
@@ -53,4 +55,17 @@ function setMedia(url) {
     let video = document.getElementById('roomVideo');
     video.src = url;
     video.load();
+}
+
+/*
+    Name: urlify
+    Source: https://stackoverflow.com/a/8943487
+    Purpose: Return a string with wrapped urls for display in a chat.
+    Params:
+        text: message
+*/
+function urlify(text) {
+    return text.replace(urlRegex, function(url) {
+        return '<a href="' + url + '" target="_blank">' + url + '</a>';
+    });
 }

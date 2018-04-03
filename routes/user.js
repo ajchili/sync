@@ -148,10 +148,10 @@ router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
 });
 
 router.get('/:uid/:room/sendMessage/:message', function (req, res) {
-    let messeage = decodeURI(req.params.message);
-
-    while (messeage.includes('_____')) {
-        messeage = messeage.replace('_____', '/');
+    let message = decodeURI(req.params.message);
+    
+    while (message.includes('_____')) {
+        message = message.replace('_____', '/');
     }
 
     ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
@@ -161,7 +161,7 @@ router.get('/:uid/:room/sendMessage/:message', function (req, res) {
             if (user.exists()) {
                 ref.child('rooms').child(req.params.room).child('messages').child(messageId).set({
                     sender: username.val(),
-                    body: req.params.message
+                    body: message
                 });
         
                 return res.sendStatus(200);
