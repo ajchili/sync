@@ -85,14 +85,14 @@ function setUserState(state) {
 function createServer(title) {
     var key = ref.child('servers').push().key;
     ref.child('servers').child(key).set({ title: title, isPrivate: false, host: user.uid });
-    ref.child('servers').child(key).child('clients').child(key).set(user.uid);
+    ref.child('servers').child(key).child('users').child(key).set(user.uid);
     ref.child('users').child(user.uid).child('server').set(key);
     setUserState(1);
 }
 
 function joinServer(serverKey) {
-    var key = ref.child('servers').child(serverKey).child('clients').push().key;
-    ref.child('servers').child(serverKey).child('clients').child(key).set(user.uid);
+    var key = ref.child('servers').child(serverKey).child('users').push().key;
+    ref.child('servers').child(serverKey).child('users').child(key).set(user.uid);
     ref.child('users').child(user.uid).child('server').set(serverKey);
     setUserState(2);
 }
@@ -103,7 +103,7 @@ function endServer() {
             var serverId = user.server;
 
             if (user.uid === snapshot.child('host').val()) {
-                snapshot.child('clients').forEach(function(childSnapshot) {
+                snapshot.child('users').forEach(function(childSnapshot) {
                     ref.child('users').child(childSnapshot.val()).child('state').set(0);
                     ref.child('users').child(childSnapshot.val()).child('server').remove();
                 });
@@ -115,10 +115,10 @@ function endServer() {
 }
 
 function leaveServer() {
-    ref.child('servers').child(user.server).child('clients').once('value').then(function(snapshot) {
+    ref.child('servers').child(user.server).child('users').once('value').then(function(snapshot) {
         snapshot.forEach(function(childSnapshot) {
             if (user.uid === childSnapshot.val()) {
-                ref.child('servers').child(user.server).child('clients').child(childSnapshot.key).remove();
+                ref.child('servers').child(user.server).child('users').child(childSnapshot.key).remove();
                 ref.child('users').child(user.uid).child('state').set(0);
                 ref.child('users').child(user.uid).child('server').remove();
             }
@@ -148,15 +148,15 @@ function loadServers() {
 function loadServerInfo() {
     ref.child('servers').child(user.server).on('value', function(snapshot) {
         var server = [];
-        var clients = [];
+        var users = [];
 
-        snapshot.child('clients').forEach(function(childSnapshot) {
+        snapshot.child('users').forEach(function(childSnapshot) {
             ref.child('users').child(childSnapshot.val()).once('value').then(function(childChildSnapshot) {
-                clients.push({ id: childSnapshot.val(), name: childChildSnapshot.child('name').val() });
+                users.push({ id: childSnapshot.val(), name: childChildSnapshot.child('name').val() });
             });
         });
 
-        server = { clients: clients };
+        server = { users: users };
         sendMessageToContent({ func: 'displayServerInfo', server: server });
     });
 }
