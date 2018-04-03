@@ -1,34 +1,9 @@
-*.class
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-/sync/nbproject/private/
-/sync/build/
-
-launcherData\.dat
-
-build.xml
-
-sync.iml
-
-META-INF
-
-\.idea
-
-target
-
-tomcat
-
-equalizer\.dat
-
-chrome_extension/ext/js/firebase\.js
-
 *.DS_Store
+node_modules/
+build/
+config/*
+semantic/dist/*
+semantic/src/*
+semantic/tasks/*
+media/
+chrome_extension/ext/js/firebase\.js
