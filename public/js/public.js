@@ -56,6 +56,9 @@ function loadServers() {
                 e.preventDefault();
 
                 let user = firebase.auth().currentUser;
+
+                showDimmer('Joining server...');
+
                 ref.child('users').child(user.uid).once('value').then(function (snapshot) {
                     let joinRequest = new XMLHttpRequest();
                     joinRequest.onreadystatechange = function () {
@@ -171,8 +174,8 @@ function setRoomUsers(host, users) {
 function setRoomMedia(link, media, isHost) {
     let player = videojs('roomVideo');
 
-    if (media.child('title').exists() 
-        && media.child('type').exists() 
+    if (media.child('title').exists()
+        && media.child('type').exists()
         && media.child('title').val().length > 0
         && media.child('type').val().length > 0) {
         let url = encodeURI(link + media.child('title').val());
@@ -277,6 +280,8 @@ function setRoomSettingsEvents(room, isHost) {
 function createRoom(title) {
     let user = firebase.auth().currentUser;
 
+    showDimmer('Creating server...');
+
     ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
         if (sessionId.exists()) {
             let createRequest = new XMLHttpRequest();
@@ -332,6 +337,8 @@ function createRoom(title) {
                         e.preventDefault();
                         e.stopPropagation();
 
+                        showDimmer('Moving media...');
+
                         let file = e.dataTransfer.files[0];
 
                         let path = encodeURI(file.path);
@@ -347,6 +354,10 @@ function createRoom(title) {
 
                         let mediaRequest = new XMLHttpRequest();
                         mediaRequest.onreadystatechange = function () {
+                            if (mediaRequest.readyState == 4) {
+                                hideDimmer();
+                            }
+                            
                             if (mediaRequest.readyState == 4 && mediaRequest.status == 401) {
                                 alert('Only the host can set the room media!');
                             } else if (mediaRequest.readyState == 4 && mediaRequest.status == 404) {
@@ -380,6 +391,8 @@ function createRoom(title) {
     Purpose: Interacts with nodejs backend to leave or disband current room depending on if the user is the host.
 */
 function leaveRoom() {
+    showDimmer('Leaving room...');
+
     if (roomListener != null) {
         roomListener.off();
     }

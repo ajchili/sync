@@ -31,14 +31,14 @@ function setViewVisibility(level) {
             $('.ui.sidebar').sidebar('hide');
             $('#home').fadeOut('fast', function () {
                 $('#room').fadeIn('slow', function () {
-
+                    hideDimmer();
                 });
             });
             break;
         default:
             $('#room').fadeOut('fast', function () {
                 $('#home').fadeIn('slow', function () {
-
+                    hideDimmer();
                 });
             });
             break;
@@ -65,7 +65,31 @@ function setMedia(url) {
         text: message
 */
 function urlify(text) {
-    return text.replace(urlRegex, function(url) {
+    return text.replace(urlRegex, function (url) {
         return '<a href="' + url + '" target="_blank">' + url + '</a>';
     });
 }
+
+/*
+    Name: showDimmer
+    Purpose: Displays loading icon and disables UI until hidden.
+    Params:
+        text: message
+*/
+function showDimmer(text) {
+    let dimmer = document.getElementById('dimmer');
+    let dimmerText = document.getElementById('dimmerText');
+    dimmerText.innerHTML = text;
+    dimmer.classList.add('active');
+}
+
+/*
+    Name: hideDimmer
+    Purpose: Hides loading icon and reenables UI.
+*/
+function hideDimmer() {
+    let dimmer = document.getElementById('dimmer');
+    let dimmerText = document.getElementById('dimmerText');
+    dimmerText.innerHTML = '';
+    dimmer.classList.remove('active');
+} 

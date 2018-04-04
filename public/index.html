@@ -61,15 +61,15 @@
             <div id="roomUsers" class="ui inverted relaxed divided list"></div>
           </div>
           <div id="roomSettingsDropdown" style="margin-bottom: 1em;">
-              <div class="title">
-                <i class="dropdown icon"></i>
-                Settings
+            <div class="title">
+              <i class="dropdown icon"></i>
+              Settings
+            </div>
+            <div class="content">
+              <div class="ui fluid input">
+                <input id="roomTitleField" type="text" placeholder="Title">
               </div>
-              <div class="content">
-                <div class="ui fluid input">
-                  <input id="roomTitleField" type="text" placeholder="Title">
-                </div>
-              </div>
+            </div>
           </div>
           <button id="roomLeave" class="ui fluid button">Leave</button>
         </div>
@@ -128,7 +128,7 @@
 
   <div id="roomDisbandedModal" class="ui basic modal">
     <div class="header">
-      The sync room you were in was disband!
+      The sync room you were in was disbanded!
     </div>
     <div class="content">
       It looks like the host was all done watching.
@@ -158,7 +158,7 @@
         <li>Your name</li>
         <li>Product/Service (include links and any other materials you deem fit)</li>
         <li>Length of promotion</li>
-        <li>Best way to contact you</li>
+        <li>Contact information</li>
         <li>Your terms</li>
         <li>Any questions you may have</li>
       </ol>
@@ -173,6 +173,10 @@
         Gotcha!
       </div>
     </div>
+  </div>
+
+  <div id="dimmer" class="ui dimmer">
+    <div id="dimmerText" class="ui indeterminate text loader"></div>
   </div>
 
   <script>require('../renderer.js');</script>
