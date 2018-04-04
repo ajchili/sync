@@ -1,5 +1,4 @@
 const ref = firebase.database().ref();
-const xmlHttp = new XMLHttpRequest();
 
 var serverListListener, roomListener, roomMediaListener, roomUserListener, roomMessageListener, videoTimeInterval;
 
@@ -58,8 +57,9 @@ function loadServers() {
 
                 let user = firebase.auth().currentUser;
                 ref.child('users').child(user.uid).once('value').then(function (snapshot) {
-                    xmlHttp.onreadystatechange = function () {
-                        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                    let joinRequest = new XMLHttpRequest();
+                    joinRequest.onreadystatechange = function () {
+                        if (joinRequest.readyState == 4 && joinRequest.status == 200) {
                             roomListener = ref.child('rooms').child(room.key);
                             roomListener.on('value', function (snapshot) {
                                 if (!snapshot.exists()) {
@@ -101,11 +101,16 @@ function loadServers() {
                                 if (e.which == 13 && !e.shiftKey) {
                                     e.preventDefault();
 
-                                    let message = document.getElementById('roomChatMessage').value;
+                                    let message = urlify(document.getElementById('roomChatMessage').value);
+
+                                    while (message.includes('/')) {
+                                        message = message.replace('/', '_____');
+                                    }
 
                                     if (message.length > 0) {
-                                        xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
-                                        xmlHttp.send();
+                                        let messageRequest = new XMLHttpRequest();
+                                        messageRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
+                                        messageRequest.send();
                                         document.getElementById('roomChatMessage').value = '';
                                     }
 
@@ -116,8 +121,8 @@ function loadServers() {
                             setViewVisibility(1);
                         }
                     }
-                    xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/joinRoom/' + room.key, true);
-                    xmlHttp.send();
+                    joinRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/joinRoom/' + room.key, true);
+                    joinRequest.send();
                 });
 
                 return false;
@@ -267,96 +272,96 @@ function createRoom(title) {
 
     ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
         if (sessionId.exists()) {
-            var key;
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-                    if (key == null) {
-                        key = xmlHttp.response;
+            let createRequest = new XMLHttpRequest();
+            createRequest.onreadystatechange = function () {
+                if (createRequest.readyState == 4 && createRequest.status == 200) {
+                    let key = createRequest.response;
 
-                        ref.child('rooms').child(key).once('value').then(function (room) {
-                            createPlayer();
+                    ref.child('rooms').child(key).once('value').then(function (room) {
+                        createPlayer();
 
-                            roomMediaListener = ref.child('rooms').child(key).child('media');
-                            roomMediaListener.on('value', function (media) {
-                                setRoomMedia(room.child('link').val(), media, true);
-                            });
-
-                            roomUserListener = ref.child('rooms').child(key).child('users');
-                            roomUserListener.on('value', function (users) {
-                                setRoomUsers(room.child('host').val(), users);
-                            });
-
-                            roomMessageListener = ref.child('rooms').child(key).child('messages');
-                            roomMessageListener.on('value', function (messages) {
-                                setRoomMessages(messages);
-                            });
-
-                            setRoomVideoEvents(key, true);
-                            setRoomSettingsEvents(key, true);
+                        roomMediaListener = ref.child('rooms').child(key).child('media');
+                        roomMediaListener.on('value', function (media) {
+                            setRoomMedia(room.child('link').val(), media, true);
                         });
 
-                        $('#roomChatMessage').off();
-                        $('#roomChatMessage').keypress(function (e) {
-                            if (e.which == 13 && !e.shiftKey) {
-                                e.preventDefault();
-
-                                let message = urlify(document.getElementById('roomChatMessage').value);
-
-                                while (message.includes('/')) {
-                                    message = message.replace('/', '_____');
-                                }
-
-                                if (message.length > 0) {
-                                    xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/sendMessage/' + message, true);
-                                    xmlHttp.send();
-                                    document.getElementById('roomChatMessage').value = '';
-                                }
-
-                                return false;
-                            }
+                        roomUserListener = ref.child('rooms').child(key).child('users');
+                        roomUserListener.on('value', function (users) {
+                            setRoomUsers(room.child('host').val(), users);
                         });
 
-                        document.addEventListener('drop', function (e) {
+                        roomMessageListener = ref.child('rooms').child(key).child('messages');
+                        roomMessageListener.on('value', function (messages) {
+                            setRoomMessages(messages);
+                        });
+
+                        setRoomVideoEvents(key, true);
+                        setRoomSettingsEvents(key, true);
+                    });
+
+                    $('#roomChatMessage').off();
+                    $('#roomChatMessage').keypress(function (e) {
+                        if (e.which == 13 && !e.shiftKey) {
                             e.preventDefault();
-                            e.stopPropagation();
 
-                            let file = e.dataTransfer.files[0];
+                            let message = urlify(document.getElementById('roomChatMessage').value);
 
-                            if (file.type.includes('video/')) {
-                                let path = encodeURI(file.path);
-
-                                while (path.includes('/')) {
-                                    path = path.replace('/', '_____');
-                                }
-
-                                xmlHttp.onreadystatechange = function () {
-                                    if (xmlHttp.readyState == 4 && xmlHttp.status == 401) {
-                                        alert('Only the host can set the room media!');
-                                    } else if (xmlHttp.readyState == 4 && xmlHttp.status == 404) {
-                                        alert('Unable to set media!');
-                                    }
-                                };
-
-                                xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/local/' + path, true);
-                                xmlHttp.send();
-                            } else {
-                                alert('Incompatable File Type: ' + file.type);
+                            while (message.includes('/')) {
+                                message = message.replace('/', '_____');
                             }
-                        });
 
-                        document.addEventListener('dragover', function (e) {
-                            e.preventDefault();
-                            e.stopPropagation();
-                        });
+                            if (message.length > 0) {
+                                let messageRequest = new XMLHttpRequest();
+                                messageRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/sendMessage/' + message, true);
+                                messageRequest.send();
+                                document.getElementById('roomChatMessage').value = '';
+                            }
 
-                        setViewVisibility(1);
-                    } else if (xmlHttp.readyState == 4 && xmlHttp.status == 403) {
-                        alert('Unable to create room, please restart sync.');
-                    }
+                            return false;
+                        }
+                    });
+
+                    document.addEventListener('drop', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        let file = e.dataTransfer.files[0];
+
+                        if (file.type.includes('video/')) {
+                            let path = encodeURI(file.path);
+
+                            while (path.includes('/')) {
+                                path = path.replace('/', '_____');
+                            }
+
+                            let mediaRequest = new XMLHttpRequest();
+                            mediaRequest.onreadystatechange = function () {
+                                if (mediaRequest.readyState == 4 && mediaRequest.status == 401) {
+                                    alert('Only the host can set the room media!');
+                                } else if (mediaRequest.readyState == 4 && mediaRequest.status == 404) {
+                                    alert('Unable to set media!');
+                                }
+                            };
+
+                            mediaRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/local/' + path, true);
+                            mediaRequest.send();
+                        } else {
+                            alert('Incompatable File Type: ' + file.type);
+                        }
+                    });
+
+                    document.addEventListener('dragover', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    });
+
+                    setViewVisibility(1);
+                } else if (createRequest.readyState == 4 && createRequest.status == 403) {
+                    alert('Unable to create room, please restart sync.');
                 }
             }
-            xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
-            xmlHttp.send();
+            createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
+            createRequest.send();
         } else {
             alert('Unable to create room, please restart sync.');
         }
@@ -389,8 +394,9 @@ function leaveRoom() {
     let user = firebase.auth().currentUser;
     ref.child('users').child(user.uid).once('value').then(function (snapshot) {
         if (snapshot.child('state').val() > 0) {
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            let leaveRequest = new XMLHttpRequest();
+            leaveRequest.onreadystatechange = function () {
+                if (leaveRequest.readyState == 4 && leaveRequest.status == 200) {
                     if (videojs('roomVideo')) {
                         player = videojs('roomVideo');
                         player.dispose();
@@ -398,8 +404,8 @@ function leaveRoom() {
                     setViewVisibility(0);
                 }
             }
-            xmlHttp.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/leaveRoom/' + snapshot.child('room').val(), true);
-            xmlHttp.send();
+            leaveRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/leaveRoom/' + snapshot.child('room').val(), true);
+            leaveRequest.send();
         }
     });
 }
