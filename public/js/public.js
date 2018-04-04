@@ -171,10 +171,17 @@ function setRoomUsers(host, users) {
 function setRoomMedia(link, media, isHost) {
     let player = videojs('roomVideo');
 
-    if (media.child('title').exists() && media.child('title').val().length > 0) {
+    if (media.child('title').exists() 
+        && media.child('type').exists() 
+        && media.child('title').val().length > 0
+        && media.child('type').val().length > 0) {
         let url = encodeURI(link + media.child('title').val());
+        let type = media.child('type').val();
         if (player.currentSrc() !== url) {
-            player.src(url);
+            player.src({
+                type: type,
+                src: url
+            });
         }
     }
 
@@ -327,27 +334,27 @@ function createRoom(title) {
 
                         let file = e.dataTransfer.files[0];
 
-                        if (file.type.includes('video/')) {
-                            let path = encodeURI(file.path);
+                        let path = encodeURI(file.path);
+                        let type = encodeURI(file.type);
 
-                            while (path.includes('/')) {
-                                path = path.replace('/', '_____');
-                            }
-
-                            let mediaRequest = new XMLHttpRequest();
-                            mediaRequest.onreadystatechange = function () {
-                                if (mediaRequest.readyState == 4 && mediaRequest.status == 401) {
-                                    alert('Only the host can set the room media!');
-                                } else if (mediaRequest.readyState == 4 && mediaRequest.status == 404) {
-                                    alert('Unable to set media!');
-                                }
-                            };
-
-                            mediaRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/local/' + path, true);
-                            mediaRequest.send();
-                        } else {
-                            alert('Incompatable File Type: ' + file.type);
+                        while (path.includes('/')) {
+                            path = path.replace('/', '_____');
                         }
+
+                        while (type.includes('/')) {
+                            type = type.replace('/', '_____');
+                        }
+
+                        let mediaRequest = new XMLHttpRequest();
+                        mediaRequest.onreadystatechange = function () {
+                            if (mediaRequest.readyState == 4 && mediaRequest.status == 401) {
+                                alert('Only the host can set the room media!');
+                            } else if (mediaRequest.readyState == 4 && mediaRequest.status == 404) {
+                                alert('Unable to set media!');
+                            }
+                        };
+                        mediaRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/' + type + '/' + path, true);
+                        mediaRequest.send();
                     });
 
                     document.addEventListener('dragover', function (e) {

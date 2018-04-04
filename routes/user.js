@@ -33,7 +33,7 @@ function moveFileToMediaFolder(file) {
     }
 }
 
-function createRoom (req, res) {
+function createRoom(req, res) {
     let key = ref.child('rooms').push().key;
 
     ref.child('rooms').child(key).set({
@@ -85,7 +85,7 @@ router.get('/:uid/:sessionId/joinRoom/:room', function (req, res) {
 
             ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
                 ref.child('rooms').child(room.key).child('users').child(req.params.uid).set(username.val());
-        
+
                 return res.sendStatus(200);
             });
         } else {
@@ -118,12 +118,20 @@ router.get('/:uid/:room/setRoomMedia/:url', function (req, res) {
     return res.sendStatus(200);
 });
 
-router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
-    let path = decodeURI(req.params.path);
+router.get('/:uid/:room/setRoomMedia/:type/:path', function (req, res) {
+    let path = req.params.path;
+    let type = req.params.type;
 
     while (path.includes('_____')) {
         path = path.replace('_____', '/');
     }
+
+    while (type.includes('_____')) {
+        type = type.replace('_____', '/');
+    }
+
+    path = decodeURI(path);
+    type = decodeURI(type);
 
     moveFileToMediaFolder(path).then(function () {
         let fileName = path.substring(path.lastIndexOf(process.platform !== 'darwin' ? '\\' : '/') + 1);
@@ -132,6 +140,7 @@ router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
             if (room.exists() && room.child('host').val() === req.params.uid) {
                 ref.child('rooms').child(req.params.room).child('media').set({
                     title: fileName,
+                    type: type,
                     paused: true,
                     time: 0
                 });
@@ -149,7 +158,7 @@ router.get('/:uid/:room/setRoomMedia/local/:path', function (req, res) {
 
 router.get('/:uid/:room/sendMessage/:message', function (req, res) {
     let message = decodeURI(req.params.message);
-    
+
     while (message.includes('_____')) {
         message = message.replace('_____', '/');
     }
@@ -163,7 +172,7 @@ router.get('/:uid/:room/sendMessage/:message', function (req, res) {
                     sender: username.val(),
                     body: message
                 });
-        
+
                 return res.sendStatus(200);
             } else {
                 return res.sendStatus(401);
