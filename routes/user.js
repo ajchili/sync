@@ -35,10 +35,21 @@ function moveFileToMediaFolder(file) {
 
 function createRoom(req, res) {
     let key = ref.child('rooms').push().key;
+    let title = req.params.title;
+    let password = req.params.password != null ? req.params.password : null;
+
+    while (title.includes('_____')) {
+        title = title.replace('_____', '/');
+    }
+
+    while (password != null && password.includes('_____')) {
+        password = password.replace('_____', '/');
+    }
 
     ref.child('rooms').child(key).set({
         host: req.params.uid,
-        title: req.params.title,
+        title: title,
+        password: password,
         link: url + '/media/'
     });
 
@@ -55,7 +66,7 @@ function createRoom(req, res) {
     });
 }
 
-router.get('/:uid/:sessionId/createRoom/:title', function (req, res) {
+function createLocalTunnel(req, res) {
     try {
         if (url == null) {
             localtunnel(3000, function (err, tunnel) {
@@ -72,6 +83,14 @@ router.get('/:uid/:sessionId/createRoom/:title', function (req, res) {
     } catch (err) {
         return res.status(403).send(err);
     }
+}
+
+router.get('/:uid/:sessionId/createRoom/:title', function (req, res) {
+    createLocalTunnel(req, res);
+});
+
+router.get('/:uid/:sessionId/createRoom/:title/:password', function (req, res) {
+    createLocalTunnel(req, res);
 });
 
 router.get('/:uid/:sessionId/joinRoom/:room', function (req, res) {

@@ -17,13 +17,14 @@ document.getElementById('homeHost').addEventListener('click', function (e) {
 document.getElementById('homeCreateRoom').addEventListener('click', function (e) {
     e.preventDefault();
     let title = document.getElementById('roomTitle');
+    let password = document.getElementById('homeCreateRoomModalPrivatePassword').value;
 
     if (title.value.length === 0) {
         title.parentElement.classList.add('error');
     } else {
         title.parentElement.classList.remove('error');
         $('#homeCreateRoomModal').modal('hide');
-        createRoom(title.value);
+        createRoom(title.value, password);
         title.value = '';
     }
 
@@ -113,4 +114,22 @@ document.getElementById('homeAdInfo').addEventListener('click', function (e) {
     $('#homeAdInfoModal').modal('show');
 
     return false;
+});
+
+$('#homeCreateRoomModalPrivatePassword').on('keyup', function (e) {
+    if (e.keyCode != 13) {
+        let password = document.getElementById('homeCreateRoomModalPrivatePassword').value;
+        let icon = document.getElementById('homeCreateRoomModalPrivateButtonIcon');
+        let button = document.getElementById('homeCreateRoomModalPrivateButton');
+    
+        if (password.length === 0) {
+            icon.classList.remove('lock');
+            icon.classList.add('unlock');
+            button.classList.remove('active');
+        } else {
+            icon.classList.remove('unlock');
+            icon.classList.add('lock');
+            button.classList.add('active');
+        }
+    }
 });

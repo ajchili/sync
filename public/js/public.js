@@ -276,11 +276,20 @@ function setRoomSettingsEvents(room, isHost) {
     Purpose: Interacts with nodejs backend to create room.
     Params:
         title: title of room
+        password: password of room
 */
-function createRoom(title) {
+function createRoom(title, password) {
     let user = firebase.auth().currentUser;
 
     showDimmer('Creating server...');
+
+    while (title.includes('/')) {
+        title = title.replace('/', '_____');
+    }
+
+    while (password.includes('/')) {
+        password = password.replace('/', '_____');
+    }
 
     ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
         if (sessionId.exists()) {
@@ -357,7 +366,7 @@ function createRoom(title) {
                             if (mediaRequest.readyState == 4) {
                                 hideDimmer();
                             }
-                            
+
                             if (mediaRequest.readyState == 4 && mediaRequest.status == 401) {
                                 alert('Only the host can set the room media!');
                             } else if (mediaRequest.readyState == 4 && mediaRequest.status == 404) {
@@ -378,7 +387,13 @@ function createRoom(title) {
                     alert('Unable to create room, please restart sync.');
                 }
             }
-            createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
+
+            if (password.length > 0) {
+                createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title + '/' +  password, true);
+            } else {
+                createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
+            }
+
             createRequest.send();
         } else {
             alert('Unable to create room, please restart sync.');
