@@ -17,15 +17,16 @@ document.getElementById('homeHost').addEventListener('click', function (e) {
 document.getElementById('homeCreateRoom').addEventListener('click', function (e) {
     e.preventDefault();
     let title = document.getElementById('roomTitle');
-    let password = document.getElementById('homeCreateRoomModalPrivatePassword').value;
+    let password = document.getElementById('homeCreateRoomModalPrivatePassword');
 
     if (title.value.length === 0) {
         title.parentElement.classList.add('error');
     } else {
         title.parentElement.classList.remove('error');
         $('#homeCreateRoomModal').modal('hide');
-        createRoom(title.value, password);
+        createRoom(title.value, password.value);
         title.value = '';
+        password.value = '';
     }
 
     return false;

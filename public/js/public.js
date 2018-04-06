@@ -34,6 +34,95 @@ function updateUsername(name) {
     document.getElementById('homeUsername').innerText = name;
 }
 
+function showPasswordModal(callback) {
+    $('#homeJoinRoomModal').modal({
+        onApprove: function () {
+            let password = document.getElementById('homeJoinRoomModalPassword');
+            
+            if (password.value.length > 0) {
+                password.parentElement.classList.remove('error');
+                callback();
+            } else {
+                password.parentElement.classList.add('error');
+                showPasswordModal(callback);
+            }
+        }
+    }).modal('show');
+}
+
+function joinRoom(user, room) {
+    showDimmer('Joining room...');
+
+    ref.child('users').child(user.uid).once('value').then(function (snapshot) {
+        let joinRequest = new XMLHttpRequest();
+        joinRequest.onreadystatechange = function () {
+            if (joinRequest.readyState == 4 && joinRequest.status == 200) {
+                roomListener = ref.child('rooms').child(room.key);
+                roomListener.on('value', function (snapshot) {
+                    if (!snapshot.exists()) {
+                        roomListener.off();
+                        let player = videojs('roomVideo');
+                        player.pause();
+                        $('#roomDisbandedModal').modal({
+                            onHidden: function () {
+                                leaveRoom();
+                            }
+                        }).modal('show');
+                    }
+                });
+
+                createPlayer();
+
+                ref.child('rooms').child(room.key).once('value').then(function (room) {
+                    roomMediaListener = ref.child('rooms').child(room.key).child('media');
+                    roomMediaListener.on('value', function (media) {
+                        setRoomMedia(room.child('link').val(), media, false);
+                    });
+
+                    roomUserListener = ref.child('rooms').child(room.key).child('users');
+                    roomUserListener.on('value', function (users) {
+                        setRoomUsers(room.child('host').val(), users);
+                    });
+
+                    roomMessageListener = ref.child('rooms').child(room.key).child('messages');
+                    roomMessageListener.on('value', function (messages) {
+                        setRoomMessages(messages);
+                    });
+
+                    setRoomVideoEvents(room.key, false);
+                    setRoomSettingsEvents(room.key, false);
+                });
+
+                $('#roomChatMessage').off();
+                $('#roomChatMessage').keypress(function (e) {
+                    if (e.which == 13 && !e.shiftKey) {
+                        e.preventDefault();
+
+                        let message = urlify(document.getElementById('roomChatMessage').value);
+
+                        while (message.includes('/')) {
+                            message = message.replace('/', '_____');
+                        }
+
+                        if (message.length > 0) {
+                            let messageRequest = new XMLHttpRequest();
+                            messageRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
+                            messageRequest.send();
+                            document.getElementById('roomChatMessage').value = '';
+                        }
+
+                        return false;
+                    }
+                });
+
+                setViewVisibility(1);
+            }
+        }
+        joinRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/joinRoom/' + room.key, true);
+        joinRequest.send();
+    });
+}
+
 /*
     Name: loadServers
     Purpose: Load servers to be displayed in server list.
@@ -45,88 +134,45 @@ function loadServers() {
         rooms.forEach(function (room) {
             let div = document.createElement('div');
             let title = room.child('title').val();
+            let private = room.child('password').exists();
             let media = room.child('media').child('title').val() != null ? room.child('media').child('title').val() : 'No media';
 
             div.id = room.key;
             div.classList.add('item');
-            div.innerHTML = '<h3>' + title + '</h3><p>' + media + '</p><button id="join_' + room.key + '" class="mini fluid ui iverted button">Join</button>';
+
+            if (private) {
+                div.innerHTML = '<h3><i class="lock icon"></i>' + title + '</h3><p>' + media + '</p><button id="join_' + room.key + '" class="mini fluid ui iverted button">Join</button>';
+            } else {
+                div.innerHTML = '<h3>' + title + '</h3><p>' + media + '</p><button id="join_' + room.key + '" class="mini fluid ui iverted button">Join</button>';
+            }
 
             serverList.appendChild(div);
+
             document.getElementById('join_' + room.key).addEventListener('click', function (e) {
                 e.preventDefault();
 
                 let user = firebase.auth().currentUser;
+                let attemptToJoin = function () {
+                    let password = room.child('password').val();
+                    let enteredPassword = document.getElementById('homeJoinRoomModalPassword');
+                    enteredPassword.classList.remove('error');
 
-                showDimmer('Joining server...');
-
-                ref.child('users').child(user.uid).once('value').then(function (snapshot) {
-                    let joinRequest = new XMLHttpRequest();
-                    joinRequest.onreadystatechange = function () {
-                        if (joinRequest.readyState == 4 && joinRequest.status == 200) {
-                            roomListener = ref.child('rooms').child(room.key);
-                            roomListener.on('value', function (snapshot) {
-                                if (!snapshot.exists()) {
-                                    roomListener.off();
-                                    let player = videojs('roomVideo');
-                                    player.pause();
-                                    $('#roomDisbandedModal').modal({
-                                        onHidden: function () {
-                                            leaveRoom();
-                                        }
-                                    }).modal('show');
-                                }
-                            });
-
-                            createPlayer();
-
-                            ref.child('rooms').child(room.key).once('value').then(function (room) {
-                                roomMediaListener = ref.child('rooms').child(room.key).child('media');
-                                roomMediaListener.on('value', function (media) {
-                                    setRoomMedia(room.child('link').val(), media, false);
-                                });
-
-                                roomUserListener = ref.child('rooms').child(room.key).child('users');
-                                roomUserListener.on('value', function (users) {
-                                    setRoomUsers(room.child('host').val(), users);
-                                });
-
-                                roomMessageListener = ref.child('rooms').child(room.key).child('messages');
-                                roomMessageListener.on('value', function (messages) {
-                                    setRoomMessages(messages);
-                                });
-
-                                setRoomVideoEvents(room.key, false);
-                                setRoomSettingsEvents(room.key, false);
-                            });
-
-                            $('#roomChatMessage').off();
-                            $('#roomChatMessage').keypress(function (e) {
-                                if (e.which == 13 && !e.shiftKey) {
-                                    e.preventDefault();
-
-                                    let message = urlify(document.getElementById('roomChatMessage').value);
-
-                                    while (message.includes('/')) {
-                                        message = message.replace('/', '_____');
-                                    }
-
-                                    if (message.length > 0) {
-                                        let messageRequest = new XMLHttpRequest();
-                                        messageRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
-                                        messageRequest.send();
-                                        document.getElementById('roomChatMessage').value = '';
-                                    }
-
-                                    return false;
-                                }
-                            });
-
-                            setViewVisibility(1);
-                        }
+                    if (password === enteredPassword.value) {
+                        joinRoom(user, room);
+                        enteredPassword.value = '';
+                    } else {
+                        setTimeout(function () {
+                            showPasswordModal(attemptToJoin);
+                            enteredPassword.classList.add('error');
+                        }, 250);
                     }
-                    joinRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/joinRoom/' + room.key, true);
-                    joinRequest.send();
-                });
+                }
+
+                if (private) {
+                    showPasswordModal(attemptToJoin);
+                } else {
+                    joinRoom(user, room);
+                }
 
                 return false;
             });
@@ -389,7 +435,7 @@ function createRoom(title, password) {
             }
 
             if (password.length > 0) {
-                createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title + '/' +  password, true);
+                createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title + '/' + password, true);
             } else {
                 createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
             }
