@@ -1,2 +1,2 @@
 *.DS_Store
-chrome_extension/ext/js/firebase\.js
+ext/js/firebase\.js
