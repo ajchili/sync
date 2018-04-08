@@ -2,9 +2,7 @@ var mediaInterval;
 
 // https://stackoverflow.com/a/46816934
 let script = document.createElement('script');
-script.text = ['const videoPlayer = netflix.appContext.state.playerApp.getAPI().videoPlayer;',
-               'const playerSessionId = videoPlayer.getAllPlayerSessionIds()[0];',
-               'const player = videoPlayer.getVideoPlayerBySessionId(playerSessionId);'].join('\n');
+script.text = 'const videoPlayer = netflix.appContext.state.playerApp.getAPI().videoPlayer;';
 document.head.appendChild(script);
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
