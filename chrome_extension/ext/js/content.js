@@ -30,10 +30,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         case 'setupMediaListener':
             clearInterval(mediaInterval);
 
-            let video = document.getElementsByTagName('video')[0]
+            let video = document.getElementsByTagName('video')[0];
             
             mediaInterval = setInterval(function() {
-                sendMessageToBackground({ func: 'updateMedia', media: { paused: video.paused, time: video.currentTime } });
+                sendMessageToBackground({ func: 'updateMedia', media: { paused: video.paused, time: video.currentTime * 1000 } });
             }, 100);
             break;
         default:
@@ -79,6 +79,7 @@ function setUI(user) {
             document.getElementById('sync').innerHTML = '<h3 class="sync-header">sync for Chrome</h3><h4 style="margin-left: 10%;">Users</h4><div class="sync-user-list"><ul id="syncUsersList"></ul></div><div class="sync-taskbar"><div class="sync-taskbar-button-container"><a id="endButton" role="link" aria-label="End"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">End</span></span></a></div></div></div>';
 
             document.getElementById('endButton').onclick = function () {
+                clearInterval(mediaInterval);
                 sendMessageToBackground({ func: 'endServer' });
             }
 
@@ -88,6 +89,7 @@ function setUI(user) {
             document.getElementById('sync').innerHTML = '<h3 class="sync-header">sync for Chrome</h3><h4 style="margin-left: 10%;">Users</h4><div class="sync-user-list"><ul id="syncUsersList"></ul></div><div class="sync-taskbar"><div class="sync-taskbar-button-container"><a id="disconnectButton" role="link" aria-label="Disconnect"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Disconnect</span></span></a></div></div></div>';
 
             document.getElementById('disconnectButton').onclick = function () {
+                clearInterval(mediaInterval);
                 sendMessageToBackground({ func: 'leaveServer' });
             }
 
@@ -140,7 +142,7 @@ function pause() {
 
 function seek(place) {
     let script = document.createElement('script');
-    script.text = '(videoPlayer.getVideoPlayerBySessionId(videoPlayer.getAllPlayerSessionIds()[0]).seek(' + place + '))();';
+    script.text = '(videoPlayer.getVideoPlayerBySessionId(videoPlayer.getAllPlayerSessionIds()[0]).seek(\'' + place + '\'))();';
     document.head.appendChild(script);
 }
 
