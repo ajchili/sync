@@ -1,0 +1,20 @@
+{
+    "manifest_version": 2,
+    "name": "sync for Chrome",
+    "version": "0.0.1",
+    "description": "A simple and easy way to sync video playback in Netflix.",
+    "homepage_url": "https://github.com/ajchili/sync",
+    "permissions": [
+        "tabs"
+    ],
+    "background": {
+        "page": "background.html",
+        "persistent": true
+    },
+    "content_scripts": [{
+        "css": [ "css/sync.css" ],
+        "js": [ "js/content.js" ],
+        "matches": ["https://www.netflix.com/*"]
+    }],
+    "content_security_policy": "script-src 'self' https://www.gstatic.com *//*.firebaseio.*; object-src 'self'"
+}

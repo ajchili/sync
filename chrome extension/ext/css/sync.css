@@ -1,0 +1,86 @@
+.sync-netflix {
+    width: 80% !important;
+    max-width: 80% !important;
+    height: 100vh;
+    max-height: 100vh;
+    float: left;
+    overflow-y: scroll;
+}
+
+.sync {
+    width: 20% !important;
+    max-width: 20% !important;
+    height: 100vh;
+    max-height: 100vh;
+    float: right;
+    background-color: #141414;
+}
+
+.sync-header {
+    width: 100%;
+    height: 5vh;
+    max-height: 5vh;
+    text-align: center;
+}
+
+.sync-browser {
+    width: 100%;
+    height: 80vh;
+    max-height: 80vh;
+    overflow-y: scroll;
+}
+
+.sync-taskbar {
+    width: 100%;
+    margin-top: 2vh;
+}
+
+.sync-taskbar-button-container {
+    display: table;
+    margin: 0 auto;
+}
+
+.sync-player {
+    width: 80% !important;
+    max-width: 80% !important;
+}
+
+.sync-server-messages {
+    width: 100%;
+    height: 60vh;
+    max-height: 60vh;
+    overflow-y: scroll;
+}
+
+.server {
+    font-size: 1.25em;
+    list-style-type: none;
+}
+
+.server > .sync-server-title {
+    width: 80%;
+    max-width: 80%;
+    overflow-wrap: break-word;
+}
+
+.server > .sync-server-button {
+    margin-top: .5vh;
+}
+
+.sync-user-list {
+    width: 100%;
+    height: 20vh;
+    max-height: 20vh;
+    overflow-y: scroll;
+}
+
+.user {
+    font-size: 1.25em;
+    list-style-type: none;
+}
+
+.server > .sync-user-name {
+    width: 80%;
+    max-width: 80%;
+    overflow-wrap: break-word;
+}
