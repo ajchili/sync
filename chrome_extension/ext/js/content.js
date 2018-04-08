@@ -50,9 +50,9 @@ function sendMessageToBackground(message) {
 sendMessageToBackground({ func: 'currentPage', page: window.location });
 
 function setUI(user) {
-    if (document.getElementsByClassName('AkiraPlayer')[0] != null
-        && !document.getElementsByClassName('AkiraPlayer')[0].classList.value.includes('sync-player')) {
-        document.getElementsByClassName('AkiraPlayer')[0].classList.add('sync-player');
+    if (document.getElementsByClassName('sizing-wrapper')[0] != null
+        && !document.getElementsByClassName('sizing-wrapper')[0].classList.value.includes('sync-player')) {
+        document.getElementsByClassName('sizing-wrapper')[0].classList.add('sync-player');
     }
 
     if (!document.getElementById('appMountPoint').classList.contains('sync-netflix')) {
