@@ -4,7 +4,7 @@
 
 ## using sync
 #### desktop
-* Currently, the desktop version of sync is deprecated and exclusivly Java. To get setup with this version, please download [this](https://github.com/ajchili/sync/releases/tag/2.0.0B) release of sync and follow the unstructions [here](https://github.com/ajchili/sync/blob/master/java%20deprecated/README.md). 
+* Currently, the desktop version of sync is deprecated and exclusivly Java. To get setup with this version, please download [this](https://github.com/ajchili/sync/releases/tag/2.0.0B) release of sync and follow the instructions [here](https://github.com/ajchili/sync/blob/master/java%20deprecated/README.md). 
 * **A newer version is expected to be released soon, if you experience any issues with this deprecated version of sync, please know that it is no longer supported and any issues relating to it will not be addressed.**
 
 #### chrome extension
