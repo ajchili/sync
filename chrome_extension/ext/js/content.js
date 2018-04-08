@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             let video = document.getElementsByTagName('video')[0];
             
             mediaInterval = setInterval(function() {
-                sendMessageToBackground({ func: 'updateMedia', media: { paused: video.paused, time: video.currentTime * 1000 } });
+                sendMessageToBackground({ func: 'updateMedia', media: { paused: video.paused, time: video.currentTime } });
             }, 100);
             break;
         default:
@@ -157,9 +157,11 @@ function setMedia(media) {
                 play();
             }
         }
-    
-        if ((video.currentTime < media.time - 1 || video.currentTime > media.time + 1) && video.buffered.length > 0) {
-            seek(media.time);
+
+        if ((video.currentTime < media.time - 1 || video.currentTime > media.time + 1)) {
+            if (video.buffered.length > 0) {
+                seek(media.time * 1000);
+            }
         }
     }
 }
