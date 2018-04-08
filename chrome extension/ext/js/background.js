@@ -1,13 +1,12 @@
 var ref = firebase.database().ref().child('chrome');
 var user = { uid: checkForUser() };
+var userListener;
 var mediaListener;
-
-setupUser();
 
 chrome.tabs.onUpdated.addListener(function (tabID, changeInfo, tab) {
     if (tab.url != null) {
         if (tab.url.indexOf('https://www.netflix.com/') == 0) {
-            setUI();
+            setupUser();
 
             if (user.state === 1) {
                 if (tab.url.includes('/watch/')) {
@@ -81,7 +80,7 @@ function checkForUser() {
         var cookie = document.cookie;
         return cookie.substring(cookie.indexOf('syncUID=') + 8);
     } else {
-        var uid = ref.push().key;
+        var uid = ref.child('users').push().key;
         document.cookie = 'syncUID=' + uid + ';';
         return uid;
     }
@@ -96,7 +95,12 @@ function setupUser() {
         }
     });
 
-    ref.child('users').child(user.uid).on('value', function (snapshot) {
+    if (userListener) {
+        userListener.off();
+    }
+
+    userListener = ref.child('users').child(user.uid);
+    userListener.on('value', function (snapshot) {
         user.name = snapshot.child('name').val();
         user.state = snapshot.child('state').val();
         user.server = snapshot.child('server').val();
