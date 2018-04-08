@@ -17,14 +17,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             displayServerInfo(request.server);
             break;
         case 'setMedia':
-            if (window.location.pathname.includes('/watch/' + request.media.title)) {
-                clearInterval(mediaInterval);
-
-                mediaInterval = setInterval(function() {
-                    setMedia(request.media);
-                }, 100);
-            } else {
-                window.location = 'https://www.netflix.com/watch/' + request.media.title;
+            if (request.media.title != null) {
+                if (window.location.pathname.includes('/watch/' + request.media.title)) {
+                    clearInterval(mediaInterval);
+    
+                    mediaInterval = setInterval(function() {
+                        setMedia(request.media);
+                    }, 100);
+                } else {
+                    window.location = 'https://www.netflix.com/watch/' + request.media.title;
+                }
             }
             break;
         case 'setupMediaListener':
@@ -34,7 +36,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             
             mediaInterval = setInterval(function() {
                 sendMessageToBackground({ func: 'updateMedia', media: { paused: video.paused, time: video.currentTime } });
-            }, 100);
+            }, 250);
             break;
         default:
             break;
