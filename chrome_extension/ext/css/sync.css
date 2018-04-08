@@ -45,13 +45,6 @@
     max-width: 80% !important;
 }
 
-.sync-client-list {
-    width: 100%;
-    height: 20vh;
-    max-height: 20vh;
-    overflow-y: scroll;
-}
-
 .sync-server-messages {
     width: 100%;
     height: 60vh;
@@ -61,27 +54,33 @@
 
 .server {
     font-size: 1.25em;
-    padding: 0.5em;
     list-style-type: none;
 }
 
 .server > .sync-server-title {
     width: 80%;
     max-width: 80%;
-    overflow-x: scroll;
+    overflow-wrap: break-word;
 }
 
 .server > .sync-server-button {
-    margin-top: 1vh;
+    margin-top: .5vh;
 }
 
-.client {
+.sync-user-list {
+    width: 100%;
+    height: 20vh;
+    max-height: 20vh;
+    overflow-y: scroll;
+}
+
+.user {
     font-size: 1.25em;
     list-style-type: none;
 }
 
-.server > .sync-client-name {
+.server > .sync-user-name {
     width: 80%;
     max-width: 80%;
-    overflow-x: scroll;
+    overflow-wrap: break-word;
 }
