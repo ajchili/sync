@@ -1,6 +1,7 @@
 const ref = firebase.database().ref();
 
-var serverListListener, roomListener, roomMediaListener, roomUserListener, roomMessageListener, videoTimeInterval;
+var serverListListener, roomListener, roomMediaListener, roomUserListener, roomMessageListener;
+var videoTimeInterval, roomTitleInterval;
 
 /*
     Name: onbeforeunload
@@ -307,7 +308,7 @@ function setRoomVideoEvents(room, isHost) {
 
 /*
     Name: setRoomSettingsEvents
-    Purpose: Sets up UI elements to properly interact with the room.
+    Purpose: Sets up UI elements to properly interact with the room as host.
     Params:
         room: room id
         isHost: is host of room
@@ -315,6 +316,19 @@ function setRoomVideoEvents(room, isHost) {
 function setRoomSettingsEvents(room, isHost) {
     let settingsDropdown = document.getElementById('roomSettingsDropdown');
     settingsDropdown.hidden = !isHost;
+
+    clearInterval(roomTitleInterval);
+
+    if (isHost) {
+        let roomTitleInput = document.getElementById('roomTitleField');
+
+        roomTitleInterval = setInterval(function() {
+            let title = roomTitleInput.value;
+            if (title.length > 0) {
+                ref.child('rooms').child(room).child('title').set(title);
+            }
+        }, 1500);
+    }
 }
 
 /*
@@ -343,6 +357,7 @@ function createRoom(title, password) {
             createRequest.onreadystatechange = function () {
                 if (createRequest.readyState == 4 && createRequest.status == 200) {
                     let key = createRequest.response;
+                    document.getElementById('roomTitleField').value = title;
 
                     ref.child('rooms').child(key).once('value').then(function (room) {
                         createPlayer();
@@ -471,6 +486,7 @@ function leaveRoom() {
     }
 
     clearInterval(videoTimeInterval);
+    clearInterval(roomTitleInterval);
 
     let user = firebase.auth().currentUser;
     ref.child('users').child(user.uid).once('value').then(function (snapshot) {
