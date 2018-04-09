@@ -14,7 +14,9 @@
   "author": "Kirin Patel, Elijah Cutler",
   "license": "MIT",
   "devDependencies": {
-    "electron": "~1.8.2"
+    "electron": "~1.8.4",
+    "gulp-awesome-electron": "^1.2.2",
+    "gulp-vinyl-zip": "^2.1.0"
   },
   "dependencies": {
     "express": "^4.16.3",
