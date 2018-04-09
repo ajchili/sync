@@ -4,8 +4,8 @@
 
 ## using sync
 #### desktop
-* Currently, the desktop version of sync is deprecated and exclusivly Java. To get setup with this version, please download [this](https://github.com/ajchili/sync/releases/tag/2.0.0B) release of sync and follow the instructions [here](https://github.com/ajchili/sync/blob/master/java%20deprecated/README.md). 
-* **A newer version is expected to be released soon, if you experience any issues with this deprecated version of sync, please know that it is no longer supported and any issues relating to it will not be addressed.**
+* sync now is built with [Electron](https://electronjs.org), the latest version can be found [here](https://github.com/ajchili/sync/releases) and is easy to get up and running. Download the correct version for your platform and start watching.
+* **Many features may not work or be missing completely.**
 
 #### chrome extension
 * The chrome extension is currently under development and only works with Netflix, to test the extremely broken extension, go [here](https://chrome.google.com/webstore/detail/aoifmjackfcjdbnkpgjcljiedejlnimj/).
