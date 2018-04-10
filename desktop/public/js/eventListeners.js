@@ -109,6 +109,10 @@ document.getElementById('roomLeave').addEventListener('click', function (e) {
     return false;
 });
 
+/*
+    Name: homeAdInfo click
+    Purpose: Show ad info modal.
+*/
 document.getElementById('homeAdInfo').addEventListener('click', function (e) {
     e.preventDefault();
 
@@ -117,6 +121,10 @@ document.getElementById('homeAdInfo').addEventListener('click', function (e) {
     return false;
 });
 
+/*
+    Name: homeCreateRoomModalPrivatePassword keyup
+    Purpose: Update the password icon to display if room is locked or unlocked depending on if password is provided.
+*/
 $('#homeCreateRoomModalPrivatePassword').on('keyup', function (e) {
     if (e.keyCode != 13) {
         let password = document.getElementById('homeCreateRoomModalPrivatePassword').value;

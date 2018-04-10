@@ -35,6 +35,12 @@ function updateUsername(name) {
     document.getElementById('homeUsername').innerText = name;
 }
 
+/*
+    Name: showPasswordModal
+    Purpose: Displays modal to allow users to connect to private server with password.
+    Params:
+        callback: function to call once finished
+*/
 function showPasswordModal(callback) {
     $('#homeJoinRoomModal').modal({
         onApprove: function () {
@@ -51,6 +57,13 @@ function showPasswordModal(callback) {
     }).modal('show');
 }
 
+/*
+    Name: showPasswordModal
+    Purpose: Joins server as user.
+    Params:
+        user: current user
+        room: room id
+*/
 function joinRoom(user, room) {
     showDimmer('Joining room...');
 
