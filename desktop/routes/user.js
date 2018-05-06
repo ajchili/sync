@@ -28,23 +28,15 @@ function moveFileToMediaFolder(file) {
         }).catch(function (err) {
             readStream.destroy();
             writeStream.end();
-            throw err;
+            reject(err);
         });
     }
 }
 
 function createRoom(req, res) {
     let key = ref.child('rooms').push().key;
-    let title = req.params.title;
-    let password = req.params.password != null ? req.params.password : null;
-
-    while (title.includes('_____')) {
-        title = title.replace('_____', '/');
-    }
-
-    while (password != null && password.includes('_____')) {
-        password = password.replace('_____', '/');
-    }
+    let title = req.body.title;
+    let password = req.body.password != null ? req.body.password : null;
 
     ref.child('rooms').child(key).set({
         host: req.params.uid,
@@ -84,12 +76,7 @@ function createLocalTunnel(req, res) {
         return res.status(403).send(err);
     }
 }
-
-router.get('/:uid/:sessionId/createRoom/:title', function (req, res) {
-    createLocalTunnel(req, res);
-});
-
-router.get('/:uid/:sessionId/createRoom/:title/:password', function (req, res) {
+router.post('/:uid/:sessionId/createRoom', function (req, res) {
     createLocalTunnel(req, res);
 });
 
@@ -133,46 +120,15 @@ router.get('/:uid/:sessionId/leaveRoom/:room', function (req, res) {
     });
 });
 
-router.get('/:uid/:room/setRoomMedia/:url', function (req, res) {
-    ref.child('rooms').child(req.params.room).once('value').then(function (room) {
-        if (room.exists() && room.child('host').val() === req.params.uid) {
-            ref.child('rooms').child(req.params.room).child('media').set({
-                title: req.params.url,
-                type: 'url',
-                paused: true,
-                time: 0
-            });
-
-            return res.sendStatus(200);
-        } else {
-            return res.sendStatus(401);
-        }
-    });
-});
-
-router.get('/:uid/:room/setRoomMedia/:type/:path', function (req, res) {
-    let path = req.params.path;
-    let type = req.params.type;
-
-    while (path.includes('_____')) {
-        path = path.replace('_____', '/');
-    }
-
-    while (type.includes('_____')) {
-        type = type.replace('_____', '/');
-    }
-
-    path = decodeURI(path);
-    type = decodeURI(type);
-
-    moveFileToMediaFolder(path).then(function () {
-        let fileName = path.substring(path.lastIndexOf(process.platform !== 'darwin' ? '\\' : '/') + 1);
+router.post('/:uid/:room/setRoomMedia/', function (req, res) {
+    if (req.body.url) {
+        let url = req.body.url;
 
         ref.child('rooms').child(req.params.room).once('value').then(function (room) {
             if (room.exists() && room.child('host').val() === req.params.uid) {
                 ref.child('rooms').child(req.params.room).child('media').set({
-                    title: fileName,
-                    type: type,
+                    title: url,
+                    type: 'url',
                     paused: true,
                     time: 0
                 });
@@ -182,18 +138,39 @@ router.get('/:uid/:room/setRoomMedia/:type/:path', function (req, res) {
                 return res.sendStatus(401);
             }
         });
-    }).catch(function (err) {
-        console.log(err);
-        return res.status(404).send(err);
-    });
+    } else {
+        let path = req.body.path;
+        let type = req.body.type;
+
+        path = decodeURI(path);
+        type = decodeURI(type);
+
+        moveFileToMediaFolder(path).then(function () {
+            let fileName = path.substring(path.lastIndexOf(process.platform !== 'darwin' ? '\\' : '/') + 1);
+
+            ref.child('rooms').child(req.params.room).once('value').then(function (room) {
+                if (room.exists() && room.child('host').val() === req.params.uid) {
+                    ref.child('rooms').child(req.params.room).child('media').set({
+                        title: fileName,
+                        type: type,
+                        paused: true,
+                        time: 0
+                    });
+
+                    return res.sendStatus(200);
+                } else {
+                    return res.sendStatus(401);
+                }
+            });
+        }).catch(function (err) {
+            console.log(err);
+            return res.status(404).send(err);
+        });
+    }
 });
 
-router.get('/:uid/:room/sendMessage/:message', function (req, res) {
-    let message = decodeURI(req.params.message);
-
-    while (message.includes('_____')) {
-        message = message.replace('_____', '/');
-    }
+router.post('/:uid/:room/sendMessage/', function (req, res) {
+    let message = decodeURI(req.body.message);
 
     ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
         let messageId = ref.child('rooms').child(req.params.room).child('messages').push().key;
@@ -209,7 +186,7 @@ router.get('/:uid/:room/sendMessage/:message', function (req, res) {
             } else {
                 return res.sendStatus(401);
             }
-        })
+        });
     });
 });
 

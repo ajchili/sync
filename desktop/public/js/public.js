@@ -107,21 +107,21 @@ function joinRoom(user, room) {
                     setRoomSettingsEvents(room.key, false);
                 });
 
-                $('#roomChatMessage').off();
-                $('#roomChatMessage').keypress(function (e) {
-                    if (e.which == 13 && !e.shiftKey) {
+                let roomChatMessage = $('#roomChatMessage');
+                roomChatMessage.off();
+                roomChatMessage.keypress(function (e) {
+                    if (e.which === 13 && !e.shiftKey) {
                         e.preventDefault();
 
                         let message = urlify(document.getElementById('roomChatMessage').value);
 
-                        while (message.includes('/')) {
-                            message = message.replace('/', '_____');
-                        }
-
                         if (message.length > 0) {
                             let messageRequest = new XMLHttpRequest();
-                            messageRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + room.key + '/sendMessage/' + message, true);
-                            messageRequest.send();
+                            messageRequest.open('POST',
+                                `http://localhost:3000/user/${user.uid}/${room.key}/sendMessage`,
+                                true);
+                            messageRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                            messageRequest.send(`message=${message}`);
                             document.getElementById('roomChatMessage').value = '';
                         }
 
@@ -356,19 +356,11 @@ function createRoom(title, password) {
 
     showDimmer('Creating server...');
 
-    while (title.includes('/')) {
-        title = title.replace('/', '_____');
-    }
-
-    while (password.includes('/')) {
-        password = password.replace('/', '_____');
-    }
-
     ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
         if (sessionId.exists()) {
             let createRequest = new XMLHttpRequest();
             createRequest.onreadystatechange = function () {
-                if (createRequest.readyState == 4 && createRequest.status == 200) {
+                if (createRequest.readyState === 4 && createRequest.status === 200) {
                     let key = createRequest.response;
                     document.getElementById('roomTitleField').value = title;
 
@@ -394,21 +386,21 @@ function createRoom(title, password) {
                         setRoomSettingsEvents(key, true);
                     });
 
-                    $('#roomChatMessage').off();
-                    $('#roomChatMessage').keypress(function (e) {
-                        if (e.which == 13 && !e.shiftKey) {
+                    let roomChatMessage = $('#roomChatMessage');
+                    roomChatMessage.off();
+                    roomChatMessage.keypress(function (e) {
+                        if (e.which === 13 && !e.shiftKey) {
                             e.preventDefault();
 
                             let message = urlify(document.getElementById('roomChatMessage').value);
 
-                            while (message.includes('/')) {
-                                message = message.replace('/', '_____');
-                            }
-
                             if (message.length > 0) {
                                 let messageRequest = new XMLHttpRequest();
-                                messageRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/sendMessage/' + message, true);
-                                messageRequest.send();
+                                messageRequest.open('POST',
+                                    `http://localhost:3000/user/${user.uid}/${key}/sendMessage`,
+                                    true);
+                                messageRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                                messageRequest.send(`message=${message}`);
                                 document.getElementById('roomChatMessage').value = '';
                             }
 
@@ -427,28 +419,21 @@ function createRoom(title, password) {
                         let path = encodeURI(file.path);
                         let type = encodeURI(file.type);
 
-                        while (path.includes('/')) {
-                            path = path.replace('/', '_____');
-                        }
-
-                        while (type.includes('/')) {
-                            type = type.replace('/', '_____');
-                        }
-
                         let mediaRequest = new XMLHttpRequest();
                         mediaRequest.onreadystatechange = function () {
-                            if (mediaRequest.readyState == 4) {
+                            if (mediaRequest.readyState === 4) {
                                 hideDimmer();
                             }
 
-                            if (mediaRequest.readyState == 4 && mediaRequest.status == 401) {
+                            if (mediaRequest.readyState === 4 && mediaRequest.status === 401) {
                                 alert('Only the host can set the room media!');
-                            } else if (mediaRequest.readyState == 4 && mediaRequest.status == 404) {
+                            } else if (mediaRequest.readyState === 4 && mediaRequest.status === 404) {
                                 alert('Unable to set media!');
                             }
                         };
-                        mediaRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + key + '/setRoomMedia/' + type + '/' + path, true);
-                        mediaRequest.send();
+                        mediaRequest.open('POST', `http://localhost:3000/user/${user.uid}/${key}/setRoomMedia/`, true);
+                        mediaRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                        mediaRequest.send(`path=${path}&type=${type}`);
                     });
 
                     document.addEventListener('dragover', function (e) {
@@ -457,18 +442,14 @@ function createRoom(title, password) {
                     });
 
                     setViewVisibility(1);
-                } else if (createRequest.readyState == 4 && createRequest.status == 403) {
+                } else if (createRequest.readyState === 4 && createRequest.status === 403) {
                     alert('Unable to create room, please restart sync.');
                 }
-            }
+            };
 
-            if (password.length > 0) {
-                createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title + '/' + password, true);
-            } else {
-                createRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + sessionId.val() + '/createRoom/' + title, true);
-            }
-
-            createRequest.send();
+            createRequest.open('POST', `http://localhost:3000/user/${user.uid}/${sessionId.val()}/createRoom/`, true);
+            createRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            createRequest.send(`title=${title}${password ? `&password=${password}` : ''}`);
         } else {
             alert('Unable to create room, please restart sync.');
         }
@@ -506,7 +487,7 @@ function leaveRoom() {
         if (snapshot.child('state').val() > 0) {
             let leaveRequest = new XMLHttpRequest();
             leaveRequest.onreadystatechange = function () {
-                if (leaveRequest.readyState == 4 && leaveRequest.status == 200) {
+                if (leaveRequest.readyState === 4 && leaveRequest.status === 200) {
                     if (videojs('roomVideo')) {
                         player = videojs('roomVideo');
                         player.dispose();

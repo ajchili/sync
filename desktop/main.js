@@ -41,6 +41,8 @@ function createWindow() {
 };
 
 app.on('ready', createWindow);
+
+expressApp.use(require('body-parser').urlencoded({ extended: true }));
 expressApp.use('/media', express.static(__dirname + '/media'));
 expressApp.use('/user', require('./routes/user'));
 expressApp.listen(3000);
