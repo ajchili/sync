@@ -39,7 +39,7 @@ document.getElementById('homeCreateRoom').addEventListener('click', function (e)
 $('#roomTitle').on('keyup', function (e) {
     if (e.keyCode == 13) {
         let title = document.getElementById('roomTitle');
-    
+
         if (title.value.length === 0) {
             title.parentElement.classList.add('error');
         } else {
@@ -121,6 +121,21 @@ document.getElementById('homeAdInfo').addEventListener('click', function (e) {
     return false;
 });
 
+document.getElementById('roomMediaButton').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    $('#roomSetMediaModal').modal('show');
+
+    return false;
+});
+
+// document.getElementById('roomSetMediaModalButton').addEventListener('click', function (e) {
+//     e.preventDefault();
+//
+//     return false;
+// });
+
+
 /*
     Name: homeCreateRoomModalPrivatePassword keyup
     Purpose: Update the password icon to display if room is locked or unlocked depending on if password is provided.
@@ -130,7 +145,7 @@ $('#homeCreateRoomModalPrivatePassword').on('keyup', function (e) {
         let password = document.getElementById('homeCreateRoomModalPrivatePassword').value;
         let icon = document.getElementById('homeCreateRoomModalPrivateButtonIcon');
         let button = document.getElementById('homeCreateRoomModalPrivateButton');
-    
+
         if (password.length === 0) {
             icon.classList.remove('lock');
             icon.classList.add('unlock');

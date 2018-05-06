@@ -2,226 +2,259 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <title>sync</title>
+    <meta charset="UTF-8">
+    <title>sync</title>
 
-  <link rel="stylesheet" type="text/css" href="../semantic/dist/semantic.min.css">
-  <link href="http://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="./css/video.css">
+    <link rel="stylesheet" type="text/css" href="../semantic/dist/semantic.min.css">
+    <link href="http://vjs.zencdn.net/6.6.3/video-js.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="./css/video.css">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
 <body>
-  <div style="width: 100%; height: 20px; position: absolute; z-index: 1000; -webkit-app-region: drag;"></div>
+<div style="width: 100%; height: 20px; position: absolute; z-index: 1000; -webkit-app-region: drag;"></div>
 
-  <div id="home" style="height: 100vh; position: relative;" hidden>
+<div id="home" style="height: 100vh; position: relative;" hidden>
     <div class="ui right sidebar inverted vertical menu">
-      <div style="color: #fff; padding: 1em;">
-        <h1>Server List</h1>
-        <div id="homeServers"></div>
-      </div>
+        <div style="color: #fff; padding: 1em;">
+            <h1>Server List</h1>
+            <div id="homeServers"></div>
+        </div>
     </div>
     <div class="pusher" style="height: 100%">
-      <div style="position: absolute; left: 1em; top: 2em;">
-        <p>Welcome
-          <span id="homeUsername"></span>
-        </p>
-        <button id="homeChangeUsername" class="mini ui button" data-tooltip="Set the username that others will see while you watch media together."
-          data-position="bottom left">Change Username</button>
-      </div>
-      <div style="width: 100%; text-align: center; position: relative; top: 50%; transform: translateY(-50%);">
-        <h1>sync</h1>
-        <h3>the easy way to watch media together</h3>
-        <div id="buttons">
-          <button id="homeHost" class="massive ui button">Host</button>
-          <button id="homeJoin" class="massive ui button">Join</button>
+        <div style="position: absolute; left: 1em; top: 2em;">
+            <p>Welcome
+                <span id="homeUsername"></span>
+            </p>
+            <button id="homeChangeUsername" class="mini ui button"
+                    data-tooltip="Set the username that others will see while you watch media together."
+                    data-position="bottom left">Change Username
+            </button>
         </div>
-      </div>
-      <div style="width: 100%; bottom: 0; position: absolute;">
-        <div class="ui centered large leaderboard test ad" data-text="Want to advertise in sync? Click the gear to learn more.">
-          <i id="homeAdInfo" class="inverted cog icon" style="font-size: 1.5em; top: .25em; right: 0; position: absolute;"></i>
+        <div style="width: 100%; text-align: center; position: relative; top: 50%; transform: translateY(-50%);">
+            <h1>sync</h1>
+            <h3>the easy way to watch media together</h3>
+            <div id="buttons">
+                <button id="homeHost" class="massive ui button">Host</button>
+                <button id="homeJoin" class="massive ui button">Join</button>
+            </div>
         </div>
-        <p style="width: 100%; text-align: center;">3.0.0 Pre-Alpha</p>
-      </div>
+        <div style="width: 100%; bottom: 0; position: absolute;">
+            <div class="ui centered large leaderboard test ad"
+                 data-text="Want to advertise in sync? Click the gear to learn more.">
+                <i id="homeAdInfo" class="inverted cog icon"
+                   style="font-size: 1.5em; top: .25em; right: 0; position: absolute;"></i>
+            </div>
+            <p style="width: 100%; text-align: center;">Pre-Alpha 3.0.1</p>
+        </div>
     </div>
-  </div>
+</div>
 
-  <div id="room" style="height: 100vh; position: relative;" hidden>
+<div id="room" style="height: 100vh; position: relative;" hidden>
     <div id="roomVideoHolder" style="width: 75%; height: 100%; float: left; background-color: #000;">
     </div>
     <div style="width: 25%; height: 100%; float: left;">
-      <div class="ui inverted segment" style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
-        <div class="ui inverted accordion">
-          <div class="title">
-            <i class="dropdown icon"></i>
-            Users
-          </div>
-          <div class="content">
-            <div id="roomUsers" class="ui inverted relaxed divided list"></div>
-          </div>
-          <div id="roomSettingsDropdown" style="margin-bottom: 1em;">
+        <div class="ui inverted segment"
+             style="width: 100%; height: 50%; overflow-y: scroll; margin: 0 !important; border-radius: 0 !important;">
+            <div class="ui inverted accordion">
+                <div class="title">
+                    <i class="dropdown icon"></i>
+                    Users
+                </div>
+                <div class="content">
+                    <div id="roomUsers" class="ui inverted relaxed divided list"></div>
+                </div>
+                <div id="roomSettingsDropdown" style="margin-bottom: 1em;">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Settings
+                    </div>
+                    <div class="content">
+                        <div class="ui fluid input">
+                            <input id="roomTitleField" type="text" placeholder="Title">
+                        </div>
+                        <button id="roomMediaButton" class="ui fluid button" style="margin-top: 1em;">Set Media</button>
+                    </div>
+                </div>
+                <button id="roomLeave" class="ui red fluid button">Leave</button>
+            </div>
+        </div>
+        <div class="ui inverted segment"
+             style="width: 100%; height: 50%; display: flex; flex-flow: column; margin: 0 !important; border-radius: 0 !important;">
             <div class="title">
-              <i class="dropdown icon"></i>
-              Settings
+                Chat
             </div>
-            <div class="content">
-              <div class="ui fluid input">
-                <input id="roomTitleField" type="text" placeholder="Title">
-              </div>
+            <div id="roomMessages" class="ui inverted relaxed divided list"
+                 style="max-width: 100%; height: 100%; word-break: break-all; overflow-y: scroll;"></div>
+            <div class="ui fluid input" style="min-height: 38px;">
+                <input id="roomChatMessage" type="text" placeholder="Your message...">
             </div>
-          </div>
-          <button id="roomLeave" class="ui fluid button">Leave</button>
         </div>
-      </div>
-      <div class="ui inverted segment" style="width: 100%; height: 50%; display: flex; flex-flow: column; margin: 0 !important; border-radius: 0 !important;">
-        <div class="title">
-          Chat
-        </div>
-        <div id="roomMessages" class="ui inverted relaxed divided list" style="max-width: 100%; height: 100%; word-break: break-all; overflow-y: scroll;"></div>
-        <div class="ui fluid input" style="min-height: 38px;">
-          <input id="roomChatMessage" type="text" placeholder="Your message...">
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 
-  <div id="homeChangeUsernameModal" class="mini ui modal">
+<div id="homeChangeUsernameModal" class="mini ui modal">
     <i class="close icon"></i>
     <div class="header">
-      Change your username
+        Change your username
     </div>
     <div class="content">
-      <div class="ui fluid input">
-        <input id="newUsername" type="text" placeholder="New username">
-      </div>
-    </div>
-    <div class="actions">
-      <div class="ui black deny button">
-        Cancel
-      </div>
-      <div id="homeChangeUsernameModalSet" class="ui right green button">
-        Yep, that's me!
-      </div>
-    </div>
-  </div>
-
-  <div id="homeCreateRoomModal" class="mini ui modal">
-    <i class="close icon"></i>
-    <div class="header">
-      Create your room
-    </div>
-    <div class="content">
-      <div class="ui fluid input">
-        <input id="roomTitle" type="text" placeholder="Enter room title">
-      </div>
-      <br>
-      <div class="ui fluid left action input">
-        <button id="homeCreateRoomModalPrivateButton" class="ui button" data-tooltip="Want the room to be secret? Type a password."
-          data-html="true" data-position="left center" tabindex="0">
-          <div class="visible content">
-            <i id="homeCreateRoomModalPrivateButtonIcon" class="unlock icon"></i>
-          </div>
-        </button>
-        <input id="homeCreateRoomModalPrivatePassword" type="text" placeholder="Enter room password">
-      </div>
-    </div>
-    <div class="actions">
-      <div class="ui black deny button">
-        Cancel
-      </div>
-      <div id="homeCreateRoom" class="ui right green button">
-        Create!
-      </div>
-    </div>
-  </div>
-
-  <div id="homeJoinRoomModal" class="mini ui modal">
-      <i class="close icon"></i>
-      <div class="header">
-        Join a private room
-      </div>
-      <div class="content">
-        <div class="ui fluid left action input">
-          <button class="ui button" tabindex="0">
-            <div class="visible content">
-              <i class="lock icon"></i>
-            </div>
-          </button>
-          <input id="homeJoinRoomModalPassword" type="text" placeholder="Enter room password">
+        <div class="ui fluid input">
+            <input id="newUsername" type="text" placeholder="New username">
         </div>
-      </div>
-      <div class="actions">
+    </div>
+    <div class="actions">
         <div class="ui black deny button">
-          Cancel
+            Cancel
+        </div>
+        <div id="homeChangeUsernameModalSet" class="ui right green button">
+            Yep, that's me!
+        </div>
+    </div>
+</div>
+
+<div id="homeCreateRoomModal" class="mini ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Create your room
+    </div>
+    <div class="content">
+        <div class="ui fluid input">
+            <input id="roomTitle" type="text" placeholder="Enter room title">
+        </div>
+        <br>
+        <div class="ui fluid left action input">
+            <button id="homeCreateRoomModalPrivateButton" class="ui button"
+                    data-tooltip="Want the room to be secret? Type a password."
+                    data-html="true" data-position="left center" tabindex="0">
+                <div class="visible content">
+                    <i id="homeCreateRoomModalPrivateButtonIcon" class="unlock icon"></i>
+                </div>
+            </button>
+            <input id="homeCreateRoomModalPrivatePassword" type="text" placeholder="Enter room password">
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            Cancel
+        </div>
+        <div id="homeCreateRoom" class="ui right green button">
+            Create!
+        </div>
+    </div>
+</div>
+
+<div id="homeJoinRoomModal" class="mini ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Join a private room
+    </div>
+    <div class="content">
+        <div class="ui fluid left action input">
+            <button class="ui button" tabindex="0">
+                <div class="visible content">
+                    <i class="lock icon"></i>
+                </div>
+            </button>
+            <input id="homeJoinRoomModalPassword" type="text" placeholder="Enter room password">
+        </div>
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            Cancel
         </div>
         <div class="ui ok right green button">
-          Join!
+            Join!
         </div>
-      </div>
     </div>
+</div>
 
-  <div id="roomDisbandedModal" class="ui basic modal">
+<div id="roomDisbandedModal" class="ui basic modal">
     <div class="header">
-      The sync room you were in was disbanded!
+        The sync room you were in was disbanded!
     </div>
     <div class="content">
-      It looks like the host was all done watching.
-      <br>If you want to keep watching feel free to join another room or host one yourself!
+        It looks like the host was all done watching.
+        <br>If you want to keep watching feel free to join another room or host one yourself!
     </div>
     <div class="actions">
-      <div id="roomDisbandedModalClose" class="ui ok inverted button">
-        Gotcha
-      </div>
+        <div id="roomDisbandedModalClose" class="ui ok inverted button">
+            Gotcha
+        </div>
     </div>
-  </div>
+</div>
 
-  <div id="homeAdInfoModal" class="small ui modal">
+<div id="homeAdInfoModal" class="small ui modal">
     <i class="close icon"></i>
     <div class="header">
-      Advertise in sync
+        Advertise in sync
     </div>
     <div class="content">
-      Want to show your product/service to users of sync and support the developers of sync?
-      <strong>This is how!</strong>
-      <br>Send an email to
-      <a href="mailto:kirinpatel@gmail.com">kirinpatel@gmail.com</a> or create an issue on
-      <a href="https://www.github.com/ajchili/sync/issues" target="_blank">Github</a> (be sure to tag it as an
-      <em>ad</em>).
-      <br>No matter what you do (an email provides better privacy should you want it), be sure to include:
-      <ol>
-        <li>Your name</li>
-        <li>Product/Service (include links and any other materials you deem fit)</li>
-        <li>Length of promotion</li>
-        <li>Contact information</li>
-        <li>Your terms</li>
-        <li>Any questions you may have</li>
-      </ol>
-      After you email or submit an issue on
-      <a href="https://www.github.com/ajchili/sync/issues" target="_blank">Github</a>, expect to see a repsonse within
-      <em>2-4 business days</em>.
-      <br>
-      <strong>Any support provided is greatly appreciated!</strong>
+        Want to show your product/service to users of sync and support the developers of sync?
+        <strong>This is how!</strong>
+        <br>Send an email to
+        <a href="mailto:kirinpatel@gmail.com">kirinpatel@gmail.com</a> or create an issue on
+        <a href="https://www.github.com/ajchili/sync/issues" target="_blank">Github</a> (be sure to tag it as an
+        <em>ad</em>).
+        <br>No matter what you do (an email provides better privacy should you want it), be sure to include:
+        <ol>
+            <li>Your name</li>
+            <li>Product/Service (include links and any other materials you deem fit)</li>
+            <li>Length of promotion</li>
+            <li>Contact information</li>
+            <li>Your terms</li>
+            <li>Any questions you may have</li>
+        </ol>
+        After you email or submit an issue on
+        <a href="https://www.github.com/ajchili/sync/issues" target="_blank">Github</a>, expect to see a repsonse within
+        <em>2-4 business days</em>.
+        <br>
+        <strong>Any support provided is greatly appreciated!</strong>
     </div>
     <div class="actions">
-      <div id="homeCreateRoom" class="ui green ok button">
-        Gotcha!
-      </div>
+        <div class="ui green ok button">
+            Gotcha!
+        </div>
     </div>
-  </div>
+</div>
 
-  <div id="dimmer" class="ui dimmer">
+<div id="roomSetMediaModal" class="mini ui modal">
+    <i class="close icon"></i>
+    <div class="header">
+        Set Media
+    </div>
+    <div class="content">
+        <!--Got a link? Paste it below!-->
+        <!--<br>-->
+        <!--<br>-->
+        <!--<div class="ui fluid input">-->
+            <!--<input id="roomSetMediaModalLink" type="text" placeholder="Media URL">-->
+        <!--</div>-->
+        <!--<br>-->
+        <!--<button id="roomSetMediaModalButton" class="ui fluid button">Set Media</button>-->
+        <!--<br>-->
+        <!--Otherwise j-->Just drag and drop any media file onto the video player in sync to get started.
+    </div>
+    <div class="actions">
+        <div class="ui black deny button">
+            Cancel
+        </div>
+    </div>
+</div>
+
+<div id="dimmer" class="ui dimmer">
     <div id="dimmerText" class="ui indeterminate text loader"></div>
-  </div>
+</div>
 
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
-  <script src="http://vjs.zencdn.net/6.6.3/video.js"></script>
-  <script src="../semantic/dist/semantic.min.js"></script>
-  <script src="../config/firebase.js"></script>
-  <script src="./js/utils.js"></script>
-  <script src="./js/public.js"></script>
-  <script src="./js/eventListeners.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+<script src="http://vjs.zencdn.net/6.6.3/video.js"></script>
+<script src="../semantic/dist/semantic.min.js"></script>
+<script src="../config/firebase.js"></script>
+<script src="./js/utils.js"></script>
+<script src="./js/public.js"></script>
+<script src="./js/eventListeners.js"></script>
 </body>
 
 </html>

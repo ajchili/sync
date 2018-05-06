@@ -1,6 +1,6 @@
 {
   "name": "sync",
-  "version": "0.0.1",
+  "version": "3.0.1",
   "description": "An Electron based media syncing application.",
   "main": "main.js",
   "scripts": {

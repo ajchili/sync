@@ -134,7 +134,20 @@ router.get('/:uid/:sessionId/leaveRoom/:room', function (req, res) {
 });
 
 router.get('/:uid/:room/setRoomMedia/:url', function (req, res) {
-    return res.sendStatus(200);
+    ref.child('rooms').child(req.params.room).once('value').then(function (room) {
+        if (room.exists() && room.child('host').val() === req.params.uid) {
+            ref.child('rooms').child(req.params.room).child('media').set({
+                title: req.params.url,
+                type: 'url',
+                paused: true,
+                time: 0
+            });
+
+            return res.sendStatus(200);
+        } else {
+            return res.sendStatus(401);
+        }
+    });
 });
 
 router.get('/:uid/:room/setRoomMedia/:type/:path', function (req, res) {
