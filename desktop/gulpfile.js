@@ -7,6 +7,7 @@ var electron = require('gulp-awesome-electron');
 const electronVersion = '1.8.4';
 const src = ['**/*.*', 
 		'!build/**', 
+		'!media/**', 
 		'!semantic/src/**', 
 		'!semantic/task/**',
 		'!CONTRIBUTING.md'];
