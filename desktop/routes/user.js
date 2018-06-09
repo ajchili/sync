@@ -4,21 +4,23 @@ const localtunnel = require('localtunnel');
 const fs = require('fs-extra');
 const firebase = require('firebase');
 const firebaseApp = firebase.initializeApp(require('../config/firebase_node.js'));
+const path = require('path');
 const ref = firebaseApp.database().ref();
 
 var url;
 
 // https://stackoverflow.com/a/30405105
 function moveFileToMediaFolder(file) {
-    let location = process.platform !== 'darwin' ? __dirname.substring(0, __dirname.lastIndexOf('\\')) + '\\media' : __dirname.substring(0, __dirname.lastIndexOf('/')) + '/media';
-    if (file === location + file.substring(file.lastIndexOf(process.platform !== 'darwin' ? '\\' : '/'))) {
+    let location = path.join(path.parse(__dirname).dir, 'media');
+    let newFile = path.join(location, path.parse(file).base);
+    if (file === newFile) {
         return new Promise(function (resolve, reject) {
             resolve();
         });
     } else {
         let readStream = fs.createReadStream(file);
         fs.ensureDir(location, null);
-        let writeStream = fs.createWriteStream(location + file.substring(file.lastIndexOf(process.platform !== 'darwin' ? '\\' : '/')));
+        let writeStream = fs.createWriteStream(newFile);
 
         return new Promise(function (resolve, reject) {
             readStream.on('error', reject);
