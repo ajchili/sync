@@ -114,7 +114,6 @@ function joinRoom(user, room) {
                 alert(`Unable to join room.\nError Code ${response.status}: ${response.data}.`);
             }
         }).catch(function (error) {
-            alert(error);
             setViewVisibility(0);
         });
     });
@@ -417,7 +416,6 @@ function createRoom(title, password) {
                     alert('Unable to create room, please restart sync.');
                 }
             }).catch(function (error) {
-                alert(error);
                 setViewVisibility(0);
             });
         } else {
@@ -468,7 +466,6 @@ function leaveRoom() {
                     setViewVisibility(0);
                 }
             }).catch(function (error) {
-                alert(error);
                 setViewVisibility(0);
             });
         }
