@@ -157,3 +157,35 @@ $('#homeCreateRoomModalPrivatePassword').on('keyup', function (e) {
         }
     }
 });
+
+function setupChatMessageListener(user, room) {
+    let roomChatMessage = $('#roomChatMessage');
+
+    roomChatMessage.off();
+    roomChatMessage.keypress(function (e) {
+        if (e.which === 13 && !e.shiftKey) {
+            e.preventDefault();
+
+            let message = urlify(document.getElementById('roomChatMessage').value);
+
+            if (message.length > 0) {
+                axios.post(`http://localhost:3000/user/${user.uid}/${room.key}/sendMessage`, 
+                `message=${message}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                }).then(function (response) {
+                    if (response.status !== 200) {
+                        alert(`Unable to send message.\nError Code ${response.status}: ${response.data}.`);
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+                document.getElementById('roomChatMessage').value = '';
+            }
+
+            return false;
+        }
+    });
+}

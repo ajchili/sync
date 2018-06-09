@@ -172,8 +172,6 @@ router.post('/:uid/:room/setRoomMedia/', function (req, res) {
 });
 
 router.post('/:uid/:room/sendMessage/', function (req, res) {
-    let message = decodeURI(req.body.message);
-
     ref.child('users').child(req.params.uid).child('name').once('value').then(function (username) {
         let messageId = ref.child('rooms').child(req.params.room).child('messages').push().key;
 
@@ -181,7 +179,7 @@ router.post('/:uid/:room/sendMessage/', function (req, res) {
             if (user.exists()) {
                 ref.child('rooms').child(req.params.room).child('messages').child(messageId).set({
                     sender: username.val(),
-                    body: message
+                    body: decodeURI(req.body.message)
                 });
 
                 return res.sendStatus(200);

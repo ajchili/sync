@@ -68,9 +68,8 @@ function joinRoom(user, room) {
     showDimmer('Joining room...');
 
     ref.child('users').child(user.uid).once('value').then(function (snapshot) {
-        let joinRequest = new XMLHttpRequest();
-        joinRequest.onreadystatechange = function () {
-            if (joinRequest.readyState == 4 && joinRequest.status == 200) {
+        axios.get(`http://localhost:3000/user/${user.uid}/${snapshot.child('sessionId').val()}/joinRoom/${room.key}`).then(function (response) {
+            if (response.status === 200) {
                 roomListener = ref.child('rooms').child(room.key);
                 roomListener.on('value', function (snapshot) {
                     if (!snapshot.exists()) {
@@ -107,33 +106,17 @@ function joinRoom(user, room) {
                     setRoomSettingsEvents(room.key, false);
                 });
 
-                let roomChatMessage = $('#roomChatMessage');
-                roomChatMessage.off();
-                roomChatMessage.keypress(function (e) {
-                    if (e.which === 13 && !e.shiftKey) {
-                        e.preventDefault();
-
-                        let message = urlify(document.getElementById('roomChatMessage').value);
-
-                        if (message.length > 0) {
-                            let messageRequest = new XMLHttpRequest();
-                            messageRequest.open('POST',
-                                `http://localhost:3000/user/${user.uid}/${room.key}/sendMessage`,
-                                true);
-                            messageRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                            messageRequest.send(`message=${message}`);
-                            document.getElementById('roomChatMessage').value = '';
-                        }
-
-                        return false;
-                    }
-                });
+                setupChatMessageListener(user, room);
 
                 setViewVisibility(1);
+            } else {
+                hideDimmer();
+                alert(`Unable to join room.\nError Code ${response.status}: ${response.data}.`);
             }
-        }
-        joinRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/joinRoom/' + room.key, true);
-        joinRequest.send();
+        }).catch(function (error) {
+            alert(error);
+            setViewVisibility(0);
+        });
     });
 }
 
@@ -358,10 +341,15 @@ function createRoom(title, password) {
 
     ref.child('users').child(user.uid).child('sessionId').once('value').then(function (sessionId) {
         if (sessionId.exists()) {
-            let createRequest = new XMLHttpRequest();
-            createRequest.onreadystatechange = function () {
-                if (createRequest.readyState === 4 && createRequest.status === 200) {
-                    let key = createRequest.response;
+            axios.post(`http://localhost:3000/user/${user.uid}/${sessionId.val()}/createRoom/`,
+            `title=${title}${password ? `&password=${password}` : ''}`,
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function (response) {
+                if  (response.status === 200) {
+                    let key = response.data;
                     document.getElementById('roomTitleField').value = title;
 
                     ref.child('rooms').child(key).once('value').then(function (room) {
@@ -384,28 +372,7 @@ function createRoom(title, password) {
 
                         setRoomVideoEvents(key, true);
                         setRoomSettingsEvents(key, true);
-                    });
-
-                    let roomChatMessage = $('#roomChatMessage');
-                    roomChatMessage.off();
-                    roomChatMessage.keypress(function (e) {
-                        if (e.which === 13 && !e.shiftKey) {
-                            e.preventDefault();
-
-                            let message = urlify(document.getElementById('roomChatMessage').value);
-
-                            if (message.length > 0) {
-                                let messageRequest = new XMLHttpRequest();
-                                messageRequest.open('POST',
-                                    `http://localhost:3000/user/${user.uid}/${key}/sendMessage`,
-                                    true);
-                                messageRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                                messageRequest.send(`message=${message}`);
-                                document.getElementById('roomChatMessage').value = '';
-                            }
-
-                            return false;
-                        }
+                        setupChatMessageListener(user, room);
                     });
 
                     document.addEventListener('drop', function (e) {
@@ -419,21 +386,24 @@ function createRoom(title, password) {
                         let path = encodeURI(file.path);
                         let type = encodeURI(file.type);
 
-                        let mediaRequest = new XMLHttpRequest();
-                        mediaRequest.onreadystatechange = function () {
-                            if (mediaRequest.readyState === 4) {
-                                hideDimmer();
+                        axios.post(`http://localhost:3000/user/${user.uid}/${key}/setRoomMedia/`,
+                        `path=${path}&type=${type}`,
+                        {
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
                             }
+                        }).then(function (response) {
+                            hideDimmer();
 
-                            if (mediaRequest.readyState === 4 && mediaRequest.status === 401) {
+                            if (response.status === 401) {
                                 alert('Only the host can set the room media!');
-                            } else if (mediaRequest.readyState === 4 && mediaRequest.status === 404) {
+                            } else if (response.status === 404) {
                                 alert('Unable to set media!');
                             }
-                        };
-                        mediaRequest.open('POST', `http://localhost:3000/user/${user.uid}/${key}/setRoomMedia/`, true);
-                        mediaRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                        mediaRequest.send(`path=${path}&type=${type}`);
+                        }).catch(function () {
+                            hideDimmer();
+                            alert('Unable to set media!');
+                        });
                     });
 
                     document.addEventListener('dragover', function (e) {
@@ -442,14 +412,14 @@ function createRoom(title, password) {
                     });
 
                     setViewVisibility(1);
-                } else if (createRequest.readyState === 4 && createRequest.status === 403) {
+                } else if (response.status === 403) {
+                    hideDimmer();
                     alert('Unable to create room, please restart sync.');
                 }
-            };
-
-            createRequest.open('POST', `http://localhost:3000/user/${user.uid}/${sessionId.val()}/createRoom/`, true);
-            createRequest.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            createRequest.send(`title=${title}${password ? `&password=${password}` : ''}`);
+            }).catch(function (error) {
+                alert(error);
+                setViewVisibility(0);
+            });
         } else {
             alert('Unable to create room, please restart sync.');
         }
@@ -485,18 +455,22 @@ function leaveRoom() {
     let user = firebase.auth().currentUser;
     ref.child('users').child(user.uid).once('value').then(function (snapshot) {
         if (snapshot.child('state').val() > 0) {
-            let leaveRequest = new XMLHttpRequest();
-            leaveRequest.onreadystatechange = function () {
-                if (leaveRequest.readyState === 4 && leaveRequest.status === 200) {
-                    if (videojs('roomVideo')) {
-                        player = videojs('roomVideo');
-                        player.dispose();
-                    }
+            axios.get(`http://localhost:3000/user/${user.uid}/${snapshot.child('sessionId').val()}/leaveRoom/${snapshot.child('room').val()}`).then(function (response) {
+                if (videojs('roomVideo')) {
+                    player = videojs('roomVideo');
+                    player.dispose();
+                }
+
+                if (response.status === 200) {
+                    setViewVisibility(0);
+                } else {
+                    alert(`Unable to leave room, you will be forcefully removed.\nError Code ${response.status}: ${response.data}.`);
                     setViewVisibility(0);
                 }
-            }
-            leaveRequest.open("GET", 'http://localhost:3000/user/' + user.uid + '/' + snapshot.child('sessionId').val() + '/leaveRoom/' + snapshot.child('room').val(), true);
-            leaveRequest.send();
+            }).catch(function (error) {
+                alert(error);
+                setViewVisibility(0);
+            });
         }
     });
 }

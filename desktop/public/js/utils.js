@@ -66,7 +66,7 @@ function setMedia(url) {
 */
 function urlify(text) {
     return text.replace(urlRegex, function (url) {
-        return '<a href="' + url + '" target="_blank">' + url + '</a>';
+        return `<a href="${url}" target="_blank">${url}</a>`;
     });
 }
 
