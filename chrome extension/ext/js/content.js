@@ -18,14 +18,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
             break;
         case 'setMedia':
             if (request.media.title != null) {
-                if (window.location.pathname.includes('/watch/' + request.media.title)) {
+                if (window.location.pathname.includes(`/watch/${request.media.title}`)) {
                     clearInterval(mediaInterval);
     
                     mediaInterval = setInterval(function() {
                         setMedia(request.media);
                     }, 100);
                 } else {
-                    window.location = 'https://www.netflix.com/watch/' + request.media.title;
+                    window.location = `https://www.netflix.com/watch/${request.media.title}`;
                 }
             }
             break;
@@ -107,13 +107,13 @@ function displayServers(servers) {
 
         servers.forEach(function (server) {
             if (server.isPrivate === false) {
-                serverList.insertAdjacentHTML('beforeend', '<li class="server"><h4 class="sync-server-title">' + server.title + '<h4><div class="sync-server-button"><a id="join_' + server.key + '" role="link" aria-label="Join"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Join</span></span></a></div></li>');
+                serverList.insertAdjacentHTML('beforeend', `<li class="server"><h4 class="sync-server-title">${server.title}<h4><div class="sync-server-button"><a id="join_${server.key}" role="link" aria-label="Join"><span tabindex="-1" class="nf-icon-button nf-flat-button nf-flat-button-primary"><span class="nf-flat-button-text">Join</span></span></a></div></li>`);
 
-                document.getElementById('join_' + server.key).onclick = function () {
+                document.getElementById(`join_${server.key}`).onclick = function () {
                     sendMessageToBackground({ func: 'joinServer', key: server.key });
                 }
             } else {
-                serverList.insertAdjacentHTML('beforeend', '<li class="server"><h4 class="sync-server-title">' + server.title + '<h4><div class="sync-server-button"></div></li>');
+                serverList.insertAdjacentHTML('beforeend', `<li class="server"><h4 class="sync-server-title">${server.title}<h4><div class="sync-server-button"></div></li>`);
             }
         });
     }
@@ -125,7 +125,7 @@ function displayServerInfo(server) {
         userList.innerHTML = '';
 
         server.users.forEach(function (user) {
-            userList.innerHTML += '<li class="user"><h5 class="sync-user-name">' + user.name + '<h5>';
+            userList.innerHTML += `<li class="user"><h5 class="sync-user-name">${user.name}<h5>`;
         });
     }
 }
@@ -144,7 +144,7 @@ function pause() {
 
 function seek(place) {
     let script = document.createElement('script');
-    script.text = '(videoPlayer.getVideoPlayerBySessionId(videoPlayer.getAllPlayerSessionIds()[0]).seek(\'' + place + '\'))();';
+    script.text = `(videoPlayer.getVideoPlayerBySessionId(videoPlayer.getAllPlayerSessionIds()[0]).seek('${place}'))();`;
     document.head.appendChild(script);
 }
 

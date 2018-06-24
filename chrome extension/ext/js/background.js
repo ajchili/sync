@@ -4,17 +4,15 @@ var userListener;
 var mediaListener;
 
 chrome.tabs.onUpdated.addListener(function (tabID, changeInfo, tab) {
-    if (tab.url != null) {
-        if (tab.url.indexOf('https://www.netflix.com/') == 0) {
-            setupUser();
+    if (tab.url && tab.url.indexOf('https://www.netflix.com/') == 0) {
+        setupUser();
 
-            if (user.state === 1) {
-                if (tab.url.includes('/watch/')) {
-                    setServerMedia(tab.url);
-                    sendMessageToContent({ func: 'setupMediaListener' })
-                } else {
-                    clearServerMedia();
-                }
+        if (user.state === 1) {
+            if (tab.url.includes('/watch/')) {
+                setServerMedia(tab.url);
+                sendMessageToContent({ func: 'setupMediaListener' })
+            } else {
+                clearServerMedia();
             }
         }
     }
@@ -54,6 +52,11 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 updateMedia(request.media);
             }
             break;
+        case 'sendMessage':
+            if (user.state === 1) {
+                senMessage(request.message);
+            }
+            break;
         default:
             break;
     }
@@ -81,17 +84,17 @@ function checkForUser() {
         return cookie.substring(cookie.indexOf('syncUID=') + 8);
     } else {
         var uid = ref.child('users').push().key;
-        document.cookie = 'syncUID=' + uid + ';';
+        document.cookie = `syncUID=${uid};`;
         return uid;
     }
 }
 
 function setupUser() {
-    ref.child('users').child(user.uid).once('value').then(function (snapshot) {
+    ref.child(`users/${user.uid}`).once('value').then(function (snapshot) {
         if (!snapshot.exists()) {
-            ref.child('users').child(user.uid).set({ state: 0, name: 'syncer' });
+            ref.child(`users/${user.uid}`).set({ state: 0, name: 'syncer' });
         } else if (!snapshot.child('name').exists()) {
-            ref.child('users').child(user.uid).child('name').set('syncer');
+            ref.child(`users/${user.uid}/name`).set('syncer');
         }
     });
 
@@ -110,15 +113,15 @@ function setupUser() {
 }
 
 function setUserName(name) {
-    ref.child('users').child(user.uid).child('name').set(name);
+    ref.child(`users/${user.uid}/name`).set(name);
 }
 
 function setUserState(state) {
-    ref.child('users').child(user.uid).child('state').set(state);
+    ref.child(`users/${user.uid}/state`).set(state);
 }
 
 function setMediaListener() {
-    mediaListener = ref.child('servers').child(user.server).child('media');
+    mediaListener = ref.child(`servers/${user.server}/media`);
     mediaListener.on('value', function (media) {
         if (media.exists()) {
             sendMessageToContent({ func: 'setMedia', media: media });
@@ -128,7 +131,7 @@ function setMediaListener() {
 
 function createServer(title) {
     var key = ref.child('servers').push().key;
-    ref.child('servers').child(key).set({
+    ref.child(`servers/${key}`).set({
         title: title,
         isPrivate: false,
         host: user.uid,
@@ -136,14 +139,14 @@ function createServer(title) {
             host: user.uid
         }
     });
-    ref.child('users').child(user.uid).child('server').set(key);
+    ref.child(`users/${user.uid}/server`).set(key);
     setUserState(1);
 }
 
 function joinServer(serverKey) {
-    var key = ref.child('servers').child(serverKey).child('users').push().key;
-    ref.child('servers').child(serverKey).child('users').child(key).set(user.uid);
-    ref.child('users').child(user.uid).child('server').set(serverKey);
+    var key = ref.child(`servers/${serverKey}/users`).push().key;
+    ref.child(`servers/${serverKey}/users/${key}`).set(user.uid);
+    ref.child(`users/${user.uid}/server`).set(serverKey);
     setUserState(2);
     setMediaListener();
 }
@@ -158,7 +161,7 @@ function setServerMedia(url) {
         media = url.substring(url.lastIndexOf('/') + 1);
     }
 
-    ref.child('servers').child(user.server).child('media').set({
+    ref.child(`servers/${user.server}/media`).set({
         title: media,
         paused: true,
         time: 0
@@ -166,31 +169,39 @@ function setServerMedia(url) {
 }
 
 function updateMedia(media) {
-    ref.child('servers').child(user.server).child('media').update({
+    ref.child(`servers/${user.server}/media`).update({
         paused: media.paused,
         time: media.time
     });
 }
 
+function sendMessage(message) {
+    var key = ref.child(`servers/${user.server}/messages/`).push().key;
+    ref.child(`servers/${user.server}/messages/${key}`).set({
+        sender: user.uid,
+        message: message
+    });
+}
+
 function clearServerMedia() {
     if (user.server != null) {
-        ref.child('servers').child(user.server).child('media').remove();
+        ref.child(`servers/${user.server}/media`).remove();
     }
 }
 
 function endServer() {
-    ref.child('servers').child(user.server).once('value').then(function (snapshot) {
+    ref.child(`servers/${user.server}`).once('value').then(function (snapshot) {
         if (snapshot.exists()) {
             var serverId = user.server;
 
             if (user.uid === snapshot.child('host').val()) {
                 snapshot.child('users').forEach(function (childSnapshot) {
-                    ref.child('users').child(childSnapshot.val()).child('state').set(0);
-                    ref.child('users').child(childSnapshot.val()).child('server').remove();
+                    ref.child(`users/${childSnapshot.val()}/state`).set(0);
+                    ref.child(`users/${childSnapshot.val()}/server`).remove();
                 });
             }
 
-            ref.child('servers').child(serverId).remove();
+            ref.child(`servers/${serverId}`).remove();
         }
     });
 }
@@ -200,12 +211,12 @@ function leaveServer() {
         mediaListener.off();
     }
 
-    ref.child('servers').child(user.server).child('users').once('value').then(function (snapshot) {
+    ref.child(`servers/${user.server}/users`).once('value').then(function (snapshot) {
         snapshot.forEach(function (childSnapshot) {
             if (user.uid === childSnapshot.val()) {
-                ref.child('servers').child(user.server).child('users').child(childSnapshot.key).remove();
-                ref.child('users').child(user.uid).child('state').set(0);
-                ref.child('users').child(user.uid).child('server').remove();
+                ref.child(`servers/${user.server}/users`).child(childSnapshot.key).remove();
+                ref.child(`users/${user.uid}/state`).set(0);
+                ref.child(`users/${user.uid}/server`).remove();
             }
         });
     });
@@ -232,12 +243,12 @@ function loadServers() {
 }
 
 function loadServerInfo() {
-    ref.child('servers').child(user.server).on('value', function (snapshot) {
+    ref.child(`servers/${user.server}`).on('value', function (snapshot) {
         var server = [];
         var users = [];
 
         snapshot.child('users').forEach(function (childSnapshot) {
-            ref.child('users').child(childSnapshot.val()).once('value').then(function (childChildSnapshot) {
+            ref.child(`users/${childSnapshot.val()}`).once('value').then(function (childChildSnapshot) {
                 users.push({ id: childSnapshot.val(), name: childChildSnapshot.child('name').val() });
             });
         });
