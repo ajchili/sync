@@ -16,7 +16,8 @@
   "devDependencies": {
     "electron": "~1.8.4",
     "gulp-awesome-electron": "^1.2.2",
-    "gulp-vinyl-zip": "^2.1.0"
+    "gulp-vinyl-zip": "^2.1.0",
+    "semantic-ui": "^2.3.0"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -24,6 +25,5 @@
     "firebase": "^4.12.1",
     "fs-extra": "^5.0.0",
     "localtunnel": "^1.8.3",
-    "semantic-ui": "^2.3.0"
   }
 }

@@ -1,8 +1,7 @@
-var gulp = require('gulp');
-var symdest = require('gulp-symdest');
-var runSequence = require('run-sequence');
-var zip = require('gulp-vinyl-zip');
-var electron = require('gulp-awesome-electron');
+const gulp = require('gulp');
+const runSequence = require('run-sequence');
+const zip = require('gulp-vinyl-zip');
+const electron = require('gulp-awesome-electron');
 
 const electronVersion = '1.8.4';
 const src = ['**/*.*', 
