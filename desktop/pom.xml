@@ -44,6 +44,12 @@
                 <role>developer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Adam Rolek</name>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
     </developers>
 
     <scm>
@@ -110,7 +116,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <kotlin.version>1.2.10</kotlin.version>
+        <kotlin.version>1.2.60</kotlin.version>
     </properties>
 
     <build>

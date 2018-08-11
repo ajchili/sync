@@ -1,9 +1,0 @@
-*.DS_Store
-node_modules/
-build/
-config/*
-semantic/dist/*
-semantic/src/*
-semantic/tasks/*
-media/
-\.idea/
