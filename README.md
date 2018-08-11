@@ -38,4 +38,4 @@ A Java based multi-client video and audio syncing application.
       3. Enjoy
 	
 ## what to do if you run into issues
-If you for any reason run into issues while using sync _(it is possible to as the application is ever changing)_, submit an issue [here](https://github.com/ajchili/sync/issues) and provide as much detail as possible as to the issue
+If you for any reason run into issues while using sync, submit an issue [here](https://github.com/ajchili/sync/issues) and use the bug report template
