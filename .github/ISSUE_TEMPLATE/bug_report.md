@@ -22,9 +22,9 @@ If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows]
- - Java Version [e.g. Version 8 Update 181 (64 bit)]
- - VLC Version [e.g. 2.2.8]
- - Version [e.g. 2.0.0]
+ - Java Version: [e.g. Version 8 Update 181 (64 bit)]
+ - VLC Version: [e.g. 2.2.8]
+ - Version: [e.g. 2.0.0]
 
 **Additional context**
 Add any other context about the problem here.
