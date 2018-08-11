@@ -41,7 +41,7 @@ public final class Sync {
             }
         } else {
             Launcher.INSTANCE.open();
-            checkVersion();
+//            checkVersion();
         }
     }
 
