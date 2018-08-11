@@ -1,5 +1,6 @@
 package com.kirinpatel.sync;
 
+import com.kirinpatel.sync.gui.Launcher;
 import com.kirinpatel.sync.net.User;
 import com.kirinpatel.sync.util.DependencyVerifier;
 import com.kirinpatel.sync.util.UIMessage;

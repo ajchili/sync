@@ -1,9 +1,10 @@
 package com.kirinpatel.sync.net;
 
-import com.kirinpatel.sync.Launcher;
+import com.kirinpatel.sync.gui.Launcher;
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.GUI;
+import com.kirinpatel.sync.util.IPAddressHandlerKt;
 import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
 import org.jetbrains.annotations.NotNull;
@@ -177,7 +178,7 @@ public class Client implements NetworkUser {
 
             gui = new GUI(CLIENT);
             ControlPanel.getInstance().setMessages(messages);
-            Launcher.saveIPAddress(ipAddress);
+            IPAddressHandlerKt.saveIPAddress(ipAddress);
 
             sendUsernameToServer();
         }

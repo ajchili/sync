@@ -1,6 +1,5 @@
 package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.sync.Launcher;
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.util.ThemeKt;

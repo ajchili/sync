@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.net;
 
-import com.kirinpatel.sync.Launcher;
+import com.kirinpatel.sync.gui.Launcher;
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.gui.ControlPanel;
 import com.kirinpatel.sync.gui.GUI;
