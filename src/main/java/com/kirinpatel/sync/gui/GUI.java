@@ -18,7 +18,7 @@ public class GUI extends JFrame {
     public PlaybackPanel playbackPanel;
 
     public GUI(PlaybackPanel.PANEL_TYPE type) {
-        super(type == SERVER ? "sync - Server" : "sync - Client (" + Client.ipAddress + ":8000)");
+        super(type == SERVER ? "sync - Server" : "sync - Client");
         this.type = type;
 
         setBackground(ThemeKt.getBACKGROUND_DARK());

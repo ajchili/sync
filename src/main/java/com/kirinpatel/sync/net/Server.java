@@ -113,7 +113,6 @@ public class Server implements NetworkUser {
                 connectionExecutor = Executors.newCachedThreadPool();
                 service = new ServerSocket(SYNC_PORT);
                 isRunning = true;
-                gui.setTitle(gui.getTitle() + " (" + ipAddress + ":" + SYNC_PORT + ")");
                 gui.setVisible(true);
                 new MediaSelectorGUI(gui);
             } catch (Exception e) {
