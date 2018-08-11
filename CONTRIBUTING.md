@@ -1,2 +1,5 @@
 ## how to contribute
-1. You don't for this version, it's deprecated.
+1. Fork the sync repository
+2. Create a branch off of develop
+3. Make changes/improvements
+4. Create a pull request from your branch into the develop branch of the sync repository
