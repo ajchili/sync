@@ -1,5 +1,8 @@
 # sync
 A Java based multi-client video and audio syncing application.
+
+## what to do if you run into issues
+If you for any reason run into issues while using sync, submit an issue [here](https://github.com/ajchili/sync/issues) and use the bug report template
 	
 ## setup
 1. Check to see if Java is installed
@@ -36,6 +39,3 @@ A Java based multi-client video and audio syncing application.
       1. Obtain the IP Address of the server you would like to connect to
       2. Connect to the server
       3. Enjoy
-	
-## what to do if you run into issues
-If you for any reason run into issues while using sync, submit an issue [here](https://github.com/ajchili/sync/issues) and use the bug report template
