@@ -15,12 +15,16 @@ fun getFile(parent : Component) : File? {
     val mediaSelector = JFileChooser("tomcat/webapps/media")
     UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
     mediaSelector.fileSelectionMode = JFileChooser.FILES_ONLY
-    mediaSelector.showOpenDialog(parent)
-    val selectedFile = mediaSelector.selectedFile ?: return null
-    return if (selectedFile.absolutePath.startsWith(File("tomcat/webapps/media").absolutePath)) {
-        selectedFile
+    val returnVal: Int = mediaSelector.showOpenDialog(parent)
+    if (returnVal == JFileChooser.APPROVE_OPTION) {
+        val selectedFile = mediaSelector.selectedFile ?: return null
+        return if (selectedFile.absolutePath.startsWith(File("tomcat/webapps/media").absolutePath)) {
+            selectedFile
+        } else {
+            moveFile(selectedFile)
+        }
     } else {
-        moveFile(selectedFile)
+        return null
     }
 }
 private fun moveFile(selectedFile : File) : File {
@@ -29,7 +33,7 @@ private fun moveFile(selectedFile : File) : File {
             "Please wait while your media is moved to the proper folder.")
     Thread {
         try {
-            FileInputStream(selectedFile).use({ inStream ->
+            FileInputStream(selectedFile).use { inStream ->
                 FileOutputStream(newFile).use { outStream ->
                     val buffer = ByteArray(1024)
                     var length: Int = inStream.read(buffer)
@@ -38,7 +42,7 @@ private fun moveFile(selectedFile : File) : File {
                         length = inStream.read(buffer)
                     }
                 }
-            })
+            }
         } catch (e: IOException) {
             e.printStackTrace()
         }

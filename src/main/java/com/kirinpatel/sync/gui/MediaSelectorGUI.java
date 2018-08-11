@@ -114,16 +114,12 @@ public class MediaSelectorGUI extends JFrame {
                     break;
                 case OFFLINE:
                     File mediaFile = FileSelectorKt.getFile(gui);
-                    if (mediaFile != null && mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
-                        gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
-                    } else {
-                        if (mediaFile != null) {
-                            UIMessage.showMessageDialog(
-                                    "The media file that you selected could not be used.",
-                                    "Error selecting media!");
+                    if (mediaFile != null) {
+                        if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
+                            gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
                         } else {
                             UIMessage.showMessageDialog(
-                                    "A file must be selected.",
+                                    "The media file that you selected could not be used.",
                                     "Error selecting media!");
                         }
                     }
