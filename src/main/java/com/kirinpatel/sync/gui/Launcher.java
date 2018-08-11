@@ -17,15 +17,12 @@ public final class Launcher extends JFrame  {
     public static final Launcher INSTANCE = new Launcher();
     public NetworkUser connectedUser;
 
-    private Launcher() {}
-
-    public void open() {
+    private Launcher() {
         setTitle("sync");
         setSize(new Dimension(225, 115));
         setResizable(false);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
         JButton hostServer = new JButton("Host");
@@ -36,9 +33,13 @@ public final class Launcher extends JFrame  {
         buttonPanel.add(joinServer);
         add(buttonPanel, BorderLayout.CENTER);
 
-        setVisible(true);
         Sync.connectedUsers.clear();
         ControlPanel.showUserTimes = false;
+    }
+
+    public void open() {
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     class LauncherButtonEvent implements ActionListener, ServerIPAddressInputListener {
@@ -66,7 +67,7 @@ public final class Launcher extends JFrame  {
 
         @Override
         public void closed() {
-            setVisible(true);
+            open();
         }
     }
 }
