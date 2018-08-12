@@ -92,7 +92,7 @@ class MenuBar extends JMenuBar {
 
         JMenuItem close = new JMenuItem("Close sync");
         close.addActionListener(e -> {
-            Launcher.INSTANCE.connectedUser.stop();
+            Launcher.connectedUser.stop();
         });
         menu.add(close);
         add(menu);

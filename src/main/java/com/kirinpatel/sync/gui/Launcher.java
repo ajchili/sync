@@ -14,15 +14,15 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public final class Launcher extends JFrame  {
 
-    public static final Launcher INSTANCE = new Launcher();
-    public NetworkUser connectedUser;
+    public static NetworkUser connectedUser;
 
-    private Launcher() {
+    public Launcher() {
         setTitle("sync");
         setSize(new Dimension(225, 115));
         setResizable(false);
         setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
         setDefaultLookAndFeelDecorated(true);
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
@@ -36,10 +36,6 @@ public final class Launcher extends JFrame  {
 
         Sync.connectedUsers.clear();
         ControlPanel.showUserTimes = false;
-    }
-
-    public void open() {
-        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -58,7 +54,7 @@ public final class Launcher extends JFrame  {
             switch(type) {
                 case SERVER:
                     new Server();
-                    setVisible(false);
+                    dispose();
                     break;
                 case CLIENT:
                     new ServerIPAddressInput().setListener(this);
@@ -67,8 +63,13 @@ public final class Launcher extends JFrame  {
         }
 
         @Override
+        public void serverSelected() {
+            dispose();
+        }
+
+        @Override
         public void closed() {
-            open();
+            setVisible(true);
         }
     }
 }

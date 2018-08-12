@@ -30,7 +30,7 @@ public class Client implements NetworkUser {
     public static GUI gui;
 
     public Client(String ipAddress) {
-        Launcher.INSTANCE.connectedUser = this;
+        Launcher.connectedUser = this;
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
         messages = new ArrayList<>();
@@ -203,7 +203,7 @@ public class Client implements NetworkUser {
             } catch(IOException e) {
                 Client.this.stop();
             } finally {
-                Launcher.INSTANCE.open();
+                new Launcher();
             }
         }
 

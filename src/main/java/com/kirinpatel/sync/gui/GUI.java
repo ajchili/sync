@@ -54,8 +54,8 @@ public class GUI extends JFrame {
 
         @Override
         public void componentHidden(ComponentEvent e) {
-            if (Launcher.INSTANCE.connectedUser != null) {
-                Launcher.INSTANCE.connectedUser.stop();
+            if (Launcher.connectedUser != null) {
+                Launcher.connectedUser.stop();
             }
         }
     }

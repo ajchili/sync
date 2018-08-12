@@ -79,6 +79,7 @@ class ServerIPAddressInput : JFrame("sync") {
             if (!ipField.text.isEmpty()) {
                 Client(ipField.text)
                 dispose()
+                listener.serverSelected()
             } else {
                 UIMessage.showMessageDialog(
                         "No IP address provided! An IP address must be provided!",

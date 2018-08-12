@@ -175,8 +175,8 @@ public class ControlPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (!chatField.getText().isEmpty()) {
-                Launcher.INSTANCE.connectedUser.sendMessage(
-                        Launcher.INSTANCE.connectedUser.getUser().getUsername() + ": " + chatField.getText());
+                Launcher.connectedUser.sendMessage(
+                        Launcher.connectedUser.getUser().getUsername() + ": " + chatField.getText());
                 chatField.setText("");
             }
         }

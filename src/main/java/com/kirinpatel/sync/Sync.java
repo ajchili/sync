@@ -41,8 +41,8 @@ public final class Sync {
                 UIMessage.showErrorDialog(e, "Unable to download dependencies");
             }
         } else {
-            Launcher.INSTANCE.open();
-//            checkVersion();
+            new Launcher();
+            checkVersion();
         }
     }
 

@@ -186,7 +186,7 @@ public class VLCJMediaPlayer extends JPanel {
                 new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to set media.\n" +
                                 "Please restart sync and reconnect to the sync server."),
                         "Media was unable to be set.");
-                Launcher.INSTANCE.connectedUser.stop();
+                Launcher.connectedUser.stop();
             }
         }
     }

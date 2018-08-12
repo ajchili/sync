@@ -39,7 +39,7 @@ public class Server implements NetworkUser {
     final static int TOMCAT_PORT = 8080;
 
     public Server() {
-        Launcher.INSTANCE.connectedUser = this;
+        Launcher.connectedUser = this;
         gui = new GUI(SERVER);
         user = new User(System.getProperty("user.name") + " (host)");
         Sync.connectedUsers.add(user);
@@ -52,7 +52,7 @@ public class Server implements NetworkUser {
     }
 
     public Server(String mediaURL) {
-        Launcher.INSTANCE.connectedUser = this;
+        Launcher.connectedUser = this;
         gui = new GUI(SERVER);
         user = new User(System.getProperty("user.name") + " (host)");
         Sync.connectedUsers.add(user);
@@ -216,7 +216,7 @@ public class Server implements NetworkUser {
             if (tomcatServer != null) {
                 tomcatServer.stop();
             }
-            Launcher.INSTANCE.open();
+            new Launcher();
         }
     }
 
