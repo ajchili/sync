@@ -9,8 +9,6 @@ import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
@@ -19,44 +17,6 @@ class MenuBar extends JMenuBar {
 
     MenuBar(PlaybackPanel playbackPanel, GUI gui) {
         super();
-
-        addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                if (!playbackPanel.getMedia().isPaused()) {
-                    playbackPanel.repaint();
-                }
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                if (!playbackPanel.getMedia().isPaused()) {
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(2500);
-                            playbackPanel.repaint();
-                        } catch (InterruptedException e1) {
-                            Thread.currentThread().interrupt();
-                        }
-                    }).start();
-                }
-             }
-        });
 
         JMenu menu = new JMenu("sync");
 
@@ -91,9 +51,7 @@ class MenuBar extends JMenuBar {
         menu.add(new JSeparator());
 
         JMenuItem close = new JMenuItem("Close sync");
-        close.addActionListener(e -> {
-            Launcher.connectedUser.stop();
-        });
+        close.addActionListener(e -> Launcher.connectedUser.stop());
         menu.add(close);
         add(menu);
 
@@ -106,21 +64,19 @@ class MenuBar extends JMenuBar {
         ui.add(fullscreen);
 
         JRadioButtonMenuItem darkMode = new JRadioButtonMenuItem("Dark Mode");
-        darkMode.addActionListener(e -> {
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    if (darkMode.isSelected()) {
-                        UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
-                    } else {
-                        UIManager.setLookAndFeel(new SubstanceBusinessLookAndFeel());
-                    }
-                } catch(Exception e1) {
-                    UIMessage.showErrorDialog(e1, "Unable to set look and feel of sync");
-                } finally {
-                    gui.repaint();
+        darkMode.addActionListener(e -> SwingUtilities.invokeLater(() -> {
+            try {
+                if (darkMode.isSelected()) {
+                    UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
+                } else {
+                    UIManager.setLookAndFeel(new SubstanceBusinessLookAndFeel());
                 }
-            });
-        });
+            } catch(Exception e1) {
+                UIMessage.showErrorDialog(e1, "Unable to set look and feel of sync");
+            } finally {
+                gui.repaint();
+            }
+        }));
         ui.add(darkMode);
         ui.add(new JSeparator());
 
