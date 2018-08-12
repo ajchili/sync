@@ -1,7 +1,5 @@
 package com.kirinpatel.sync.gui;
 
-import com.kirinpatel.sync.util.ThemeKt;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -19,12 +17,12 @@ public class GUI extends JFrame {
         super(type == SERVER ? "sync - Server" : "sync - Client");
         this.type = type;
 
-        setBackground(ThemeKt.getBACKGROUND_DARK());
         setSize(new Dimension(940, 360));
         setMinimumSize(new Dimension(940, 360));
         setLayout(new BorderLayout());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setDefaultLookAndFeelDecorated(true);
         addComponentListener(new ResizeListener());
 
         playbackPanel = new PlaybackPanel(type, this);

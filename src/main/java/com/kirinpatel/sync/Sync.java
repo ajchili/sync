@@ -5,6 +5,7 @@ import com.kirinpatel.sync.net.User;
 import com.kirinpatel.sync.util.DependencyVerifier;
 import com.kirinpatel.sync.util.UIMessage;
 import jdk.nashorn.api.scripting.URLReader;
+import org.pushingpixels.substance.api.skin.SubstanceBusinessLookAndFeel;
 import uk.co.caprica.vlcj.discovery.NativeDiscovery;
 
 import javax.swing.*;
@@ -21,16 +22,15 @@ public final class Sync {
     public static User host;
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch(IllegalAccessException
-                | InstantiationException
-                | UnsupportedLookAndFeelException
-                | ClassNotFoundException e) {
-            UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
-        }
-        verifyDependencies();
-
+        SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(new SubstanceBusinessLookAndFeel());
+            } catch(Exception e) {
+                UIMessage.showErrorDialog(e, "Unable to set look and feel of sync");
+            } finally {
+                verifyDependencies();
+            }
+        });
     }
 
     private static void verifyDependencies() {

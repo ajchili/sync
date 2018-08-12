@@ -40,6 +40,7 @@ class AudioSettingsGUI: JFrame("Audio Equalizer") {
         isResizable = false
         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
         setLocationRelativeTo(null)
+        setDefaultLookAndFeelDecorated(true)
 
         for (i in 0..9) {
             val hzBand = 32 * Math.pow(2.0, i.toDouble()).toInt()

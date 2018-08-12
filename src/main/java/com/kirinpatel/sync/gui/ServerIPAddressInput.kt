@@ -40,6 +40,7 @@ class ServerIPAddressInput : JFrame("sync") {
             }
         })
         setLocationRelativeTo(null)
+        setDefaultLookAndFeelDecorated(true)
 
         val label = JLabel("Please enter or select the server you want to join")
         label.horizontalAlignment = SwingConstants.CENTER

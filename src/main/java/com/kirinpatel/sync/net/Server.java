@@ -12,6 +12,7 @@ import org.bitlet.weupnp.GatewayDiscover;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.net.*;
@@ -113,8 +114,10 @@ public class Server implements NetworkUser {
                 connectionExecutor = Executors.newCachedThreadPool();
                 service = new ServerSocket(SYNC_PORT);
                 isRunning = true;
-                gui.setVisible(true);
-                new MediaSelectorGUI(gui);
+                SwingUtilities.invokeLater(() -> {
+                    gui.setVisible(true);
+                    new MediaSelectorGUI(gui);
+                });
             } catch (Exception e) {
                 message.showErrorDialogAndExit(e, "Couldn't open server");
                 Server.this.stop();

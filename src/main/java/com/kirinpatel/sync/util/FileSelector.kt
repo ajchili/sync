@@ -11,9 +11,7 @@ import javax.swing.JFileChooser
 import javax.swing.UIManager
 
 fun getFile(parent : Component) : File? {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
     val mediaSelector = JFileChooser("tomcat/webapps/media")
-    UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
     mediaSelector.fileSelectionMode = JFileChooser.FILES_ONLY
     val returnVal: Int = mediaSelector.showOpenDialog(parent)
     if (returnVal == JFileChooser.APPROVE_OPTION) {

@@ -2,8 +2,9 @@ package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.net.Client;
 import com.kirinpatel.sync.net.Server;
-import com.kirinpatel.sync.util.ThemeKt;
 import com.kirinpatel.sync.util.UIMessage;
+import org.pushingpixels.substance.api.skin.SubstanceBusinessLookAndFeel;
+import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -106,8 +107,19 @@ class MenuBar extends JMenuBar {
 
         JRadioButtonMenuItem darkMode = new JRadioButtonMenuItem("Dark Mode");
         darkMode.addActionListener(e -> {
-            ThemeKt.setIsDarkModeEnabled(darkMode.isSelected());
-            ControlPanel.getInstance().setUIMode();
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    if (darkMode.isSelected()) {
+                        UIManager.setLookAndFeel(new SubstanceGraphiteGlassLookAndFeel());
+                    } else {
+                        UIManager.setLookAndFeel(new SubstanceBusinessLookAndFeel());
+                    }
+                } catch(Exception e1) {
+                    UIMessage.showErrorDialog(e1, "Unable to set look and feel of sync");
+                } finally {
+                    gui.repaint();
+                }
+            });
         });
         ui.add(darkMode);
         ui.add(new JSeparator());

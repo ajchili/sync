@@ -24,6 +24,7 @@ class ClientInfoGUI constructor(val user: User): JFrame("Client info") {
         defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
         addComponentListener(ClientInfoComponentListener())
         setLocationRelativeTo(null)
+        setDefaultLookAndFeelDecorated(true)
 
         add(JLabel("Username: " + user.username))
         add(JLabel("UserID: " + user.userID))

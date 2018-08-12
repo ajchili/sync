@@ -2,7 +2,6 @@ package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.Sync;
 import com.kirinpatel.sync.net.User;
-import com.kirinpatel.sync.util.ThemeKt;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -91,7 +90,6 @@ public class ControlPanel extends JPanel {
         chatWindow.setEditable(false);
         chatWindow.setLineWrap(true);
         chatWindow.setWrapStyleWord(true);
-        chatWindow.setToolTipText("Chat Box");
         // Credit: https://stackoverflow.com/a/1627068
         DefaultCaret caret = (DefaultCaret)chatWindow.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -100,7 +98,6 @@ public class ControlPanel extends JPanel {
         chatPanel.add(chatWindowScroll, BorderLayout.CENTER);
         messagePanel = new JPanel(new BorderLayout());
         chatField = new JTextField();
-        chatField.setToolTipText("Message Box");
         chatField.addActionListener(new ControlPanel.SendMessageListener());
         messagePanel.add(chatField, BorderLayout.CENTER);
         send = new JButton("Send");
@@ -171,37 +168,6 @@ public class ControlPanel extends JPanel {
         if (chatWindow.getText().length() > 0) {
             chatWindow.replaceRange("", chatWindow.getText().length() - 1, chatWindow.getText().length());
         }
-    }
-
-    void setUIMode() {
-        connectedClients.setForeground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getTEXT_DARK()
-                : ThemeKt.getTEXT_STANDARD());
-        connectedClients.setBackground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getBACKGROUND_DARK()
-                : ThemeKt.getBACKGROUND_STANDARD());
-        chatWindow.setForeground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getTEXT_DARK()
-                : ThemeKt.getTEXT_STANDARD());
-        chatWindow.setBackground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getBACKGROUND_DARK()
-                : ThemeKt.getBACKGROUND_STANDARD());
-        messagePanel.setBackground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getBACKGROUND_DARK()
-                : ThemeKt.getBACKGROUND_STANDARD());
-        chatField.setForeground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getTEXT_DARK()
-                : ThemeKt.getTEXT_STANDARD());
-        chatField.setBackground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getBACKGROUND_DARK()
-                : ThemeKt.getBACKGROUND_STANDARD());
-        send.setForeground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getTEXT_DARK()
-                : ThemeKt.getTEXT_STANDARD());
-        send.setBackground(ThemeKt.isDarkModeEnabled()
-                ? ThemeKt.getBACKGROUND_DARK()
-                : ThemeKt.getBACKGROUND_STANDARD());
-        repaint();
     }
 
     class SendMessageListener implements ActionListener {

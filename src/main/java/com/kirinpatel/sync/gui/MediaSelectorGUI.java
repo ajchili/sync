@@ -40,6 +40,7 @@ public class MediaSelectorGUI extends JFrame {
         super("sync");
 
         if (isOpened) {
+            dispose();
             return;
         }
         this.gui = gui;
@@ -71,6 +72,7 @@ public class MediaSelectorGUI extends JFrame {
             }
         });
         setLocationRelativeTo(null);
+        setDefaultLookAndFeelDecorated(true);
 
         JPanel buttonPanel = new JPanel(new GridLayout(2, 1));
         JButton onlineMedia = new JButton("Set Media URL");
@@ -99,18 +101,25 @@ public class MediaSelectorGUI extends JFrame {
 
             switch(type) {
                 case ONLINE:
-                    String mediaURL = UIMessage.getInput("Set media URL", "Please provide the media URL of your media.");
-                    if (!mediaURL.isEmpty()) {
-                        if (mediaURL.startsWith("http")) {
-                            gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(mediaURL));
+                    SwingUtilities.invokeLater(() -> {
+                        String mediaURL = JOptionPane.showInputDialog(
+                                null,
+                                "Please provide the media URL of your media.",
+                                "Set media URL",
+                                JOptionPane.QUESTION_MESSAGE);
+
+                        if (!mediaURL.isEmpty()) {
+                            if (mediaURL.startsWith("http")) {
+                                gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(mediaURL));
+                            } else {
+                                gui.playbackPanel.getMediaPlayer().setMediaSource(new Media("http://" + mediaURL));
+                            }
                         } else {
-                            gui.playbackPanel.getMediaPlayer().setMediaSource(new Media("http://" + mediaURL));
+                            UIMessage.showMessageDialog(
+                                    "The Media URL must be specified!",
+                                    "Error setting Media URL!");
                         }
-                    } else {
-                        UIMessage.showMessageDialog(
-                                "The Media URL must be specified!",
-                                "Error setting Media URL!");
-                    }
+                    });
                     break;
                 case OFFLINE:
                     File mediaFile = FileSelectorKt.getFile(gui);

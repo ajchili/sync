@@ -1,7 +1,6 @@
 package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.net.Media;
-import com.kirinpatel.sync.util.ThemeKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +42,6 @@ public class PlaybackPanel extends JPanel {
     PlaybackPanel(PANEL_TYPE type, GUI gui) {
         super(new BorderLayout());
         this.type = type;
-        setBackground(ThemeKt.getBACKGROUND_DARK());
 
         initMediaPlayer(gui);
     }
@@ -145,27 +143,19 @@ public class PlaybackPanel extends JPanel {
     }
 
     private void initControls() {
-        Color foreground = Color.WHITE;
-        Color background = Color.BLACK;
         controlPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-        controlPanel.setBackground(background);
 
         pauseMedia = new JButton("");
         pauseMedia.setContentAreaFilled(false);
         pauseMedia.setInputMap(0, null);
         pauseMedia.setEnabled(type == SERVER);
-        pauseMedia.setBackground(background);
-        pauseMedia.setForeground(foreground);
         pauseMedia.setOpaque(true);
         pauseMedia.setBorderPainted(false);
         pauseMedia.setFocusable(false);
         controlPanel.add(pauseMedia);
 
         JPanel positionPanel = new JPanel(new BorderLayout());
-        positionPanel.setBackground(background);
         mediaPositionLabel = new JLabel("0:0:00 / 0:0:00");
-        mediaPositionLabel.setBackground(background);
-        mediaPositionLabel.setForeground(foreground);
         mediaPositionLabel.setFocusable(false);
         positionPanel.add(mediaPositionLabel, BorderLayout.EAST);
         mediaPosition = new JSlider(0, 0, 0);
@@ -175,10 +165,7 @@ public class PlaybackPanel extends JPanel {
         controlPanel.add(positionPanel);
 
         JPanel volumePanel = new JPanel(new BorderLayout());
-        volumePanel.setBackground(background);
         JLabel mediaVolumeLabel = new JLabel("Volume: ");
-        mediaVolumeLabel.setBackground(background);
-        mediaVolumeLabel.setForeground(foreground);
         mediaVolumeLabel.setOpaque(true);
         mediaVolumeLabel.setFocusable(false);
         volumePanel.add(mediaVolumeLabel, BorderLayout.WEST);
