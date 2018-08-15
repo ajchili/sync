@@ -106,7 +106,6 @@ public class Server implements NetworkUser {
 
         @Override
         public void run() {
-            UIMessage message = new UIMessage(gui);
             try {
                 device = createGatewayDevice();
                 tomcatServer = new TomcatServer();
@@ -119,7 +118,7 @@ public class Server implements NetworkUser {
                     new MediaSelectorGUI(gui);
                 });
             } catch (Exception e) {
-                message.showErrorDialogAndExit(e, "Couldn't open server");
+                UIMessage.showErrorDialog(e, "Couldn't open server");
                 Server.this.stop();
                 return;
             }

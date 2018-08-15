@@ -84,15 +84,10 @@ public class VLCJMediaPlayer extends JPanel {
                     }
                 } catch (Error error) {
                     // Stop if Invalid memory access occurs
-                    if (gui.playbackPanel.type == SERVER) {
-                        new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
-                                        "Forcefully closing sync, please restart sync."),
-                                "Media was unable to be set.");
-                    } else {
-                        new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to initialize media player.\n" +
-                                        "Forcefully closing sync, please restart sync."),
-                                "Media was unable to be set.");
-                    }
+                    UIMessage.showErrorDialog(
+                            new IOException("Unable to initialize media player.\n" +
+                                    "Forcefully closing sync, please restart sync."),
+                            "Media was unable to be set.");
                 }
             });
 
@@ -161,15 +156,9 @@ public class VLCJMediaPlayer extends JPanel {
         } catch (Error e) {
             // Stop if Invalid memory access occurs
             e.printStackTrace();
-            if (gui.playbackPanel.type == SERVER) {
-                new UIMessage(Server.gui).showErrorDialogAndExit(new IOException("Unable to release media player.\n" +
-                                "Forcefully closing sync, please restart sync."),
-                        "Media was unable to be set.");
-            } else {
-                new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to release media player.\n" +
-                                "Forcefully closing sync, please restart sync."),
-                        "Media was unable to be set.");
-            }
+            UIMessage.showErrorDialog(
+                    new IOException("Unable to release media player.\n Forcefully closing sync, please restart sync."),
+                    "Media was unable to be set.");
         }
     }
 
@@ -183,7 +172,7 @@ public class VLCJMediaPlayer extends JPanel {
         } catch (Error e) {
             // Stop client if Invalid memory access occurs
             if (gui.playbackPanel.type == CLIENT) {
-                new UIMessage(Client.gui).showErrorDialogAndExit(new IOException("Unable to set media.\n" +
+                UIMessage.showErrorDialog(new IOException("Unable to set media.\n" +
                                 "Please restart sync and reconnect to the sync server."),
                         "Media was unable to be set.");
                 Launcher.connectedUser.stop();

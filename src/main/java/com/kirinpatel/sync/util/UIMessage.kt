@@ -1,16 +1,9 @@
 package com.kirinpatel.sync.util
 
-import com.kirinpatel.sync.gui.GUI
 import javax.swing.JOptionPane
 import javax.swing.SwingUtilities
 
-class UIMessage(g : GUI) {
-    private val gui : GUI = g
-
-    fun showErrorDialogAndExit(error : Exception, title : String) {
-        showErrorDialog(error, title)
-    }
-
+class UIMessage {
     companion object {
         @JvmStatic
         fun showErrorDialog(error : Exception, title : String) {
