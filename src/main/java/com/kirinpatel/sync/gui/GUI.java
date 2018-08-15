@@ -10,12 +10,10 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 public class GUI extends JFrame {
 
-    private final PlaybackPanel.PANEL_TYPE type;
     public PlaybackPanel playbackPanel;
 
     public GUI(PlaybackPanel.PANEL_TYPE type) {
         super(type == SERVER ? "sync - Server" : "sync - Client");
-        this.type = type;
 
         setSize(new Dimension(940, 360));
         setMinimumSize(new Dimension(940, 360));
