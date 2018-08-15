@@ -25,6 +25,15 @@ public class Media {
             return formatTime(currentTime);
         }
 
+        @Override
+        public boolean equals(Object object) {
+            if (object instanceof  MediaData) {
+                MediaData data = (MediaData) object;
+                return url.equals(data.url) && filePath.equals(filePath);
+            }
+            return false;
+        }
+
         void setURL(String url) {
             this.url = url;
             this.filePath = "null";
