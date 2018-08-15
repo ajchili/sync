@@ -41,7 +41,7 @@ public final class Sync {
                 UIMessage.showErrorDialog(e, "Unable to download dependencies");
             }
         } else {
-            new Launcher();
+            SwingUtilities.invokeLater(Launcher::new);
             checkVersion();
         }
     }

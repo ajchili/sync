@@ -215,7 +215,7 @@ public class Server implements NetworkUser {
             if (tomcatServer != null) {
                 tomcatServer.stop();
             }
-            new Launcher();
+            SwingUtilities.invokeLater(Launcher::new);
         }
     }
 

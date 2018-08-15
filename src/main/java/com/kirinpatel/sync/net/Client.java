@@ -9,6 +9,7 @@ import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -203,7 +204,7 @@ public class Client implements NetworkUser {
             } catch(IOException e) {
                 Client.this.stop();
             } finally {
-                new Launcher();
+                SwingUtilities.invokeLater(Launcher::new);
             }
         }
 
