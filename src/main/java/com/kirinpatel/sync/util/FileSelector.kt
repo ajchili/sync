@@ -10,10 +10,10 @@ import java.io.IOException
 import javax.swing.JFileChooser
 import javax.swing.UIManager
 
-fun getFile(parent : Component) : File? {
+fun getFile() : File? {
     val mediaSelector = JFileChooser("tomcat/webapps/media")
     mediaSelector.fileSelectionMode = JFileChooser.FILES_ONLY
-    val returnVal: Int = mediaSelector.showOpenDialog(parent)
+    val returnVal: Int = mediaSelector.showOpenDialog(null)
     if (returnVal == JFileChooser.APPROVE_OPTION) {
         val selectedFile = mediaSelector.selectedFile ?: return null
         return if (selectedFile.absolutePath.startsWith(File("tomcat/webapps/media").absolutePath)) {
@@ -25,6 +25,7 @@ fun getFile(parent : Component) : File? {
         return null
     }
 }
+
 private fun moveFile(selectedFile : File) : File {
     val newFile = File("tomcat/webapps/media/" + selectedFile.name)
     val progressView = ProgressView("Moving media",

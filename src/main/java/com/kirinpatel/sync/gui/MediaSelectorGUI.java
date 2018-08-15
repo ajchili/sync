@@ -122,7 +122,7 @@ public class MediaSelectorGUI extends JFrame {
                     });
                     break;
                 case OFFLINE:
-                    File mediaFile = FileSelectorKt.getFile(gui);
+                    File mediaFile = FileSelectorKt.getFile();
                     if (mediaFile != null) {
                         if (mediaFile.getAbsolutePath().startsWith(new File("tomcat/webapps/media").getAbsolutePath())) {
                             gui.playbackPanel.getMediaPlayer().setMediaSource(new Media(Paths.get(mediaFile.getAbsolutePath())));
