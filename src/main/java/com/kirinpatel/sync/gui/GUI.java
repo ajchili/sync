@@ -1,9 +1,14 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.util.FileSelector;
+import com.kirinpatel.sync.util.FileSelectorListener;
+import com.kirinpatel.sync.util.UIMessage;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.IOException;
 
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.CLIENT;
 import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
@@ -30,6 +35,8 @@ public class GUI extends JFrame {
         add(ControlPanel.getInstance(), BorderLayout.EAST);
         setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel, this));
 
+        FileSelector.Companion.addListener(new FileMovementListener());
+
         setVisible(type == CLIENT);
     }
 
@@ -55,6 +62,33 @@ public class GUI extends JFrame {
             if (Launcher.connectedUser != null) {
                 Launcher.connectedUser.stop();
             }
+        }
+    }
+
+    class FileMovementListener implements FileSelectorListener {
+
+        @Override
+        public void startedMovingFile() {
+            setEnabled(false);
+        }
+
+        @Override
+        public void successfullyMovedFile() {
+            setEnabled(true);
+            UIMessage.showMessageDialog(
+                    "Your media has been moved to the\nTomcat folder and is ready for playback.",
+                    "Your media is ready");
+        }
+
+        @Override
+        public void failedToMoveFile(IOException exception) {
+            setEnabled(true);
+            UIMessage.showErrorDialog(exception, "Unable to move media");
+        }
+
+        @Override
+        public void fileProgressUpdated(int progress) {
+
         }
     }
 }

@@ -89,10 +89,6 @@ public class Server implements NetworkUser {
         return gui;
     }
 
-    public static void setEnabled(boolean enabled) {
-        gui.setEnabled(enabled);
-    }
-
     @Override
     public User getUser() {
         return user;
