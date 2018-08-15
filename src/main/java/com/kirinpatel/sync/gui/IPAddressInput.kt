@@ -11,10 +11,10 @@ import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 import javax.swing.*
 
-class ServerIPAddressInput : JFrame("sync") {
+class IPAddressInput : JFrame("sync") {
 
     private val ipField: JTextField
-    private lateinit var listener: ServerIPAddressInputListener
+    private lateinit var listener: IPAddressInputListener
 
     init {
         size = Dimension(300, 115)
@@ -69,7 +69,7 @@ class ServerIPAddressInput : JFrame("sync") {
         isVisible = true
     }
 
-    fun setListener(listener: ServerIPAddressInputListener) {
+    fun setListener(listener: IPAddressInputListener) {
         this.listener = listener
     }
 

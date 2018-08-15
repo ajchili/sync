@@ -39,7 +39,7 @@ public final class Launcher extends JFrame  {
         setVisible(true);
     }
 
-    class LauncherButtonEvent implements ActionListener, ServerIPAddressInputListener {
+    class LauncherButtonEvent implements ActionListener, IPAddressInputListener {
 
         private PlaybackPanel.PANEL_TYPE type;
 
@@ -57,7 +57,7 @@ public final class Launcher extends JFrame  {
                     dispose();
                     break;
                 case CLIENT:
-                    new ServerIPAddressInput().setListener(this);
+                    new IPAddressInput().setListener(this);
                     break;
             }
         }

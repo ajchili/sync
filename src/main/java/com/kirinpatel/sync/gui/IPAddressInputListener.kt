@@ -1,6 +1,6 @@
 package com.kirinpatel.sync.gui
 
-interface ServerIPAddressInputListener {
+interface IPAddressInputListener {
     fun serverSelected()
     fun closed()
 }
