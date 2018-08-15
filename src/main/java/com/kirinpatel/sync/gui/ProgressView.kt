@@ -69,7 +69,7 @@ class ProgressView: JFrame("Moving media...") {
 
         override fun fileProgressUpdated(progress: Int) {
             SwingUtilities.invokeLater {
-                view.progressBar.string = progress.toString() + "%"
+                view.progressBar.string = "$progress%"
                 view.progressBar.value = progress
             }
         }
