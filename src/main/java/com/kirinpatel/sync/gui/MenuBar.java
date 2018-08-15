@@ -1,8 +1,10 @@
 package com.kirinpatel.sync.gui;
 
 import com.kirinpatel.sync.net.Client;
+import com.kirinpatel.sync.net.Media;
 import com.kirinpatel.sync.net.Server;
 import com.kirinpatel.sync.util.UIMessage;
+import org.jetbrains.annotations.NotNull;
 import org.pushingpixels.substance.api.skin.SubstanceBusinessLookAndFeel;
 import org.pushingpixels.substance.api.skin.SubstanceGraphiteGlassLookAndFeel;
 
@@ -15,13 +17,37 @@ import static com.kirinpatel.sync.gui.PlaybackPanel.PANEL_TYPE.SERVER;
 
 class MenuBar extends JMenuBar {
 
+    private boolean canOpenMediaSelector = true;
+
     MenuBar(PlaybackPanel playbackPanel, GUI gui) {
         super();
+
+        MediaSelector.Companion.addListener(new MediaSelectorListener() {
+
+            @Override
+            public void opened() {
+                canOpenMediaSelector = false;
+            }
+
+            @Override
+            public void mediaSelected(@NotNull Media media) {
+
+            }
+
+            @Override
+            public void closed() {
+                canOpenMediaSelector = true;
+            }
+        });
 
         JMenu menu = new JMenu("sync");
 
         JMenuItem file = new JMenuItem("Set Media");
-        file.addActionListener(e -> new MediaSelectorGUI(gui));
+        file.addActionListener(e -> {
+            if (canOpenMediaSelector) {
+                new MediaSelector();
+            }
+        });
         if (playbackPanel.type == SERVER) {
             menu.add(file);
             menu.add(new JSeparator());

@@ -1,10 +1,7 @@
 package com.kirinpatel.sync.net;
 
-import com.kirinpatel.sync.gui.Launcher;
+import com.kirinpatel.sync.gui.*;
 import com.kirinpatel.sync.Sync;
-import com.kirinpatel.sync.gui.ControlPanel;
-import com.kirinpatel.sync.gui.GUI;
-import com.kirinpatel.sync.gui.MediaSelectorGUI;
 import com.kirinpatel.sync.util.Message;
 import com.kirinpatel.sync.util.UIMessage;
 import org.bitlet.weupnp.GatewayDevice;
@@ -111,7 +108,7 @@ public class Server implements NetworkUser {
                 isRunning = true;
                 SwingUtilities.invokeLater(() -> {
                     gui.setVisible(true);
-                    new MediaSelectorGUI(gui);
+                    new MediaSelector();
                 });
             } catch (Exception e) {
                 UIMessage.showErrorDialog(e, "Couldn't open server");
