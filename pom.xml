@@ -96,6 +96,21 @@
             <version>0.1.2</version>
         </dependency>
         <dependency>
+            <groupId>org.pushing-pixels</groupId>
+            <artifactId>radiance-neon</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pushing-pixels</groupId>
+            <artifactId>radiance-substance</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pushing-pixels</groupId>
+            <artifactId>radiance-trident</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jre8</artifactId>
             <version>${kotlin.version}</version>
