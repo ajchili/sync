@@ -95,7 +95,7 @@ class MediaSelector: JFrame("sync") {
                             JOptionPane.QUESTION_MESSAGE)
                     if (mediaURL != null && !mediaURL.isEmpty()) {
                         if (!mediaURL.startsWith("http")) {
-                            mediaURL = "http://$mediaURL"
+                            mediaURL = "https://$mediaURL"
                         }
                         listeners.forEach { listener ->
                             listener.mediaSelected(Media(mediaURL))

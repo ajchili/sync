@@ -131,7 +131,7 @@ public class Media {
     }
 
     public void setFilePath(Path filePath) {
-        data.url = "http://" + Server.ipAddress + ":8080/" + encode(filePath.getFileName().toString());
+        data.url = "https://" + Server.ipAddress + ":8080/" + encode(filePath.getFileName().toString());
         data.filePath = filePath.toAbsolutePath().toString();
     }
 

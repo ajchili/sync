@@ -1,8 +1,10 @@
 package com.kirinpatel.sync.gui;
 
+import com.kirinpatel.sync.net.Media;
 import com.kirinpatel.sync.util.FileSelector;
 import com.kirinpatel.sync.util.FileSelectorListener;
 import com.kirinpatel.sync.util.UIMessage;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +37,7 @@ public class GUI extends JFrame {
         setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel, this));
 
         if (type == SERVER) {
+            MediaSelector.Companion.addListener(new MediaSelectedListener());
             FileSelector.Companion.addListener(new FileMovementListener());
         }
     }
@@ -61,6 +64,23 @@ public class GUI extends JFrame {
             if (Launcher.connectedUser != null) {
                 Launcher.connectedUser.stop();
             }
+        }
+    }
+
+    class MediaSelectedListener implements MediaSelectorListener {
+        @Override
+        public void opened() {
+
+        }
+
+        @Override
+        public void mediaSelected(@NotNull Media media) {
+            playbackPanel.getMediaPlayer().setMedia(media);
+        }
+
+        @Override
+        public void closed() {
+
         }
     }
 
