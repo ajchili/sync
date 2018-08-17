@@ -34,6 +34,7 @@ public class Client implements NetworkUser {
         Launcher.connectedUser = this;
         Client.ipAddress = ipAddress;
         Client.user = new User(System.getProperty("user.name"));
+        gui = new GUI(CLIENT);
         messages = new ArrayList<>();
         clientThread = new ClientThread();
         new Thread(clientThread).start();
@@ -177,11 +178,13 @@ public class Client implements NetworkUser {
                 disconnectFromServer();
             }
 
-            gui = new GUI(CLIENT);
-            ControlPanel.getInstance().setMessages(messages);
             IPAddressHandlerKt.saveIPAddress(ipAddress);
-
             sendUsernameToServer();
+
+            SwingUtilities.invokeLater(() -> {
+                gui.setVisible(true);
+                ControlPanel.getInstance().setMessages(messages);
+            });
         }
 
         private synchronized void disconnectFromServer() {
@@ -254,7 +257,11 @@ public class Client implements NetworkUser {
             try {
                 lastSentTime = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(MEDIA_TIME, gui.playbackPanel.getMedia().getCurrentTime()));
+                if (gui != null) {
+                    output.writeObject(new Message(MEDIA_TIME, gui.playbackPanel.getMedia().getCurrentTime()));
+                } else {
+                    output.writeObject(new Message(MEDIA_TIME, -1));
+                }
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();
@@ -265,7 +272,11 @@ public class Client implements NetworkUser {
             try {
                 lastSentState = System.currentTimeMillis();
                 output.reset();
-                output.writeObject(new Message(MEDIA_STATE, gui.playbackPanel.getMedia().isPaused()));
+                if (gui != null) {
+                    output.writeObject(new Message(MEDIA_STATE, gui.playbackPanel.getMedia().isPaused()));
+                } else {
+                    output.writeObject(new Message(MEDIA_STATE, true));
+                }
                 output.flush();
             } catch(IOException e) {
                 disconnectFromServer();

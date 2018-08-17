@@ -34,9 +34,9 @@ public class GUI extends JFrame {
         add(ControlPanel.getInstance(), BorderLayout.EAST);
         setJMenuBar(new com.kirinpatel.sync.gui.MenuBar(playbackPanel, this));
 
-        FileSelector.Companion.addListener(new FileMovementListener());
-
-        setVisible(type == CLIENT);
+        if (type == SERVER) {
+            FileSelector.Companion.addListener(new FileMovementListener());
+        }
     }
 
     class ResizeListener implements ComponentListener {

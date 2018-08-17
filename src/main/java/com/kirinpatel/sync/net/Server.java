@@ -116,10 +116,10 @@ public class Server implements NetworkUser {
                 return;
             }
             try {
-                while (isRunning && gui.isVisible()) {
+                do {
                     socket = service.accept();
                     connectionExecutor.execute(new ServerSocketTask(socket));
-                }
+                } while (isRunning && gui.isVisible());
             } catch(IOException e) {
                 // Couldn't accept a client or on called on server close, just ignore exception.
             } finally {
