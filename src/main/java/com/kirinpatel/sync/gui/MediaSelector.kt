@@ -93,7 +93,7 @@ class MediaSelector: JFrame("sync") {
                             "Please provide the media URL of your media.",
                             "Set media URL",
                             JOptionPane.QUESTION_MESSAGE)
-                    if (!mediaURL.isEmpty()) {
+                    if (mediaURL != null && !mediaURL.isEmpty()) {
                         if (!mediaURL.startsWith("http")) {
                             mediaURL = "http://$mediaURL"
                         }
