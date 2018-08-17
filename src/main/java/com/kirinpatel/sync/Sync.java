@@ -22,6 +22,7 @@ public final class Sync {
     public static User host;
 
     public static void main(String[] args) {
+        JFrame.setDefaultLookAndFeelDecorated(true);
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(new SubstanceBusinessLookAndFeel());

@@ -23,7 +23,6 @@ public final class Launcher extends JFrame  {
         setLayout(new BorderLayout());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setDefaultLookAndFeelDecorated(true);
 
         JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
         JButton hostServer = new JButton("Host");

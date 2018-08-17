@@ -53,7 +53,6 @@ class MediaSelector: JFrame("sync") {
             }
         })
         setLocationRelativeTo(null)
-        JFrame.setDefaultLookAndFeelDecorated(true)
 
         val buttonPanel = JPanel(GridLayout(2, 1))
         val onlineMedia = JButton("Set Media URL")

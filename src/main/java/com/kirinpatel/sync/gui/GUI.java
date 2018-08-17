@@ -25,7 +25,6 @@ public class GUI extends JFrame {
         setLayout(new BorderLayout());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setDefaultLookAndFeelDecorated(true);
         addComponentListener(new ResizeListener());
 
         playbackPanel = new PlaybackPanel(type, this);
