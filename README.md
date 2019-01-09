@@ -1,6 +1,11 @@
 # sync
 A Java based multi-client video and audio syncing application.
 
+## Getting started with development
+1. Fork/Clone repo
+2. Make changes
+3. Test changes by running `mvn clean install exec:java`
+
 ## what to do if you run into issues
 If you for any reason run into issues while using sync, submit an issue [here](https://github.com/ajchili/sync/issues) and use the bug report template
 	
