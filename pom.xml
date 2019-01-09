@@ -96,23 +96,8 @@
             <version>0.1.2</version>
         </dependency>
         <dependency>
-            <groupId>org.pushing-pixels</groupId>
-            <artifactId>radiance-neon</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.pushing-pixels</groupId>
-            <artifactId>radiance-substance</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.pushing-pixels</groupId>
-            <artifactId>radiance-trident</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jre8</artifactId>
+            <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
@@ -124,17 +109,17 @@
         <dependency>
             <groupId>org.pushing-pixels</groupId>
             <artifactId>radiance-neon</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.pushing-pixels</groupId>
             <artifactId>radiance-substance</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.pushing-pixels</groupId>
             <artifactId>radiance-trident</artifactId>
-            <version>0.9-SNAPSHOT</version>
+            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -145,9 +130,9 @@
     </dependencies>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <kotlin.version>1.2.60</kotlin.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <kotlin.version>1.3.11</kotlin.version>
     </properties>
 
     <build>
@@ -185,7 +170,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.8.0</version>
                 <executions>
                     <execution>
                         <id>default-compile</id>
@@ -214,7 +199,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
+                <version>1.6.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -228,8 +213,8 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <version>2.6</version>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.1</version>
                 <configuration>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
