@@ -1,8 +1,9 @@
-import electron from "electron";
+// @ts-ignore
+const electron = require("electron");
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
-let mainWindow: electron.BrowserWindow | null;
+let mainWindow;
 
 function createWindow() {
   mainWindow = new BrowserWindow({ width: 800, height: 600 });
