@@ -1,46 +1,68 @@
-# sync
-A Java based multi-client video and audio syncing application.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Getting started with development
-1. Fork/Clone repo
-2. Make changes
-3. Test changes by running `mvn clean install exec:java`
+## Available Scripts
 
-## what to do if you run into issues
-If you for any reason run into issues while using sync, submit an issue [here](https://github.com/ajchili/sync/issues) and use the bug report template
-	
-## setup
-1. Check to see if Java is installed
-   1. The easiest way to do this is to go to the [Java Download Page](https://www.java.com/en/download/) and download the latest version
-   2. After downloading the latest version, run the installer
-   3. This will either install, update, or notify you that Java is installed
-2. Download and install [VLC](http://www.videolan.org/vlc/index.html)
-3. Download [sync](https://www.github.com/ajchili/sync/releases)
-   * The latest stable version can be found in the link above
-   * For development builds please download the master branch and view [CONTRIBUTING.md](https://github.com/ajchili/sync/blob/master/CONTRIBUTING.md)
-4. Run sync
-   * Server setup
-      * Please note that UPnP is required for sync to work past a local network
-         * You must enable UPnP in your router _(please look at the [Port Forward](https://portforward.com/router.htm) website if you do not know how to enable UPnP)_
-      * It is recommended to:
-         * Add sync to your firewall _(to ensure that Tomcat will run flawlessly, allow all Java entries to be permitted)_
-         * Specify the amount of ram that the application can use _(2 gigabytes of ram minimum)_
-         * Use a multi-core cpu
-         * Have an unresricted and a beefy internet connection
-         * Use 720p content to prevent excessive bandwidth usage and smooth playback
-            * Should your media be in a higher resolution, look at [this](https://github.com/ajchili/sync/issues/8) issue for more information
-      1. Obtain your IP Address
-         * Located either in the title of the window or under `sync` -> `Share Server Address` in the menu bar
-      2. Load your media into sync and share your IP Address
-         1. Click `sync` -> `Set Media` in the menu of the server
-         2. Select media type
-            * For online media, click `Set Media URL` and provide the link
-               * _Should your media link be anything other than `http://`, please provide that_
-            * For offline media, click `Set Media File` and select your file
-     3. Enjoy
-   * Client setup
-      * It is recommended to:
-         * Add sync to your firewall
-      1. Obtain the IP Address of the server you would like to connect to
-      2. Connect to the server
-      3. Enjoy
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.<br>
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.<br>
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.<br>
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.<br>
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.<br>
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+
+### Analyzing the Bundle Size
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+
+### Making a Progressive Web App
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+
+### Advanced Configuration
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+
+### Deployment
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+
+### `npm run build` fails to minify
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
