@@ -37,3 +37,5 @@ app.on("activate", function() {
     createWindow();
   }
 });
+
+require("./server");
