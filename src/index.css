@@ -1,6 +1,7 @@
-body {	
-  margin: 0;	
+body {
+  margin: 0;
   padding: 0;
+  font-family: Geneva, sans-serif;
 }
 
 .full {
@@ -14,4 +15,66 @@ body {
   top: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
+}
+
+.unselectable {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button {
+  height: 20px;
+  padding: 2.5px 10px 2.5px 10px;
+  cursor: pointer;
+  display: inline-block;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1.5px;
+  border-radius: 4px;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+}
+
+.button:hover {
+  color: #ffffff;
+  background-color: #4caf50;
+  border-color: #000000;
+  border-style: solid;
+  border-width: 1.5px;
+  border-radius: 4px;
+  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
+    0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 150px;
+  left: 50%;
+  bottom: 115%;
+  padding: 2.5px 10px 2.5px 10px;
+  transform: translate(-50%, 0%);
+  background-color: #000000;
+  color: #ffffff;
+  text-align: center;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
