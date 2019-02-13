@@ -24,11 +24,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "ELECTRON_URL=http://localhost:3000 electron .",
-    "lint_react": "eslint -c .eslintrc.js src/components src/pages",
-    "lint_backend": "eslint -c .eslintrc.js src/server",
-    "prestart": "npm run lint_react",
-    "backend": "nodemon src/server/index.js",
-    "prebackend": "npm run lint_backend"
+    "backend": "nodemon src/server/index.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -41,7 +37,6 @@
   ],
   "devDependencies": {
     "electron": "^4.0.4",
-    "eslint-plugin-react": "^7.12.4",
     "nodemon": "^1.18.10"
   }
 }
