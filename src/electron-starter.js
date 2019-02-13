@@ -5,10 +5,16 @@ const url = require("url");
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
+require("./server");
+
 let mainWindow;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    nodeIntegration: true
+  });
   const page =
     process.env.ELECTRON_URL ||
     url.format({
@@ -18,7 +24,7 @@ function createWindow() {
     });
   mainWindow.loadURL(page);
 
-  mainWindow.webContents.openDevTools();
+  if (process.env.ELECTRON_URL) mainWindow.webContents.openDevTools();
   mainWindow.on("closed", function() {
     mainWindow = null;
   });
@@ -37,5 +43,3 @@ app.on("activate", function() {
     createWindow();
   }
 });
-
-require("./server");

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "src/electron-starter.js",
+  "homepage": "./",
   "dependencies": {
     "@types/jest": "^24.0.0",
     "@types/node": "^10.12.24",
@@ -25,7 +26,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron": "ELECTRON_URL=http://localhost:3000 electron .",
+    "electron": "electron .",
+    "electron-dev": "ELECTRON_URL=http://localhost:3000 electron .",
     "backend": "nodemon src/server/index.js"
   },
   "eslintConfig": {
