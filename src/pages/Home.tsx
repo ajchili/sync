@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { withRouter } from "react-router-dom";
 import { Button, Tooltip } from "../components";
 import { Communicator } from "../services";
 
@@ -20,13 +21,12 @@ class Home extends Component<any, any> {
   }
 
   async _createRoom() {
+    const { history } = this.props;
     try {
-      let tunnel = await Communicator.createRoom();
+      let id = await Communicator.createRoom();
+      history.push(`/room/${id}`);
     } catch (err) {
       switch (err.response.status) {
-        case 400:
-          // Room already exists
-          break;
         case 500:
           // Error creating room
           break;
@@ -51,7 +51,7 @@ class Home extends Component<any, any> {
               component={<Button title={"Host"} disabled />}
             />
           ) : (
-            <Button title={"Host"} onClick={this._createRoom} />
+            <Button title={"Host"} onClick={this._createRoom.bind(this)} />
           )}
         </div>
       </div>
@@ -59,4 +59,4 @@ class Home extends Component<any, any> {
   }
 }
 
-export default Home;
+export default withRouter(Home);

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Home } from "../pages";
+import { Home, Room } from "../pages";
 
 class Navigator extends Component {
   render() {
@@ -9,6 +9,7 @@ class Navigator extends Component {
         <Router>
           <Switch>
             <Route path="/" exact component={Home} />
+            <Route path="/room/:id" exact component={Room} />
           </Switch>
         </Router>
       </div>
