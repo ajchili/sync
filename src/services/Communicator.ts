@@ -4,6 +4,12 @@ const LOCALHOST = "http://localhost:8080";
 const roomNameExpression = new RegExp("//.[^.]*");
 
 export default {
+  closeRoom: async () => {
+    await axios({
+      url: `${LOCALHOST}/room/close`,
+      method: "POST"
+    });
+  },
   createRoom: async () => {
     try {
       let res = await axios({

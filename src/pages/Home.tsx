@@ -20,11 +20,11 @@ class Home extends Component<any, any> {
     }
   }
 
-  async _createRoom() {
+  _createRoom = async () => {
     const { history } = this.props;
     try {
       let id = await Communicator.createRoom();
-      history.push(`/room/${id}`);
+      history.push(`/room/${id}`, { host: true });
     } catch (err) {
       switch (err.response.status) {
         case 500:
@@ -51,7 +51,7 @@ class Home extends Component<any, any> {
               component={<Button title={"Host"} disabled />}
             />
           ) : (
-            <Button title={"Host"} onClick={this._createRoom.bind(this)} />
+            <Button title={"Host"} onClick={this._createRoom} />
           )}
         </div>
       </div>
