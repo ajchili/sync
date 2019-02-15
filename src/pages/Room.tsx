@@ -15,7 +15,7 @@ class Room extends Component<any, any> {
     } catch (err) {
       // Do nothing if this fails.
       // It will only fail if no tunnel is active.
-      // This means that the serve was not running to begin with.
+      // This means that the server was not running to begin with.
     } finally {
       history.replace("/");
     }
