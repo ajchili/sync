@@ -34,13 +34,38 @@ class Room extends Component<any, any> {
   };
 
   render() {
-    const { match } = this.props;
+    const { location } = this.props;
+
     return (
-      <div className="centered">
-        {match.params.id}
-        <br />
-        <br />
-        <Button title="Close" onClick={this._closeRoom} />
+      <div className="full noScroll">
+        <video
+          style={{
+            width: "75%",
+            height: "100%",
+            backgroundColor: "#000000",
+            float: "left"
+          }}
+          controls={true}
+        />
+        <div
+          style={{
+            width: "25%",
+            height: "100%",
+            backgroundColor: "#000000",
+            float: "left"
+          }}
+        >
+          <Button
+            title="Close Room"
+            onClick={this._closeRoom}
+            light
+            style={{
+              position: "absolute",
+              top: 10,
+              right: 10
+            }}
+          />
+        </div>
       </div>
     );
   }

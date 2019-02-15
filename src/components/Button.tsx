@@ -15,13 +15,11 @@ class Button extends Component<any, any> {
 
   render() {
     const { title, onClick, style } = this.props;
-    const disabled = this.props.disabled || false;
+    const disabled = (this.props.disabled && "disabled") || "";
+    const light = (this.props.light && "light") || "";
+    const classes = `button unselectable ${disabled} ${light}`;
     return (
-      <div
-        className={`button unselectable ${disabled && "disabled"}`}
-        style={style}
-        onClick={onClick}
-      >
+      <div className={classes} style={style} onClick={onClick}>
         {title}
       </div>
     );

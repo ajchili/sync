@@ -17,6 +17,10 @@ body {
   text-align: center;
 }
 
+.noScroll {
+  overflow: hidden;
+}
+
 .unselectable {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -44,10 +48,26 @@ body {
   transition-duration: 0.4s;
 }
 
+.button.light {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
 .button:hover {
   color: #ffffff;
   background-color: #4caf50;
   border-color: #000000;
+  border-style: solid;
+  border-width: 1.5px;
+  border-radius: 4px;
+  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24),
+    0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+.button.light:hover {
+  color: #ffffff;
+  background-color: #4caf50;
+  border-color: #ffffff;
   border-style: solid;
   border-width: 1.5px;
   border-radius: 4px;
