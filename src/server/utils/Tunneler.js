@@ -6,9 +6,13 @@ class Tunneler {
     this.creatingTunnel = false;
   }
 
+  isActive() {
+    return this.tunnel && !this.tunnel._closed;
+  }
+
   createTunnel(port = 8080) {
     return new Promise((resolve, reject) => {
-      if (this.tunnel) reject(Error("Tunnel already exists!"));
+      if (this.isActive()) reject(Error("Tunnel already exists!"));
       else if (this.creatingTunnel === true)
         reject(Error("Tunnel creation already in progress!"));
       else this.creatingTunnel = true;
@@ -17,9 +21,6 @@ class Tunneler {
         if (err) reject(err);
         else {
           this.tunnel = tunnel;
-          this.tunnel.on("close", () => {
-            this.tunnel = null;
-          });
           resolve(this.tunnel);
         }
       });
