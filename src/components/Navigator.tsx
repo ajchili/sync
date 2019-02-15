@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Home, Room } from "../pages";
+import { ErrorPage404, Home, Room } from "../pages";
 
 class Navigator extends Component {
   render() {
@@ -10,6 +10,7 @@ class Navigator extends Component {
           <Switch>
             <Route path="/" exact component={Home} />
             <Route path="/room/:id" exact component={Room} />
+            <Route path="/" component={ErrorPage404} />
           </Switch>
         </Router>
       </div>
