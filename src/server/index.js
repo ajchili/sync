@@ -17,6 +17,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use("/", require("./routes"));
-app.use("/room", require("./routes/room"));
+app.use("/room", require("./routes/room")(port));
 
 app.listen(port, () => console.log(`Sync listening on port ${port}!`));
