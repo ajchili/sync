@@ -7,6 +7,9 @@ const port = process.env.PORT || 8080;
 app.use(bodyParser.urlencoded({ extended: true }));
 // cors
 app.use((req, res, next) => {
+  if (req.headers.origin !== "http://localhost:3000") {
+    return res.status(401).send();
+  }
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
     "Access-Control-Allo-Headers",
