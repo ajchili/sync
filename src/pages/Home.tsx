@@ -19,6 +19,24 @@ class Home extends Component<any, any> {
     }
   }
 
+  async _createRoom() {
+    try {
+      let tunnel = await Communicator.createRoom();
+    } catch (err) {
+      switch (err.response.status) {
+        case 400:
+          // Room already exists
+          break;
+        case 500:
+          // Error creating room
+          break;
+        default:
+          // Unexpected error
+          break;
+      }
+    }
+  }
+
   render() {
     const { web } = this.state;
     return (
@@ -33,7 +51,7 @@ class Home extends Component<any, any> {
               component={<Button title={"Host"} disabled />}
             />
           ) : (
-            <Button title={"Host"} />
+            <Button title={"Host"} onClick={this._createRoom} />
           )}
         </div>
       </div>
