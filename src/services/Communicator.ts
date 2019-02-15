@@ -1,6 +1,9 @@
 import axios from "axios";
 
 const LOCALHOST = "http://localhost:8080";
+const LOCALTUNNEL = (id: string) => {
+  return `http://${id}.localtunnel.me`;
+};
 const roomNameExpression = new RegExp("//.[^.]*");
 
 export default {
@@ -37,6 +40,17 @@ export default {
       return res.status === 200 ? "desktop" : "web";
     } catch (err) {
       return "web";
+    }
+  },
+  getSocketURL: async (id: string) => {
+    try {
+      let res = await axios({
+        url: `${LOCALTUNNEL(id)}/room/socketTunnel`,
+        method: "GET"
+      });
+      return res.data.url;
+    } catch (err) {
+      throw err;
     }
   }
 };

@@ -34,5 +34,13 @@ module.exports = (http, port = 8080, socketPort = 8081) => {
     }
   });
 
+  router.get("/socketTunnel", (req, res) => {
+    if (socketTunneler.isActive()) {
+      res.status(200).send(socketTunneler.tunnel);
+    } else {
+      res.sendStatus(400);
+    }
+  });
+
   return router;
 };

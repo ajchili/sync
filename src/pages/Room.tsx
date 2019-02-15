@@ -10,9 +10,14 @@ class Room extends Component<any, any> {
     super(props);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { match } = this.props;
-    const socket = io("http://localhost:8081");
+    try {
+      let socketURL = await Communicator.getSocketURL(match.params.id);
+      const socket = io(socketURL);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   _closeRoom = async () => {
@@ -26,11 +31,10 @@ class Room extends Component<any, any> {
     } finally {
       history.replace("/");
     }
-  }
+  };
 
   render() {
     const { match } = this.props;
-
     return (
       <div className="centered">
         {match.params.id}
