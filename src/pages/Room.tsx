@@ -2,10 +2,17 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { Button } from "../components";
 import { Communicator } from "../services";
+// @ts-ignore
+import io from "socket.io-client";
 
 class Room extends Component<any, any> {
   constructor(props: {}) {
     super(props);
+  }
+
+  componentDidMount() {
+    const { match } = this.props;
+    const socket = io("http://localhost:8081");
   }
 
   _closeRoom = async () => {

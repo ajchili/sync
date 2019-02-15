@@ -1,13 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const SocketHandler = require("../utils/SocketHandler");
 const Tunneler = require("../utils/Tunneler");
 
-module.exports = (port = 8080) => {
+module.exports = (http, port = 8080, socketPort = 8081) => {
   let tunneler = new Tunneler();
+  let socketTunneler = new Tunneler();
+  let socketHandler = new SocketHandler();
 
   router.post("/close", (req, res) => {
-    if (tunneler.tunnel) {
+    if (tunneler.isActive()) {
       tunneler.closeTunnel();
+      socketTunneler.closeTunnel();
+      socketHandler.stop();
       res.sendStatus(200);
     } else {
       res.sendStatus(400);
@@ -20,6 +25,8 @@ module.exports = (port = 8080) => {
     } else {
       try {
         let tunnel = await tunneler.createTunnel(port);
+        await socketTunneler.createTunnel(socketPort);
+        socketHandler.start(http);
         res.status(200).json(tunnel);
       } catch (err) {
         res.status(500).json(err);
