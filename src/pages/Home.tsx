@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button } from "../components";
+import { Button, Tooltip } from "../components";
 import { Communicator } from "../services";
 
 class Home extends Component<any, any> {
@@ -25,10 +25,9 @@ class Home extends Component<any, any> {
         <div>
           <Button title={"Join"} style={{ marginRight: "1em" }} />
           {web ? (
-            <Button
-              title={"Host"}
+            <Tooltip
               tooltip={"You must be using the sync client to host a room."}
-              disabled
+              component={<Button title={"Host"} disabled />}
             />
           ) : (
             <Button title={"Host"} />

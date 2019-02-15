@@ -5,7 +5,6 @@ class Button extends Component<any, any> {
     title: string;
     onClick: () => {};
     disabled: boolean;
-    tooltip: string;
     style: any;
   }) {
     super(props);
@@ -15,17 +14,15 @@ class Button extends Component<any, any> {
   }
 
   render() {
-    const { title, onClick, tooltip, style } = this.props;
+    const { title, onClick, style } = this.props;
     const disabled = this.props.disabled || false;
     return (
       <div
-        className={`button unselectable ${disabled && "disabled"} ${!!tooltip &&
-          "tooltip"}`}
+        className={`button unselectable ${disabled && "disabled"}`}
         style={style}
         onClick={onClick}
       >
         {title}
-        <span className="tooltiptext">{tooltip || ""}</span>
       </div>
     );
   }
