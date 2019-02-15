@@ -1,4 +1,3 @@
-// @ts-ignore
 const localtunnel = require("localtunnel");
 const EventEmitter = require("events");
 

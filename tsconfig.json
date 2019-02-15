@@ -20,6 +20,12 @@
     "jsx": "preserve"
   },
   "include": [
-    "src"
+    "src/**/*"
+  ],
+  "exclude": [
+    "build",
+    "node_modules",
+    "server",
+    "**/*.js"
   ]
 }
