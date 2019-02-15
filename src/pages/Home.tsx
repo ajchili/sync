@@ -10,10 +10,13 @@ class Home extends Component<any, any> {
     };
   }
 
-  componentDidMount() {
-    Communicator.getClientType().then(type => {
+  async componentDidMount() {
+    try {
+      let type = await Communicator.getClientType();
       this.setState({ web: type === "web" });
-    });
+    } catch (err) {
+      this.setState({ web: true });
+    }
   }
 
   render() {
