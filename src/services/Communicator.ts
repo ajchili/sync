@@ -8,6 +8,7 @@ const roomNameExpression = new RegExp("//.[^.]*");
 
 export default {
   closeRoom: async () => {
+    localStorage.removeItem("bearer");
     await axios({
       url: `${LOCALHOST}/room/close`,
       method: "POST"
@@ -19,12 +20,13 @@ export default {
         url: `${LOCALHOST}/room/create`,
         method: "POST"
       });
-      let id = roomNameExpression.exec(res.data.url) || [];
+      if (res.data.bearer) localStorage.setItem("bearer", res.data.bearer);
+      let id = roomNameExpression.exec(res.data.tunnel.url) || [];
       return id.join("").substr(2);
     } catch (err) {
       switch (err.response.status) {
         case 400:
-          let id = roomNameExpression.exec(err.response.data.url) || [];
+          let id = roomNameExpression.exec(err.response.data.tunnel.url) || [];
           return id.join("").substr(2);
         default:
           throw err;
