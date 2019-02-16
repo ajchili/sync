@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { Button } from "../components";
+import { RoomSidebar } from "../components";
 import { Communicator, Swal } from "../services";
 // @ts-ignore
 import io from "socket.io-client";
@@ -48,38 +48,18 @@ class Room extends Component<any, any> {
       <div className="full noScroll">
         <video
           style={{
-            width: "75%",
+            width: "80%",
             height: "100%",
             backgroundColor: "#000000",
             float: "left"
           }}
           controls={true}
         />
-        <div
-          style={{
-            width: "25%",
-            height: "100%",
-            backgroundColor: "#000000",
-            float: "left"
-          }}
-        >
-          <h3 className="light">Room ID: {match.params.id}</h3>
-          {location.state && location.state.host && (
-            <div>
-              <Button
-                title="Close Room"
-                onClick={this._closeRoom}
-                light
-                style={{
-                  float: "right",
-                  marginRight: 10
-                }}
-              />
-              <br />
-            </div>
-          )}
-          <h3 className="light">Viewers</h3>
-        </div>
+        <RoomSidebar
+          roomId={match.params.id}
+          isHost={location.state && location.state.host}
+          closeRoom={this._closeRoom}
+        />
       </div>
     );
   }
