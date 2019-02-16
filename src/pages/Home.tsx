@@ -35,7 +35,24 @@ class Home extends Component<any, any> {
           break;
       }
     }
-  }
+  };
+
+  _joinRoom = async () => {
+    const { history } = this.props;
+    let id: string | null = prompt("Enter Room ID");
+    if (id) {
+      try {
+        await Communicator.getSocketURL(id);
+        history.push(`/room/${id}`, { host: false });
+      } catch (err) {
+        switch (err.response.status) {
+          default:
+            // Unexpected error
+            break;
+        }
+      }
+    }
+  };
 
   render() {
     const { web } = this.state;
@@ -44,7 +61,11 @@ class Home extends Component<any, any> {
         <h1>sync</h1>
         <p>The simplest way to watch media together</p>
         <div>
-          <Button title={"Join"} style={{ marginRight: "1em" }} />
+          <Button
+            title={"Join"}
+            style={{ marginRight: "1em" }}
+            onClick={this._joinRoom}
+          />
           {web ? (
             <Tooltip
               tooltip={"You must be using the sync client to host a room."}
