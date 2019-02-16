@@ -19,6 +19,13 @@ export default {
   },
   show,
   showAction,
+  showError: (title: string, text: string = "") => {
+    show({
+      title,
+      text,
+      type: "error"
+    });
+  },
   showInput: async (title: string): Promise<string | null> => {
     return await showAction({
       title,

@@ -26,17 +26,10 @@ class Home extends Component<any, any> {
       Swal.showLoading();
       let id = await Communicator.createRoom();
       history.push(`/room/${id}`, { host: true });
-    } catch (err) {
-      switch (err.response.status) {
-        case 500:
-          // Error creating room
-          break;
-        default:
-          // Unexpected error
-          break;
-      }
-    } finally {
       Swal.hide();
+    } catch (err) {
+      console.error(err);
+      Swal.showError("Unable to Create Room");
     }
   };
 
@@ -45,9 +38,17 @@ class Home extends Component<any, any> {
     let id: string | null = await Swal.showInput("Enter Room ID");
     if (id) {
       try {
+        Swal.showLoading();
         await Communicator.getSocketURL(id);
         history.push(`/room/${id}`, { host: false });
-      } catch (err) {}
+        Swal.hide();
+      } catch (err) {
+        console.error(err);
+        Swal.showError(
+          "Unable to Join Room",
+          "Please ensure the room id specified is correct"
+        );
+      }
     }
   };
 
