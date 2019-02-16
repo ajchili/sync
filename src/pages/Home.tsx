@@ -42,18 +42,12 @@ class Home extends Component<any, any> {
 
   _joinRoom = async () => {
     const { history } = this.props;
-    let id: string | null = prompt("Enter Room ID");
+    let id: string | null = await Swal.showInput("Enter Room ID");
     if (id) {
       try {
         await Communicator.getSocketURL(id);
         history.push(`/room/${id}`, { host: false });
-      } catch (err) {
-        switch (err.response.status) {
-          default:
-            // Unexpected error
-            break;
-        }
-      }
+      } catch (err) {}
     }
   };
 
