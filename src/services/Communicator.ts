@@ -8,10 +8,14 @@ const roomNameExpression = new RegExp("//.[^.]*");
 
 export default {
   closeRoom: async () => {
+    const bearer = localStorage.getItem("bearer");
     localStorage.removeItem("bearer");
     await axios({
       url: `${LOCALHOST}/room/close`,
-      method: "POST"
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${bearer}`
+      }
     });
   },
   createRoom: async () => {
