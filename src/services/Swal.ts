@@ -19,6 +19,13 @@ export default {
   },
   show,
   showAction,
+  showAlert: (title: string, text: string = "") => {
+    show({
+      title,
+      text,
+      type: "info"
+    });
+  },
   showError: (title: string, text: string = "") => {
     show({
       title,
