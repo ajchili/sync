@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { Button } from "../components";
-import { Communicator } from "../services";
+import { Communicator, Swal } from "../services";
 // @ts-ignore
 import io from "socket.io-client";
 
@@ -29,18 +29,20 @@ class Room extends Component<any, any> {
   _closeRoom = async () => {
     const { history } = this.props;
     try {
+      Swal.showLoading("Closing Server");
       await Communicator.closeRoom();
     } catch (err) {
       // Do nothing if this fails.
       // It will only fail if no tunnel is active.
       // This means that the server was not running to begin with.
     } finally {
+      Swal.hide();
       history.replace("/");
     }
   };
 
   render() {
-    const { location } = this.props;
+    const { location, match } = this.props;
 
     return (
       <div className="full noScroll">
@@ -61,18 +63,22 @@ class Room extends Component<any, any> {
             float: "left"
           }}
         >
+          <h3 className="light">Room ID: {match.params.id}</h3>
           {location.state && location.state.host && (
-            <Button
-              title="Close Room"
-              onClick={this._closeRoom}
-              light
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10
-              }}
-            />
+            <div>
+              <Button
+                title="Close Room"
+                onClick={this._closeRoom}
+                light
+                style={{
+                  float: "right",
+                  marginRight: 10
+                }}
+              />
+              <br />
+            </div>
           )}
+          <h3 className="light">Viewers</h3>
         </div>
       </div>
     );
