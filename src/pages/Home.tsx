@@ -12,6 +12,14 @@ class Home extends Component<any, any> {
   }
 
   async componentDidMount() {
+    const { location } = this.props;
+    if (location.state) {
+      if (location.state.roomClosed) {
+        Swal.showAlert("Room Closed");
+      } else if (location.state.roomDoesNotExist) {
+        Swal.showError("Unable to Join Room", "Room does not exist!");
+      }
+    }
     try {
       let type = await Communicator.getClientType();
       this.setState({ web: type === "web" });

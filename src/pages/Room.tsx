@@ -11,12 +11,18 @@ class Room extends Component<any, any> {
   }
 
   async componentDidMount() {
-    const { match } = this.props;
+    const { history, location, match } = this.props;
     try {
       let socketURL = await Communicator.getSocketURL(match.params.id);
       const socket = io(socketURL);
+      socket.on("closed", () => {
+        history.push(
+          "/",
+          location.state && location.state.host && { roomClosed: true }
+        );
+      });
     } catch (err) {
-      console.error(err);
+      history.push("/", { roomDoesNotExist: true });
     }
   }
 
@@ -55,16 +61,18 @@ class Room extends Component<any, any> {
             float: "left"
           }}
         >
-          <Button
-            title="Close Room"
-            onClick={this._closeRoom}
-            light
-            style={{
-              position: "absolute",
-              top: 10,
-              right: 10
-            }}
-          />
+          {location.state && location.state.host && (
+            <Button
+              title="Close Room"
+              onClick={this._closeRoom}
+              light
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10
+              }}
+            />
+          )}
         </div>
       </div>
     );
