@@ -2,12 +2,17 @@ import React, { Component } from "react";
 import { RoomSettings, RoomViewers } from ".";
 
 class RoomSizebar extends Component<any, any> {
-  constructor(props: { roomId: string; isHost: boolean; closeRoom: () => {} }) {
+  constructor(props: {
+    roomId: string;
+    isHost: boolean;
+    setMedia: () => {};
+    closeRoom: () => {};
+  }) {
     super(props);
   }
 
   render() {
-    const { roomId, isHost, closeRoom } = this.props;
+    const { roomId, isHost, setMedia, closeRoom } = this.props;
 
     return (
       <div
@@ -21,7 +26,7 @@ class RoomSizebar extends Component<any, any> {
         }}
       >
         <h4 className="light">Room ID: {roomId}</h4>
-        {isHost && <RoomSettings roomId={roomId} closeRoom={closeRoom} />}
+        {isHost && <RoomSettings setMedia={setMedia} closeRoom={closeRoom} />}
         <h4 className="light">Viewers</h4>
         <RoomViewers />
         <h4 className="light">Chat</h4>
