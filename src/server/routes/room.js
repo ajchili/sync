@@ -59,6 +59,13 @@ module.exports = (http, port = 8080, socketPort = 8081) => {
     }
   });
 
+  router.post("/setMedia", (req, res) => {
+    if (req.body.url) {
+      socketHandler.setMedia(req.body.url);
+      res.sendStatus(200);
+    } else res.sendStatus(400);
+  });
+
   router.get("/socketTunnel", (req, res) => {
     if (socketTunneler.isActive()) {
       res.status(200).send(socketTunneler.tunnel);

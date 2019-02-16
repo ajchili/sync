@@ -5,10 +5,13 @@ const LOCALTUNNEL = (id: string) => {
   return `http://${id}.localtunnel.me`;
 };
 const roomNameExpression = new RegExp("//.[^.]*");
+const Bearer = () => {
+  return localStorage.getItem("bearer");
+};
 
 export default {
   closeRoom: async () => {
-    const bearer = localStorage.getItem("bearer");
+    const bearer = Bearer();
     localStorage.removeItem("bearer");
     await axios({
       url: `${LOCALHOST}/room/close`,
@@ -58,5 +61,17 @@ export default {
     } catch (err) {
       throw err;
     }
+  },
+  setMedia: async ({ url }: { url?: string } = { url }) => {
+    await axios({
+      url: `${LOCALHOST}/room/setMedia`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${Bearer()}`
+      },
+      data: {
+        url
+      }
+    });
   }
 };
