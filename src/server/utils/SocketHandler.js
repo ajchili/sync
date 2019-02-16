@@ -9,13 +9,14 @@ class SocketHanlder {
   }
 
   stop() {
+    this.io.emit("closed", {});
     this.io.close();
     this.io = null;
   }
 
   setupEventHanlders() {
     this.io.on("connection", socket => {
-      console.log("New connection:", socket);
+      console.log("New connection");
     });
   }
 }

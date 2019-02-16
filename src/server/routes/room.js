@@ -10,10 +10,12 @@ module.exports = (http, port = 8080, socketPort = 8081) => {
 
   router.post("/close", (req, res) => {
     if (tunneler.isActive()) {
-      tunneler.closeTunnel();
-      socketTunneler.closeTunnel();
       socketHandler.stop();
-      res.sendStatus(200);
+      tunneler.closeTunnel();
+      setTimeout(() => {
+        socketTunneler.closeTunnel();
+        res.sendStatus(200);
+      }, 1500);
     } else {
       res.sendStatus(400);
     }
