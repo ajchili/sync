@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { Button, Tooltip } from "../components";
-import { Communicator } from "../services";
+import { Communicator, Swal } from "../services";
 
 class Home extends Component<any, any> {
   constructor(props: {}) {
@@ -23,6 +23,7 @@ class Home extends Component<any, any> {
   _createRoom = async () => {
     const { history } = this.props;
     try {
+      Swal.showLoading();
       let id = await Communicator.createRoom();
       history.push(`/room/${id}`, { host: true });
     } catch (err) {
@@ -34,6 +35,8 @@ class Home extends Component<any, any> {
           // Unexpected error
           break;
       }
+    } finally {
+      Swal.hide();
     }
   };
 
