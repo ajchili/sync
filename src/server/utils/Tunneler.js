@@ -1,35 +1,49 @@
-const localtunnel = require("localtunnel");
+const ngrok = require("ngrok");
 
 class Tunneler {
   constructor() {
-    this.tunnel = null;
-    this.creatingTunnel = false;
+    this.constructing = false;
+    this.url = null;
   }
 
   isActive() {
-    return this.tunnel && !this.tunnel._closed;
+    return this.url;
   }
 
   createTunnel(port = 8080) {
     return new Promise((resolve, reject) => {
       if (this.isActive()) reject(Error("Tunnel already exists!"));
-      else if (this.creatingTunnel === true)
+      else if (this.constructing)
         reject(Error("Tunnel creation already in progress!"));
-      else this.creatingTunnel = true;
-      localtunnel(port, (err, tunnel) => {
-        this.creatingTunnel = false;
-        if (err) reject(err);
-        else {
-          this.tunnel = tunnel;
-          resolve(this.tunnel);
-        }
-      });
+      else this.constructing = true;
+      ngrok
+        .connect(port)
+        .then(url => {
+          this.url = url;
+          resolve(url);
+        })
+        .catch(err => {
+          reject(err);
+        })
+        .finally(() => {
+          this.constructing = false;
+        });
     });
   }
 
   closeTunnel() {
-    if (!this.tunnel) throw new Error("Tunnel does not exist!");
-    else this.tunnel.close();
+    return new Promise((resolve, reject) => {
+      if (!this.isActive()) reject(new Error("Tunnel does not exist!"));
+      else {
+        ngrok
+          .disconnect()
+          .then(resolve)
+          .catch(err => reject(err))
+          .finally(() => {
+            this.url = null;
+          });
+      }
+    });
   }
 }
 

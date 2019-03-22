@@ -12,9 +12,8 @@ const generateBearer = () => {
 
 const blacklist = ["/create", "/socketTunnel"];
 
-module.exports = (http, port = 8080, socketPort = 8081) => {
+module.exports = (server, port = 8080) => {
   let tunneler = new Tunneler();
-  let socketTunneler = new Tunneler();
   let socketHandler = new SocketHandler();
   let bearer = null;
 
@@ -33,9 +32,8 @@ module.exports = (http, port = 8080, socketPort = 8081) => {
     if (tunneler.isActive()) {
       bearer = null;
       socketHandler.stop();
-      tunneler.closeTunnel();
       setTimeout(() => {
-        socketTunneler.closeTunnel();
+        tunneler.closeTunnel();
         res.sendStatus(200);
       }, 1500);
     } else {
@@ -45,14 +43,13 @@ module.exports = (http, port = 8080, socketPort = 8081) => {
 
   router.post("/create", async (req, res) => {
     if (tunneler.isActive()) {
-      res.status(400).json({ tunnel: tunneler.tunnel });
+      res.status(400).json({ url: tunneler.url });
     } else {
       try {
-        let tunnel = await tunneler.createTunnel(port);
-        await socketTunneler.createTunnel(socketPort);
-        socketHandler.start(http);
+        let url = await tunneler.createTunnel(port);
+        socketHandler.start(server);
         bearer = generateBearer();
-        res.status(200).json({ tunnel, bearer });
+        res.status(200).json({ url, bearer });
       } catch (err) {
         res.status(500).json(err);
       }
@@ -67,11 +64,8 @@ module.exports = (http, port = 8080, socketPort = 8081) => {
   });
 
   router.get("/socketTunnel", (req, res) => {
-    if (socketTunneler.isActive()) {
-      res.status(200).send(socketTunneler.tunnel);
-    } else {
-      res.sendStatus(400);
-    }
+    if (tunneler.isActive()) res.status(200).send(tunneler.url);
+    else res.sendStatus(400);
   });
 
   return router;

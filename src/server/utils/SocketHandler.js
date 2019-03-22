@@ -9,8 +9,8 @@ class SocketHanlder {
     if (this.io) this.io.emit("media", this.media);
   }
 
-  start(http) {
-    this.io = require("socket.io")(http);
+  start(server) {
+    this.io = require("socket.io")(server);
     this.setupEventHanlders();
   }
 
