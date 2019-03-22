@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const LOCALHOST = "http://localhost:8080";
-const LOCALTUNNEL = (id: string) => {
-  return `http://${id}.localtunnel.me`;
+const TUNNEL = (id: string) => {
+  return `https://${id}.ngrok.io`;
 };
 const roomNameExpression = new RegExp("//.[^.]*");
 const Bearer = () => {
@@ -28,12 +28,12 @@ export default {
         method: "POST"
       });
       if (res.data.bearer) localStorage.setItem("bearer", res.data.bearer);
-      let id = roomNameExpression.exec(res.data.tunnel.url) || [];
+      let id = roomNameExpression.exec(res.data.url) || [];
       return id.join("").substr(2);
     } catch (err) {
       switch (err.response.status) {
         case 400:
-          let id = roomNameExpression.exec(err.response.data.tunnel.url) || [];
+          let id = roomNameExpression.exec(err.response.data.url) || [];
           return id.join("").substr(2);
         default:
           throw err;
@@ -53,11 +53,11 @@ export default {
   },
   getSocketURL: async (id: string) => {
     try {
-      let res = await axios({
-        url: `${LOCALTUNNEL(id)}/room/socketTunnel`,
+      await axios({
+        url: `${TUNNEL(id)}/room/socketTunnel`,
         method: "GET"
       });
-      return res.data.url;
+      return TUNNEL(id);
     } catch (err) {
       throw err;
     }
