@@ -6,8 +6,10 @@ import { Communicator, Swal } from "../services";
 import io from "socket.io-client";
 
 class Room extends Component<any, any> {
+  videoRef: React.RefObject<HTMLVideoElement>;
   constructor(props: {}) {
     super(props);
+    this.videoRef = React.createRef();
     this.state = {
       url: null
     };
@@ -77,6 +79,7 @@ class Room extends Component<any, any> {
               float: "left"
             }}
             controls={true}
+            ref={this.videoRef}
             src={url}
           />
         ) : (
