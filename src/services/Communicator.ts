@@ -88,5 +88,35 @@ export default {
         data
       });
     }
+  },
+  playMedia: async () => {
+    await axios({
+      url: `${LOCALHOST}/room/playMedia`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${Bearer()}`
+      }
+    });
+  },
+  pauseMedia: async () => {
+    await axios({
+      url: `${LOCALHOST}/room/pauseMedia`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${Bearer()}`
+      }
+    });
+  },
+  setMediaTime: async (time: number) => {
+    await axios({
+      url: `${LOCALHOST}/room/setMediaTime`,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${Bearer()}`
+      },
+      data: {
+        time
+      }
+    });
   }
 };

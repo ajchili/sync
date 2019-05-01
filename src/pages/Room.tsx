@@ -5,13 +5,12 @@ import { Communicator, Swal } from "../services";
 //@ts-ignore
 import io from "socket.io-client";
 
-let socket: any;
-
 interface State {
   url: string | null;
 }
 
 class Room extends Component<any, State> {
+  socket: any;
   videoRef: React.RefObject<HTMLVideoElement>;
   constructor(props: {}) {
     super(props);
@@ -21,28 +20,12 @@ class Room extends Component<any, State> {
     };
   }
 
-  async componentDidMount() {
-    const { history, location, match } = this.props;
-    try {
-      let socketURL = await Communicator.getSocketURL(match.params.id);
-      socket = io(socketURL);
-      socket.on("media", (data: string) => {
-        this.setState({ url: data });
-      });
-      socket.on("closed", () => {
-        history.push(
-          "/",
-          location.state && location.state.host && { roomClosed: true }
-        );
-      });
-    } catch (err) {
-      console.error(err);
-      history.push("/", { roomDoesNotExist: true });
-    }
+  componentDidMount() {
+    this._setupSocketListener();
   }
 
   componentWillUnmount() {
-    if (socket) socket.disconnect();
+    if (this.socket) this.socket.disconnect();
   }
 
   _closeRoom = async () => {
@@ -80,11 +63,94 @@ class Room extends Component<any, State> {
             //@ts-ignore
             let file: File = e.target.files[0];
             if (file) await Communicator.setMedia({ file });
-          }
+          };
           input.click();
           break;
       }
     } catch (err) {}
+  };
+
+  _setupSocketListener = async () => {
+    const { history, location, match } = this.props;
+    let isHost = location.state && location.state.host;
+    let socketURL;
+    try {
+      socketURL = await Communicator.getSocketURL(match.params.id);
+    } catch (err) {
+      console.error(err);
+      history.push("/", { roomDoesNotExist: true });
+    }
+    this.socket = io(socketURL);
+    this.socket.on("media", (data: string) => {
+      this.setState({ url: data });
+      let video: HTMLVideoElement | null = this.videoRef.current;
+      if (video) this._setupVideoElement(video);
+    });
+    this.socket.on("play", () => {
+      let video: HTMLVideoElement | null = this.videoRef.current;
+      if (!isHost && video) video.play();
+    });
+    this.socket.on("pause", () => {
+      let video: HTMLVideoElement | null = this.videoRef.current;
+      if (!isHost && video) video.pause();
+    });
+    this.socket.on(
+      "mediaTime",
+      (data: { time: number; status: "playing" | "paused" }) => {
+        let video: HTMLVideoElement | null = this.videoRef.current;
+        if (!isHost && video) {
+          switch (data.status) {
+            case "playing":
+              if (video.paused) video.play();
+              break;
+            case "paused":
+              if (!video.paused) video.pause();
+              break;
+          }
+          let timeDifference = data.time - video.currentTime;
+          // If there is a time difference of more than 2 seconds
+          // skip user to time.
+          if (Math.abs(timeDifference) > 2) {
+            video.currentTime = data.time;
+          }
+        }
+      }
+    );
+    this.socket.on("closed", () => {
+      history.push(
+        "/",
+        location.state && location.state.host && { roomClosed: true }
+      );
+    });
+  };
+
+  _setupVideoElement = (video: HTMLVideoElement) => {
+    const { location } = this.props;
+    let isHost = location.state && location.state.host;
+    if (!isHost) return;
+    video.onplay = async () => {
+      try {
+        await Communicator.playMedia();
+      } catch (err) {
+        console.error("Unable to trigger play event:", err);
+      }
+    };
+    video.onpause = async () => {
+      try {
+        await Communicator.pauseMedia();
+      } catch (err) {
+        console.error("Unable to trigger pause event:", err);
+      }
+    };
+    const timeUpdated = async () => {
+      try {
+        await Communicator.setMediaTime(video.currentTime);
+      } catch (err) {
+        console.error("Unable to trigger seek event:", err);
+      }
+    };
+    video.onseeking = timeUpdated;
+    video.ontimeupdate = timeUpdated;
   };
 
   render() {

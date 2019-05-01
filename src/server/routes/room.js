@@ -83,6 +83,23 @@ module.exports = (server, port = 8080) => {
     } else res.sendStatus(400);
   });
 
+  router.post("/playMedia", (req, res) => {
+    socketHandler.play();
+    res.sendStatus(200);
+  });
+
+  router.post("/pauseMedia", (req, res) => {
+    socketHandler.pause();
+    res.sendStatus(200);
+  });
+
+  router.post("/setMediaTime", (req, res) => {
+    if (req.body.time) {
+      socketHandler.seek(req.body.time);
+      res.sendStatus(200);
+    } else res.sendStatus(400);
+  })
+
   router.get("/socketTunnel", (req, res) => {
     if (tunneler.isActive()) res.status(200).send(tunneler.url);
     else res.sendStatus(400);
