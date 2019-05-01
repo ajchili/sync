@@ -62,16 +62,31 @@ export default {
       throw err;
     }
   },
-  setMedia: async ({ url }: { url?: string } = { url }) => {
-    await axios({
-      url: `${LOCALHOST}/room/setMedia`,
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${Bearer()}`
-      },
-      data: {
-        url
-      }
-    });
+  setMedia: async (
+    { url, file }: { url?: string; file?: File } = { url, file }
+  ) => {
+    if (url) {
+      await axios({
+        url: `${LOCALHOST}/room/setMedia`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Bearer()}`
+        },
+        data: {
+          url
+        }
+      });
+    } else if (file) {
+      let data = new FormData();
+      data.append("media", file);
+      await axios({
+        url: `${LOCALHOST}/room/uploadMedia`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Bearer()}`
+        },
+        data
+      });
+    }
   }
 };

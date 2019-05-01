@@ -64,12 +64,24 @@ class Room extends Component<any, State> {
     try {
       let mediaType = await Swal.showChoice({
         title: "Select Media Type",
-        confirmButtonText: "Online Media"
+        confirmButtonText: "Online Media",
+        cancelButtonText: "Local Media"
       });
       switch (mediaType) {
         case 0:
           let url = await Swal.showURLInput("Media URL");
           if (url) await Communicator.setMedia({ url });
+          break;
+        case 1:
+          let input = document.createElement("input");
+          input.type = "file";
+          input.accept = "video/*";
+          input.onchange = async e => {
+            //@ts-ignore
+            let file: File = e.target.files[0];
+            if (file) await Communicator.setMedia({ file });
+          }
+          input.click();
           break;
       }
     } catch (err) {}

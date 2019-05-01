@@ -69,6 +69,20 @@ module.exports = (server, port = 8080) => {
     } else res.sendStatus(400);
   });
 
+  router.post("/uploadMedia", (req, res) => {
+    if (req.files && req.files.media) {
+      let file = req.files.media;
+      file.mv(`./media/${file.name}`, err => {
+        if (err) return res.status(500).json(err);
+        if (tunneler.isActive()) {
+          let mediaURL = `${tunneler.url}/media/${file.name}`;
+          socketHandler.setMedia(mediaURL);
+        }
+        res.sendStatus(200);
+      });
+    } else res.sendStatus(400);
+  });
+
   router.get("/socketTunnel", (req, res) => {
     if (tunneler.isActive()) res.status(200).send(tunneler.url);
     else res.sendStatus(400);
