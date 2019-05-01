@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "src/electron-starter.js",
-  "homepage": "./",
+  "homepage": "https://ajchili.github.io/sync",
   "dependencies": {
     "@types/jest": "^24.0.0",
     "@types/node": "^10.12.24",
@@ -33,7 +33,8 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "electron-dev": "ELECTRON_URL=http://localhost:3000 electron .",
-    "backend": "nodemon src/server/index.js"
+    "backend": "nodemon src/server/index.js",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -46,6 +47,7 @@
   ],
   "devDependencies": {
     "electron": "^4.0.4",
+    "gh-pages": "^2.0.1",
     "nodemon": "^1.18.10"
   }
 }
