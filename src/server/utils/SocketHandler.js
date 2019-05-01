@@ -16,7 +16,6 @@ class SocketHanlder {
 
   stop() {
     this.io.emit("closed", {});
-    this.io.close();
     this.io = null;
     this.media = null;
   }
