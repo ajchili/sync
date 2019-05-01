@@ -1,8 +1,13 @@
 import React, { Component } from "react";
 import { Button } from ".";
 
-class RoomSettings extends Component<any, any> {
-  constructor(props: { setMedia: () => {}; closeRoom: () => {} }) {
+interface Props {
+  setMedia: () => void;
+  closeRoom: () => void;
+}
+
+class RoomSettings extends Component<Props> {
+  constructor(props: Props) {
     super(props);
   }
 

@@ -5,8 +5,16 @@ import { Communicator, Swal } from "../services";
 //@ts-ignore
 import io from "socket.io-client";
 
+interface User {
+  id: string;
+  displayName: string;
+  ping: number;
+  isHost: boolean;
+}
+
 interface State {
   url: string | null;
+  users: Array<User>;
 }
 
 class Room extends Component<any, State> {
@@ -16,7 +24,8 @@ class Room extends Component<any, State> {
     super(props);
     this.videoRef = React.createRef();
     this.state = {
-      url: null
+      url: null,
+      users: []
     };
   }
 
@@ -81,6 +90,9 @@ class Room extends Component<any, State> {
       history.push("/", { roomDoesNotExist: true });
     }
     this.socket = io(socketURL);
+    this.socket.on("pong", (ping: number) => {
+      this.socket.emit("latency", { ping });
+    });
     this.socket.on("media", (data: string) => {
       this.setState({ url: data });
       let video: HTMLVideoElement | null = this.videoRef.current;
@@ -116,12 +128,18 @@ class Room extends Component<any, State> {
         }
       }
     );
+    this.socket.on("users", (data: { users: Array<User> }) => {
+      this.setState({ users: data.users });
+    });
     this.socket.on("closed", () => {
       history.push(
         "/",
         location.state && location.state.host && { roomClosed: true }
       );
     });
+    if (isHost) {
+      this.socket.emit("authenticate", { bearer: Communicator.Bearer() });
+    }
   };
 
   _setupVideoElement = (video: HTMLVideoElement) => {
@@ -154,8 +172,8 @@ class Room extends Component<any, State> {
   };
 
   render() {
-    const { url } = this.state;
     const { location, match } = this.props;
+    const { url, users } = this.state;
 
     return (
       <div className="full noScroll">
@@ -186,6 +204,7 @@ class Room extends Component<any, State> {
           isHost={location.state && location.state.host}
           setMedia={this._setMedia}
           closeRoom={this._closeRoom}
+          users={users}
         />
       </div>
     );
