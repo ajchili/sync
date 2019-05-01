@@ -12,9 +12,9 @@ class Tunneler {
 
   createTunnel(port = 8080) {
     return new Promise((resolve, reject) => {
-      if (this.isActive()) reject(Error("Tunnel already exists!"));
+      if (this.isActive()) reject(new Error("Tunnel already exists!"));
       else if (this.constructing)
-        reject(Error("Tunnel creation already in progress!"));
+        reject(new Error("Tunnel creation already in progress!"));
       else this.constructing = true;
       ngrok
         .connect(port)
@@ -22,12 +22,8 @@ class Tunneler {
           this.url = url;
           resolve(url);
         })
-        .catch(err => {
-          reject(err);
-        })
-        .finally(() => {
-          this.constructing = false;
-        });
+        .catch(reject)
+        .finally(() => (this.constructing = false));
     });
   }
 
@@ -38,7 +34,7 @@ class Tunneler {
         ngrok
           .disconnect()
           .then(resolve)
-          .catch(err => reject(err))
+          .catch(reject)
           .finally(() => {
             this.url = null;
           });

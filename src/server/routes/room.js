@@ -28,21 +28,26 @@ module.exports = (server, port = 8080) => {
     res.sendStatus(401);
   });
 
-  router.post("/close", (req, res) => {
+  router.post("/close", async (_, res) => {
     if (tunneler.isActive()) {
       bearer = null;
       socketHandler.stop();
-      setTimeout(() => {
-        tunneler.closeTunnel();
+      try {
+        await tunneler.closeTunnel();
         res.sendStatus(200);
-      }, 1500);
+      } catch (err) {
+        console.error("Unable to close room:", err);
+        res.status(500).json(err);
+      }
     } else {
+      console.error("Attempting to close room that does not exist!");
       res.sendStatus(400);
     }
   });
 
-  router.post("/create", async (req, res) => {
+  router.post("/create", async (_, res) => {
     if (tunneler.isActive()) {
+      console.error("Room already exists!");
       res.status(400).json({ url: tunneler.url });
     } else {
       try {
@@ -51,6 +56,7 @@ module.exports = (server, port = 8080) => {
         bearer = generateBearer();
         res.status(200).json({ url, bearer });
       } catch (err) {
+        console.error("Unable to create room:", err);
         res.status(500).json(err);
       }
     }

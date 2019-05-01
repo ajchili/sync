@@ -2,10 +2,16 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { RoomSidebar } from "../components";
 import { Communicator, Swal } from "../services";
-// @ts-ignore
+//@ts-ignore
 import io from "socket.io-client";
 
-class Room extends Component<any, any> {
+let socket: any;
+
+interface State {
+  url: string | null;
+}
+
+class Room extends Component<any, State> {
   videoRef: React.RefObject<HTMLVideoElement>;
   constructor(props: {}) {
     super(props);
@@ -19,8 +25,8 @@ class Room extends Component<any, any> {
     const { history, location, match } = this.props;
     try {
       let socketURL = await Communicator.getSocketURL(match.params.id);
-      const socket = io(socketURL);
-      socket.on("media", (data: any) => {
+      socket = io(socketURL);
+      socket.on("media", (data: string) => {
         this.setState({ url: data });
       });
       socket.on("closed", () => {
@@ -30,8 +36,13 @@ class Room extends Component<any, any> {
         );
       });
     } catch (err) {
+      console.error(err);
       history.push("/", { roomDoesNotExist: true });
     }
+  }
+
+  componentWillUnmount() {
+    if (socket) socket.disconnect();
   }
 
   _closeRoom = async () => {
