@@ -52,8 +52,8 @@ module.exports = (server, port = 8080) => {
     } else {
       try {
         let url = await tunneler.createTunnel(port);
-        socketHandler.start(server);
         bearer = generateBearer();
+        socketHandler.start(server, bearer);
         res.status(200).json({ url, bearer });
       } catch (err) {
         console.error("Unable to create room:", err);

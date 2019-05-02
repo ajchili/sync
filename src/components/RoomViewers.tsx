@@ -1,11 +1,24 @@
 import React, { Component } from "react";
 
-class RoomSizebar extends Component<any, any> {
-  constructor(props: {}) {
+interface User {
+  id: string;
+  displayName: string;
+  ping: number;
+  isHost: boolean;
+}
+
+interface Props {
+  users: Array<User>;
+}
+
+class RoomSizebar extends Component<Props> {
+  constructor(props: Props) {
     super(props);
   }
 
   render() {
+    const { users } = this.props;
+
     return (
       <div
         style={{
@@ -14,7 +27,15 @@ class RoomSizebar extends Component<any, any> {
           backgroundColor: "#000000",
           overflowY: "scroll"
         }}
-      />
+      >
+        {users.map((user: User) => {
+          return (
+            <p key={user.id} style={{ color: user.isHost ? "#4caf50" : "#FFFFFF" }}>
+              {user.displayName} ({user.ping})
+            </p>
+          );
+        })}
+      </div>
     );
   }
 }

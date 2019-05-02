@@ -1,18 +1,28 @@
 import React, { Component } from "react";
 import { RoomSettings, RoomViewers } from ".";
 
-class RoomSizebar extends Component<any, any> {
-  constructor(props: {
-    roomId: string;
-    isHost: boolean;
-    setMedia: () => {};
-    closeRoom: () => {};
-  }) {
+interface User {
+  id: string;
+  displayName: string;
+  ping: number;
+  isHost: boolean;
+}
+
+interface Props {
+  roomId: string;
+  isHost: boolean;
+  setMedia: () => void;
+  closeRoom: () => void;
+  users: Array<User>;
+}
+
+class RoomSizebar extends Component<Props> {
+  constructor(props: Props) {
     super(props);
   }
 
   render() {
-    const { roomId, isHost, setMedia, closeRoom } = this.props;
+    const { roomId, isHost, setMedia, closeRoom, users } = this.props;
 
     return (
       <div
@@ -28,7 +38,7 @@ class RoomSizebar extends Component<any, any> {
         <h4 className="light">Room ID: {roomId}</h4>
         {isHost && <RoomSettings setMedia={setMedia} closeRoom={closeRoom} />}
         <h4 className="light">Viewers</h4>
-        <RoomViewers />
+        <RoomViewers users={users} />
         <h4 className="light">Chat</h4>
         <div
           style={{

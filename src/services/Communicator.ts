@@ -10,6 +10,7 @@ const Bearer = () => {
 };
 
 export default {
+  Bearer,
   closeRoom: async () => {
     const bearer = Bearer();
     localStorage.removeItem("bearer");
