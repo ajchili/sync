@@ -20,7 +20,7 @@
     "jsx": "preserve"
   },
   "include": [
-    "web/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "build",
