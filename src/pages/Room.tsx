@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { RoomSidebar } from "../components";
 import { Communicator, Swal } from "../services";
-//@ts-ignore
+import { SocketCommunicator } from "../lib";
 import io from "socket.io-client";
 
 interface User {
@@ -18,7 +18,7 @@ interface State {
 }
 
 class Room extends Component<any, State> {
-  socket: any;
+  socket?: SocketCommunicator;
   videoRef: React.RefObject<HTMLVideoElement>;
   constructor(props: {}) {
     super(props);
@@ -82,68 +82,56 @@ class Room extends Component<any, State> {
   _setupSocketListener = async () => {
     const { history, location, match } = this.props;
     let isHost = location.state && location.state.host;
-    let socketURL;
     try {
-      socketURL = await Communicator.getSocketURL(match.params.id);
+      let socketURL: string = await Communicator.getSocketURL(match.params.id);
+      this.socket = new SocketCommunicator(io(socketURL), isHost);
+      this.socket.on("media", (url: string) => {
+        this.setState({ url });
+        let video: HTMLVideoElement | null = this.videoRef.current;
+        if (video) this._setupVideoElement(video);
+      });
+      this.socket.on("play", () => {
+        let video: HTMLVideoElement | null = this.videoRef.current;
+        if (video) video.play();
+      });
+      this.socket.on("pause", () => {
+        let video: HTMLVideoElement | null = this.videoRef.current;
+        if (video) video.pause();
+      });
+      this.socket.on(
+        "mediaTime",
+        (data: { time: number; state: "playing" | "paused" }) => {
+          let video: HTMLVideoElement | null = this.videoRef.current;
+          if (video) {
+            let timeDifference = Math.abs(video.currentTime - data.time);
+            if (
+              (isHost && timeDifference > 1 && !video.seeking) ||
+              timeDifference > 2
+            ) {
+              video.currentTime = data.time;
+            }
+            if (!isHost) {
+              if (data.state === "playing" && video.paused) {
+                video.play();
+              } else if (data.state === "paused" && !video.paused) {
+                video.pause();
+              }
+            }
+          }
+        }
+      );
+      this.socket.on("users", (users: Array<User>) => {
+        this.setState({ users });
+      });
+      this.socket.on("close", () => {
+        history.push(
+          "/",
+          location.state && location.state.host && { roomClosed: true }
+        );
+      });
     } catch (err) {
       console.error(err);
       history.push("/", { roomDoesNotExist: true });
-    }
-    this.socket = io(socketURL);
-    this.socket.on("pong", (ping: number) => {
-      this.socket.emit("latency", { ping });
-    });
-    this.socket.on("media", (data: string) => {
-      this.setState({ url: data });
-      let video: HTMLVideoElement | null = this.videoRef.current;
-      if (video) this._setupVideoElement(video);
-    });
-    this.socket.on("play", () => {
-      let video: HTMLVideoElement | null = this.videoRef.current;
-      if (!isHost && video) video.play();
-    });
-    this.socket.on("pause", () => {
-      let video: HTMLVideoElement | null = this.videoRef.current;
-      if (!isHost && video) video.pause();
-    });
-    this.socket.on(
-      "mediaTime",
-      (data: { time: number; status: "playing" | "paused" }) => {
-        let video: HTMLVideoElement | null = this.videoRef.current;
-        if (!isHost && video) {
-          switch (data.status) {
-            case "playing":
-              if (video.paused) video.play();
-              break;
-            case "paused":
-              if (!video.paused) video.pause();
-              break;
-          }
-          let timeDifference = data.time - video.currentTime;
-          // If there is a time difference of more than 2 seconds
-          // skip user to time.
-          if (Math.abs(timeDifference) > 2) {
-            video.currentTime = data.time;
-          }
-        }
-      }
-    );
-    this.socket.on("users", (data: { users: Array<User> }) => {
-      this.setState({ users: data.users });
-    });
-    this.socket.on("closed", () => {
-      history.push(
-        "/",
-        location.state && location.state.host && { roomClosed: true }
-      );
-    });
-    if (isHost) {
-      this.socket.emit("authenticate", { bearer: Communicator.Bearer() });
-    }
-    if (!!window.localStorage.getItem("displayName")) {
-      this.socket.emit("displayName", {
-        displayName: window.localStorage.getItem("displayName")
-      });
     }
   };
 
