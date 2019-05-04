@@ -4,7 +4,7 @@ A web based, multi-platform, media syncing application.
 ## Getting Started
 
 ### Hosting a Room
-To host a room, you will need to have two things, [Node.js](https://nodejs.org/en/) and [yarn](https://yarnpkg.com/en/). These are required dependencies that must be installed. Once both Node.js and yarn are installed, you can no follow these steps.
+To host a room, you will need to have two things, [Node.js](https://nodejs.org/en/) and [yarn](https://yarnpkg.com/en/). These are required dependencies that must be installed. Once both Node.js and yarn are installed, you can now follow these steps.
 1. Clone/download the repository
 2. cd into the downloaded repository
 3. Run `yarn` within the directory
