@@ -140,6 +140,11 @@ class Room extends Component<any, State> {
     if (isHost) {
       this.socket.emit("authenticate", { bearer: Communicator.Bearer() });
     }
+    if (!!window.localStorage.getItem("displayName")) {
+      this.socket.emit("displayName", {
+        displayName: window.localStorage.getItem("displayName")
+      });
+    }
   };
 
   _setupVideoElement = (video: HTMLVideoElement) => {

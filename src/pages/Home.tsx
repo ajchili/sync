@@ -61,27 +61,41 @@ class Home extends Component<any, any> {
     }
   };
 
+  _setDisplayName = async () => {
+    let displayName: string | null = await Swal.showInput("New Display Name");
+    if (displayName && displayName.trim().length) {
+      window.localStorage.setItem("displayName", displayName.trim());
+    }
+  };
+
   render() {
     const { web } = this.state;
     return (
-      <div className="centered">
-        <h1>sync</h1>
-        <p>The simplest way to watch media together</p>
-        <div>
-          <Button
-            title={"Join"}
-            style={{ marginRight: "1em" }}
-            onClick={this._joinRoom}
-          />
-          {web ? (
-            <Tooltip
-              tooltip={"You must be using the sync client to host a room."}
-              component={<Button title={"Host"} disabled />}
+      <div className="full">
+        <div className="centered">
+          <h1>sync</h1>
+          <p>The simplest way to watch media together</p>
+          <div>
+            <Button
+              title={"Join"}
+              style={{ marginRight: "1em" }}
+              onClick={this._joinRoom}
             />
-          ) : (
-            <Button title={"Host"} onClick={this._createRoom} />
-          )}
+            {web ? (
+              <Tooltip
+                tooltip={"You must be using the sync client to host a room."}
+                component={<Button title={"Host"} disabled />}
+              />
+            ) : (
+              <Button title={"Host"} onClick={this._createRoom} />
+            )}
+          </div>
         </div>
+        <Button
+          title="Set Display Name"
+          style={{ position: "absolute", bottom: 10, right: 10 }}
+          onClick={this._setDisplayName}
+        />
       </div>
     );
   }
