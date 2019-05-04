@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { RoomSettings, RoomViewers } from ".";
+import { RoomSettings, RoomViewers } from "../components";
 
 interface User {
   id: string;

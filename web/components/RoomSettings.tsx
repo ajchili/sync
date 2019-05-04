@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button } from ".";
+import { Button } from "../components";
 
 interface Props {
   setMedia: () => void;

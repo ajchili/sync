@@ -20,7 +20,7 @@ app.use(
 );
 app.use("/", require("./routes"));
 app.use("/room", require("./routes/room")(server, port));
-app.use("/media", express.static(path.join(__dirname, "../../media")));
+app.use("/media", express.static(path.join(__dirname, "../media")));
 
 app.start = app.listen = function() {
   console.log(`Sync listening on port ${port}!`);

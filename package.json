@@ -2,7 +2,7 @@
   "name": "sync",
   "version": "0.1.0",
   "private": true,
-  "main": "src/electron-starter.js",
+  "main": "electron-starter.js",
   "homepage": "https://ajchili.github.io/sync/",
   "dependencies": {
     "@types/jest": "^24.0.0",
@@ -34,7 +34,7 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "electron-dev": "ELECTRON_URL=http://localhost:3000 electron .",
-    "backend": "nodemon src/server/index.js",
+    "backend": "nodemon server/index.js",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
