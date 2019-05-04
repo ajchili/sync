@@ -20,13 +20,13 @@ class SocketHanlder {
 
   start(server, bearer) {
     this.io = require("socket.io")(server, {
-      pingInterval: 2500
+      pingInterval: 1000
     });
     this.bearer = bearer;
     this.setupEventHanlders();
     this.emitConnectedUsersInterval = setInterval(() => {
       this.emitConnectedUsers();
-    }, 2500);
+    }, 500);
   }
 
   stop() {
