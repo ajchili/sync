@@ -1,12 +1,19 @@
 import React, { Component } from "react";
 
-class Button extends Component<any, any> {
-  constructor(props: {
-    title: string;
-    onClick: () => {};
-    disabled: boolean;
-    style: any;
-  }) {
+interface Props {
+  title: string;
+  onClick: () => void;
+  disabled: boolean;
+  light?: boolean;
+  style?: any;  
+}
+
+interface State {
+  clicked: boolean;
+}
+
+class Button extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       clicked: false
