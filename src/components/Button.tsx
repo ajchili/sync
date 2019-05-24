@@ -2,9 +2,9 @@ import React, { Component } from "react";
 
 interface Props {
   title: string;
-  onClick: () => void;
-  disabled: boolean;
-  light?: boolean;
+  onClick?: () => void;
+  disabled?: any;
+  light?: any;
   style?: any;  
 }
 
