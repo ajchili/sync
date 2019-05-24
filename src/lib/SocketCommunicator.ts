@@ -1,5 +1,6 @@
 import { EventEmitter } from "events";
 import { Communicator } from "../services";
+import { User, Message } from "../components/RoomSidebar";
 
 export default class SocketCommunicator extends EventEmitter {
   private _socket: SocketIOClient.Socket;
@@ -31,8 +32,16 @@ export default class SocketCommunicator extends EventEmitter {
     this._socket.on("mediaTime", (data: any) => {
       this.emit("mediaTime", data);
     });
-    this._socket.on("users", (data: { users: Array<any> }) => {
+    this._socket.on("users", (data: { users: Array<User> }) => {
       this.emit("users", data.users);
+    });
+    this._socket.on("message", (data: { message: Message }) => {
+      this.emit("message", data.message);
+    });
+    this._socket.on("messages", (data: { messages: Array<Message> }) => {
+      data.messages.forEach((message: Message) => {
+        this.emit("message", message);
+      });
     });
     this._socket.on("closed", () => {
       this.emit("closed");
@@ -44,6 +53,9 @@ export default class SocketCommunicator extends EventEmitter {
   private emitDisplayName() {
     let displayName: string | null = window.localStorage.getItem("displayName");
     if (!!displayName) this._socket.emit("displayName", { displayName });
+  }
+  sendMessage(message: string) {
+    this._socket.emit("message", { message });
   }
   disconnect() {
     this._socket.disconnect();

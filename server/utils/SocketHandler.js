@@ -8,6 +8,7 @@ class SocketHanlder {
     this.mediaState = "paused";
     this.mediaTime = 0;
     this.connectedUsers = [];
+    this.messages = [];
     this.emitConnectedUsersInterval = null;
   }
 
@@ -37,6 +38,7 @@ class SocketHanlder {
     this.mediaState = "paused";
     this.mediaTime = 0;
     this.connectedUsers = [];
+    this.messages = [];
     clearInterval(this.emitConnectedUsersInterval);
   }
 
@@ -79,6 +81,17 @@ class SocketHanlder {
       socket.on("authenticate", data => {
         user.isHost = data.bearer === this.bearer;
         this.emitConnectedUsers();
+        this.emitMessages();
+      });
+      socket.on("message", data => {
+        let id = `_${Math.random()
+          .toString(36)
+          .substr(2, 9)}`;
+        let sender = user.displayName;
+        let timeSent = new Date().getTime();
+        let message = { id, sender, body: data.message, timeSent };
+        this.messages.push(message);
+        if (this.io) this.io.emit("message", { message });
       });
       socket.on("disconnect", () => {
         this.connectedUsers = this.connectedUsers.filter(connectedUser => {
@@ -99,6 +112,10 @@ class SocketHanlder {
       };
     });
     if (this.io) this.io.emit("users", { users });
+  }
+
+  emitMessages() {
+    if (this.io) this.io.emit("messages", { messages: this.messages });
   }
 }
 

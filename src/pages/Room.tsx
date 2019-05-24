@@ -1,31 +1,27 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { RoomSidebar } from "../components";
+import { User, Message } from "../components/RoomSidebar";
 import { Communicator, Swal } from "../services";
 import { SocketCommunicator } from "../lib";
 import io from "socket.io-client";
 
-interface User {
-  id: string;
-  displayName: string;
-  ping: number;
-  isHost: boolean;
-}
-
 interface State {
   url: string | null;
   users: Array<User>;
+  messages: Array<Message>;
 }
 
 class Room extends Component<any, State> {
   socket?: SocketCommunicator;
   videoRef: React.RefObject<HTMLVideoElement>;
-  constructor(props: {}) {
+  constructor(props: any) {
     super(props);
     this.videoRef = React.createRef();
     this.state = {
       url: null,
-      users: []
+      users: [],
+      messages: []
     };
   }
 
@@ -123,6 +119,11 @@ class Room extends Component<any, State> {
       this.socket.on("users", (users: Array<User>) => {
         this.setState({ users });
       });
+      this.socket.on("message", (message: Message) => {
+        const { messages } = this.state;
+        messages.push(message);
+        this.setState({ messages });
+      });
       this.socket.on("close", () => {
         history.push(
           "/",
@@ -166,7 +167,7 @@ class Room extends Component<any, State> {
 
   render() {
     const { location, match } = this.props;
-    const { url, users } = this.state;
+    const { url, users, messages } = this.state;
 
     return (
       <div className="full noScroll">
@@ -185,20 +186,24 @@ class Room extends Component<any, State> {
         ) : (
           <div
             style={{
-              width: "80%",
+              width: this.socket ? "80%" : "100%",
               height: "100%",
               backgroundColor: "#000000",
               float: "left"
             }}
           />
         )}
-        <RoomSidebar
-          roomId={match.params.id}
-          isHost={location.state && location.state.host}
-          setMedia={this._setMedia}
-          closeRoom={this._closeRoom}
-          users={users}
-        />
+        {this.socket && (
+          <RoomSidebar
+            roomId={match.params.id}
+            isHost={location.state && location.state.host}
+            setMedia={this._setMedia}
+            closeRoom={this._closeRoom}
+            sendMessage={(message: string) => this.socket!.sendMessage(message)}
+            users={users}
+            messages={messages}
+          />
+        )}
       </div>
     );
   }
