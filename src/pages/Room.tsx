@@ -1,15 +1,14 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import { RoomSidebar } from "../components";
-import { User, Message } from "../components/RoomSidebar";
 import { Communicator, Swal } from "../services";
-import { SocketCommunicator } from "../lib";
+import { SocketCommunicator, SocketUser, UserMessage } from "../lib";
 import io from "socket.io-client";
 
 interface State {
   url: string | null;
-  users: Array<User>;
-  messages: Array<Message>;
+  users: Array<SocketUser>;
+  messages: Array<UserMessage>;
 }
 
 class Room extends Component<any, State> {
@@ -116,10 +115,10 @@ class Room extends Component<any, State> {
           }
         }
       );
-      this.socket.on("users", (users: Array<User>) => {
+      this.socket.on("users", (users: Array<SocketUser>) => {
         this.setState({ users });
       });
-      this.socket.on("message", (message: Message) => {
+      this.socket.on("message", (message: UserMessage) => {
         const { messages } = this.state;
         messages.push(message);
         this.setState({ messages });

@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { Communicator } from "../services";
-import { User, Message } from "../components/RoomSidebar";
+import { SocketUser, UserMessage } from "../lib";
 
 export default class SocketCommunicator extends EventEmitter {
   private _socket: SocketIOClient.Socket;
@@ -32,14 +32,14 @@ export default class SocketCommunicator extends EventEmitter {
     this._socket.on("mediaTime", (data: any) => {
       this.emit("mediaTime", data);
     });
-    this._socket.on("users", (data: { users: Array<User> }) => {
+    this._socket.on("users", (data: { users: Array<SocketUser> }) => {
       this.emit("users", data.users);
     });
-    this._socket.on("message", (data: { message: Message }) => {
+    this._socket.on("message", (data: { message: UserMessage }) => {
       this.emit("message", data.message);
     });
-    this._socket.on("messages", (data: { messages: Array<Message> }) => {
-      data.messages.forEach((message: Message) => {
+    this._socket.on("messages", (data: { messages: Array<UserMessage> }) => {
+      data.messages.forEach((message: UserMessage) => {
         this.emit("message", message);
       });
     });

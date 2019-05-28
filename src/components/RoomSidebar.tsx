@@ -1,19 +1,6 @@
 import React, { Component } from "react";
-import { RoomSettings, RoomViewers } from "../components";
-
-export interface User {
-  id: string;
-  displayName: string;
-  ping: number;
-  isHost: boolean;
-}
-
-export interface Message {
-  id: string;
-  sender: string;
-  body: string;
-  timeSent: number;
-}
+import { RoomSettings, RoomViewers, Tooltip } from "../components";
+import { SocketUser, UserMessage } from "../lib";
 
 interface Props {
   roomId: string;
@@ -21,8 +8,8 @@ interface Props {
   setMedia: () => void;
   closeRoom: () => void;
   sendMessage: (message: string) => void;
-  users: Array<User>;
-  messages: Array<Message>;
+  users: Array<SocketUser>;
+  messages: Array<UserMessage>;
 }
 
 interface State {
@@ -86,15 +73,20 @@ class RoomSizebar extends Component<Props, State> {
               maxHeight: "100%"
             }}
           >
-            {messages.map((message: Message) => {
+            {messages.map((message: UserMessage) => {
               return (
-                <p key={message.id} style={{ color: "#ffffff", margin: 0 }}>
-                  {message.sender}: {message.body}
-                </p>
+                <Tooltip
+                  key={message.id}
+                  tooltip={new Date(message.timeSent).toString()}
+                  component={
+                    <p style={{ color: "#ffffff", margin: 0 }}>
+                      {message.sender}: {message.body}
+                    </p>
+                  }
+                />
               );
             })}
           </div>
-
           <input
             type="text"
             placeholder="Send a message..."
