@@ -68,24 +68,18 @@ class RoomSizebar extends Component<Props, State> {
               flexGrow: 1,
               backgroundColor: "#000000",
               overflowY: "scroll",
+              overflowX: "hidden",
               display: "flex",
               flexFlow: "column",
-              maxHeight: "100%"
+              maxHeight: "100%",
+              wordBreak: "break-all"
             }}
           >
-            {messages.map((message: UserMessage) => {
-              return (
-                <Tooltip
-                  key={message.id}
-                  tooltip={new Date(message.timeSent).toString()}
-                  component={
-                    <p style={{ color: "#ffffff", margin: 0 }}>
-                      {message.sender}: {message.body}
-                    </p>
-                  }
-                />
-              );
-            })}
+            {messages.map((message: UserMessage) => (
+              <p style={{ color: "#ffffff", margin: 0 }}>
+                {message.sender}: {message.body}
+              </p>
+            ))}
           </div>
           <input
             type="text"
