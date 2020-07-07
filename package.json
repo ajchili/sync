@@ -46,7 +46,7 @@
     "@types/react-dom": "^16.8.0",
     "@types/react-router-dom": "^4.3.1",
     "@types/socket.io-client": "^1.4.32",
-    "electron": "^4.0.4",
+    "electron": "^7.2.4",
     "gh-pages": "^2.0.1",
     "nodemon": "^1.18.10",
     "react-test-renderer": "^16.8.6"
