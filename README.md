@@ -1,3 +1,12 @@
 # sync
 
-A multi-media sharing application build with Node.js, Typescript, and ❤️.
+A multi-media sharing and viewing application build with Node.js, Typescript,
+React, and ❤️.
+
+## Getting Started
+
+<!-- TODO -->
+
+## Developers
+
+<!-- TODO -->
