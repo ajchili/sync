@@ -1,0 +1,19 @@
+{
+  "name": "sync",
+  "version": "4.0.0",
+  "description": "Multi-media sharing application.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajchili/sync.git"
+  },
+  "author": "Kirin Patel <kirinpatel@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajchili/sync/issues"
+  },
+  "homepage": "https://github.com/ajchili/sync#readme"
+}
