@@ -1,0 +1,12 @@
+{
+  "name": "@ajchili/sync",
+  "version": "4.0.0",
+  "description": "A multi-media sharing and viewing application build with Node.js, Typescript, Vite, React, and ❤️.",
+  "workspaces": [
+    "packages/**"
+  ],
+  "author": "Kirin Patel",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
